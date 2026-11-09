@@ -7,9 +7,10 @@
 [![Runs on ns-3](https://img.shields.io/badge/runs%20on-ns--3-informational)](https://www.nsnam.org)
 <!-- org-sync:end badges -->
 
-BeeAdHoc, the honeybee-inspired routing protocol of Wedde & Farooq (2005)
-(scouts, foragers, the dance floor, battery and delay metrics) as a
-simulator-agnostic `core/` plus the ns-3 contrib module `beeadhoc` on
+BeeAdHoc, the honeybee-inspired routing protocol of Wedde & Farooq (2005),
+as specified by the PG 460 report's Linux kernel module (scouts, foragers
+drawn from per-destination forager arrays, battery and delay metrics; #16),
+as a simulator-agnostic `core/` plus the ns-3 contrib module `beeadhoc` on
 [`swarm-core`](https://github.com/swarm-routing/ns3-swarm-core). **Status:**
 empty, populated in the org's Phase 4.
 
