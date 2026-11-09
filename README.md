@@ -1,5 +1,12 @@
 # BeeAdHoc
 
+<!-- org-sync:begin badges -->
+[![Licence: GPL-2.0-only, core/ tools/ MIT OR GPL-2.0-only](https://img.shields.io/badge/licence-GPL--2.0--only%2C%20core%2F%20tools%2F%20MIT%20OR%20GPL--2.0--only-blue)](LICENSING.md)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow)](https://www.conventionalcommits.org)
+[![C++20](https://img.shields.io/badge/C%2B%2B-20-blue?logo=cplusplus)](AGENTS.md)
+[![Runs on ns-3](https://img.shields.io/badge/runs%20on-ns--3-informational)](https://www.nsnam.org)
+<!-- org-sync:end badges -->
+
 BeeAdHoc, the honeybee-inspired routing protocol of Wedde & Farooq (2005)
 (scouts, foragers, the dance floor, battery and delay metrics) as a
 simulator-agnostic `core/` plus the ns-3 contrib module `beeadhoc` on
