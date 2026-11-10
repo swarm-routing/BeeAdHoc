@@ -67,9 +67,9 @@ version (ch. 3 or ch. 6) ch. 7 ran. See *Anchor candidate*.
 
 | Mechanism | Source | Implementation | Status |
 |---|---|---|---|
-| Strict source routing: the source writes the whole route into the packet; intermediate nodes follow it | [PG460] §12.1.2, Fig. 12.6 | A `BeeRouteTrailer` (route, 24-bit info field, an optional piggybacked forager) on every data packet; the destination strips it before local delivery | deviation: a trailer, not an IP option. The application header stays first, so the harness classifies flows unchanged. Its bytes (4 per node + 3 + 2) are on the air, so `nrl_bytes` pays for them |
+| Strict source routing: the source writes the whole route into the packet; intermediate nodes follow it | [PG460] §12.1.2, Fig. 12.6 | A `BeeRouteTrailer` (route, 24-bit info field, an optional piggybacked forager) on every data packet; the destination strips it before local delivery | deviation: a trailer, not an IP option. The application header stays first, so the harness classifies flows unchanged. Its bytes are on the air: 4 per route address + 4 per piggybacked address + 8 (two 24-bit info fields and 2 bytes of counts), the piggyback's info field included even when no forager rides along. The harness books them outside `nrl_bytes`, in `##INPKT##` and `nrlBytesIncl` (AntHocNet #808) |
 | A packet this node originates gets its route on the way out (OUTPUT chain) | [PG460] §12.1.3 | Never routed in `RouteOutput`: the base bounces it through loopback (AODV's deferred-route pattern), and `OnLoopedBack` puts the trailer onto IP's own copy and sends it at once when a forager exists; otherwise it is held for a scout | as written; settled ([PG460] §12.1.3). The loopback is ns-3 plumbing (AntHocNet #800 fix: adding the trailer to the application's packet made `OnOffApplication` re-send it) |
-| Longest route: 10 hops, from the 40-byte IP options budget | [PG460] §12.1.2 | `MaxHops` 10 | as written; settled ([PG460] §12.1.2) |
+| Longest route: 10 hops, from the 40-byte IP options budget | [PG460] §12.1.2, Listing 13.5 | `MaxHops` 10 | unknown: unresolved. §12.1.2 states 10 hops, but its own budget holds 8 four-byte route addresses, and Listing 13.5 rejects any route whose options (`IPT_BEEADHOC_OPTIONLENGTH` + 4 · route_length − 1, padded to 4) push the IP header past 15 words. That constant has no value in the report, so whether a 10-hop route fits is not settled |
 | Each forwarding host shifts the 24-bit info field left 3 bits and writes its 3-bit battery level (FORWARD chain) | [PG460] §12.1.2, §13.2.2, Listing 13.7 | Same, at every intermediate hop; the battery is the harness's energy accounting (`--energyJ`), read through an energy probe (AntHocNet #801) | as written; settled ([PG460] Listing 13.7) for the shift and the writers on the FORWARD chain. Which endpoint, if any, also writes a value is the open row below |
 | Battery level → 3-bit value | [PG460] Listing 13.7 | ≤ 9 % → 0, (9, 14] → 1, > 65 % → 7; levels 2–6 split (14, 65] into five equal bins of 10.2 % | unknown: unresolved. The listing elides levels 2–6 (`[.....]`); the arm's bins are an interpolation. Accounting only: a node at 0 % keeps transmitting. At the default 5000 J no node falls below about 79 % in a 900 s run, so every level reads 7 |
 | A node without battery data reports a full battery | [PG460] §13.1.2, §13.2.2 | `--energyJ=0` → every node reports 7 | as written; settled ([PG460] §13.1.2: without the ACPI patch a machine "will allways claim that its battery is full") |
@@ -102,7 +102,7 @@ version (ch. 3 or ch. 6) ch. 7 ran. See *Anchor candidate*.
 | `IPT_BEEADHOC_MAX_DANCES` | 8 | [PG460] §14.3.2 | settled. Also the direct-neighbour rating (Listing 13.15) |
 | `IPT_BEEADHOC_FORAGER_LIFETIME` | 2 | [PG460] §14.3.2 | settled for the value. Unit: §14.3.2 gives none; Listing 13.17 compares it with differences of `get_seconds()`, so seconds (the arm reads 2 s). The arm's 30 s is the hold-queue timeout, a different setting |
 | `IPT_BEEADHOC_FORAGER_DANCETIME` | 2 | [PG460] §14.3.2 | settled; seconds, by the same reading of Listing 13.17 |
-| `IPT_BEEADHOC_MAXHOPS` (longest route) | 10 | [PG460] §12.1.2 | settled: 3 bytes for the source-route option, 8 × 4 bytes of route, 5 bytes for the BeeAdHoc option |
+| `IPT_BEEADHOC_MAXHOPS` (longest route) | 10 | [PG460] §12.1.2 | unresolved: the stated value, but §12.1.2's budget (3 bytes for the source-route option, 8 × 4 bytes of route, 5 bytes for the BeeAdHoc option) and the 40-byte check of Listing 13.5 do not obviously allow 10 (see Mechanisms) |
 | Info field | 24 bits, 3 bits per hop | [PG460] §12.1.2 | settled: room for 8 values |
 | Rating divisor | 44 | [PG460] Listing 13.15 | settled |
 | `SCOUTLISTLENGTH` (scout seen list) | 30 | [PG460] §14.3.2 | settled |
@@ -159,7 +159,9 @@ thin by the report's own account.
 - **What comes next** (maintainer, #4, 2026-11-09): if settling a Listing
   13.15 reading changes the implementation, the anchor is re-registered under
   a new id; if both readings settle as implemented, `v270a` is re-run
-  unchanged on this repository.
+  unchanged on this repository. That unchanged re-run (10 seeds) is a
+  historical replication only: a comparison this repository counts needs
+  its own pre-registration with paired per-seed deltas over ≥ 20 seeds.
 
 ## Shared plumbing (from the arm)
 
