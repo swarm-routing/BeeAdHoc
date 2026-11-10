@@ -13,7 +13,7 @@ BeeAdHoc, the honeybee-inspired routing protocol of Wedde & Farooq (2005),
 in the version the PG 460 report's Linux kernel module specifies (chs. 12–13,
 the only version given down to its constants, and the one AntHocNet's arm
 follows; decided in #16): scouts, foragers drawn from per-destination
-forager arrays, and the battery/delay metrics, as a hexagonal `core/` + ns-3
+forager arrays, and the battery (energy) metric only (§13.2.2), as a hexagonal `core/` + ns-3
 `ns3/` (contrib module `beeadhoc`) on `swarm-core`, benchmarked against ARA,
 AntHocNet, AODV and OLSR. The formal model's packers and dance-floor
 recruitment (PG 460 ch. 4) are out of scope; adding them later is a
