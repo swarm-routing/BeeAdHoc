@@ -21,5 +21,4 @@ description = "BeeAdHoc, the honeybee-inspired routing protocol of Wedde & Faroo
 homepage = "https://swarm-routing.github.io/arena/BeeAdHoc/"
 topics = ["beeadhoc", "bee-colony", "swarm-intelligence", "manet", "ad-hoc-routing", "routing-protocol", "energy-aware-routing", "ns-3", "network-simulation"]
 ruleset = "protocol"
-# The PR-title and licence checks are added here once this repository runs them (swarm-routing/.github#117).
-required_checks = ["check / org-sync"]
+required_checks = ["check / org-sync", "title / title", "headers / licence"]
