@@ -7,7 +7,7 @@ before changing anything. Org-wide conventions:
 
 ## What this repo is
 
-**Status: `core/` in progress (Phase 4, #36).** Its first slice, route discovery (scouts with the seen list and the expanding ring, the three-type forager arrays, the Listing 13.15 rating, the `MAXAGE` collector, the scout wire header), builds and tests on its own; the data path (source-route trailer, foreign foragers, piggybacking), swarms and link failure come next. `ns3/` is still the plan (marked below); update this file in the PR that creates it.
+**Status: `core/` and `ns3/` in progress (Phase 4, #36, #47).** The core's first slice, route discovery (scouts with the seen list and the expanding ring, the three-type forager arrays, the Listing 13.15 rating, the `MAXAGE` collector, the scout wire header), builds and tests on its own and inside ns-3 as the contrib module `beeadhoc`, whose adapter carries it out on swarm-core's `SwarmRoutingBase`; the data path (source-route trailer, FORWARD-chain levels, foreign foragers, piggybacking), swarms and link failure come next (#36), then the gates (#47).
 
 BeeAdHoc, the honeybee-inspired routing protocol of Wedde & Farooq (2005),
 in the version the PG 460 report's Linux kernel module specifies (chs. 12–13,
@@ -27,9 +27,16 @@ core/       simulator-agnostic agents, forager arrays, metrics + unit tests (MIT
   beeadhoc-forager.*   battery levels, the rating, the forager store (three types, own/foreign, MAXAGE)
   beeadhoc-router.*    per-node state and decisions (ports in, RouteDecisions out)
   test/                the core tests (plain CMake + ctest; the ns-3 suite will run the same list)
-ns3/        (planned) contrib module `beeadhoc` (GPL-2.0-only): header codec, adapter, energy hook use, test suite
+ns3/        contrib module `beeadhoc` (GPL-2.0-only), compiling core/ on swarm-core
+  model/beeadhoc-header.*            ScoutHeader (core/'s scout codec as an ns3::Header) and RouteTag (the source route, interim until #36 slice 2's trailer, #47)
+  model/beeadhoc-routing-protocol.*  the adapter: one core::Router per node on SwarmRoutingBase; converts and carries out, no constant of its own
+  helper/beeadhoc-helper.*           BeeAdHocHelper (stack + protocol + monitors, EnergyMetricHook included)
+  helper/beeadhoc-bench-arms.cc      the `beeadhoc` arm of ns3-tools' routing-bench (compiled only beside it)
+  examples/beeadhoc-example.cc       a small RWP MANET; CI's determinism program
+  test/beeadhoc-test-suite.cc        test.py -s beeadhoc: the core tests, codec roundtrip + fuzz, chain delivery, the battery port, determinism
 docs/       fidelity.md: the fidelity sheet (#13), every row against PG 460's Linux module (chs. 12–13); GECCO 2005 once in hand (#5); PG 439 and Farooq's thesis do not specify BeeAdHoc
 .github/workflows/core.yml   core/ alone: strict warnings, tests, ASan + UBSan, clang-format (check `core`)
+.github/workflows/ns3.yml    ns3/ in ns3-dev latest debug + sanitized (reusable-ns3-ci.yml; checks `ci / ns-latest debug`, `ci / ns-latest sanitized`, `ci / format`)
 ```
 
 ## Build & verify
@@ -43,9 +50,12 @@ cmake -S core -B build/asan -DBEEADHOC_CORE_SANITIZE=ON -DSWARM_CORE_DIR=/path/t
 
 It fetches swarm-core at `SWARM_CORE_REF` unless `SWARM_CORE_DIR` names a
 checkout's `core/`; bump the pin together with `core-deps` in
-`.github/workflows/licence.yml` and `SWARM_CORE_REF` in the `Makefile`.
+`.github/workflows/licence.yml` and `.github/workflows/ns3.yml`, and
+`SWARM_CORE_REF` in the `Makefile`. The ns-3 module builds on swarm-core
+`main` instead (swarm-core golden rule 12), so a swarm-core `core/` change is
+met by a pin bump here.
 
-Once `ns3/` exists, its CI is [`reusable-ns3-ci.yml`](https://github.com/swarm-routing/.github/blob/main/.github/workflows/reusable-ns3-ci.yml):
+CI for `ns3/` is [`reusable-ns3-ci.yml`](https://github.com/swarm-routing/.github/blob/main/.github/workflows/reusable-ns3-ci.yml):
 the module builds inside `ghcr.io/swarm-routing/ns3-dev:latest-{debug,sanitized}`
 (warm ns-3 tree; only the module compiles) and runs its test.py suites.
 `latest` is the release ns-3 supports (it maintains its latest only), so
@@ -55,11 +65,24 @@ CONTRIBUTING invariant 7). The
 same locally:
 
 ```bash
-docker run --rm -v "$PWD:/src/beeadhoc:ro" ghcr.io/swarm-routing/ns3-dev:latest-debug \
-    ns3-build-contrib --test swarm-core=/src/ns3-swarm-core beeadhoc=/src/beeadhoc/ns3
+docker run --rm -v "$PWD:/src/beeadhoc:ro" -v "$PWD/../ns3-swarm-core:/src/ns3-swarm-core:ro" \
+    ghcr.io/swarm-routing/ns3-dev:latest-debug \
+    ns3-build-contrib --strict-warnings --quality-modules beeadhoc --test \
+    swarm-core=/src/ns3-swarm-core beeadhoc=/src/beeadhoc/ns3
 ```
 
-CI passes `dependencies: swarm-core=swarm-routing/ns3-swarm-core@main`.
+(`make test` does the same with `SWARM_CORE_NS3=<checkout>`, default
+`../ns3-swarm-core`). To build the harness arm and run it in the same
+container, also mount `swarm-routing/ns3-tools` at `/src/ns3-tools`, add
+`routing-bench=/src/ns3-tools/ns3/routing-bench` before `beeadhoc=`, and pass
+`--run "routing-compare --scenario=paper --nNodes=20 --time=30 --runs=1
+--protocols=beeadhoc"` to `ns3-build-contrib`. CI
+(`.github/workflows/ns3.yml`) passes `dependencies:
+swarm-core=swarm-routing/ns3-swarm-core@main` and
+`routing-bench=swarm-routing/ns3-tools@main:ns3/routing-bench`, runs
+`routing-compare --scenario=paper --nNodes=20 --time=30 --runs=1
+--protocols=beeadhoc` as the smoke and `beeadhoc-example --seed={seed}` as the
+determinism program.
 
 ## Golden rules (invariants — do not break)
 
