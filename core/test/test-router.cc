@@ -78,6 +78,16 @@ void TestExpandingRing(Checker& c) {
                     !net.at(0).searching(2),
                 "then the held packets are dropped");
     }
+    {
+        Config zero;
+        zero.initialScoutTtl = 0;
+        zero.maxScoutTtl = 0;
+        Network net(2, zero, 7);
+        net.at(0).routeOutput(1, ForagerType::Energy);
+        net.clock().runUntil(10.0);
+        c.check(net.broadcasts(0) == 2 && net.discards.size() == 1,
+                "a configured TTL of 0 reads as 1, and the search still gives up");
+    }
 }
 
 void TestScoutBounds(Checker& c) {

@@ -44,9 +44,8 @@ cmake -S core -B build/asan -DBEEADHOC_CORE_SANITIZE=ON -DSWARM_CORE_DIR=/path/t
 It fetches swarm-core at `SWARM_CORE_REF` unless `SWARM_CORE_DIR` names a
 checkout's `core/`; bump the pin together with `core-deps` in
 `.github/workflows/licence.yml` and `SWARM_CORE_REF` in the `Makefile`.
-Once `ns3/` exists:
 
-CI is [`reusable-ns3-ci.yml`](https://github.com/swarm-routing/.github/blob/main/.github/workflows/reusable-ns3-ci.yml):
+Once `ns3/` exists, its CI is [`reusable-ns3-ci.yml`](https://github.com/swarm-routing/.github/blob/main/.github/workflows/reusable-ns3-ci.yml):
 the module builds inside `ghcr.io/swarm-routing/ns3-dev:latest-{debug,sanitized}`
 (warm ns-3 tree; only the module compiles) and runs its test.py suites.
 `latest` is the release ns-3 supports (it maintains its latest only), so

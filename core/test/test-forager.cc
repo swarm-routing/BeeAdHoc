@@ -55,6 +55,9 @@ void TestRating(Checker& c) {
     c.check(rateForager(3, levels({7, 7, 0}), config) == 0, "one level 0 rates 0");
     c.check(rateForager(0, 0, config) == 0, "an empty route rates 0");
     c.check(rateForager(12, levels({7, 7, 7}), config) == 0, "never negative");
+    Config shortHops;
+    shortHops.maxHops = 2;  // (2 - 3) * 49 + 1 = -48: negative before the clamp
+    c.check(rateForager(4, levels({7, 7, 7, 7}), shortHops) == 0, "a negative result clamps to 0");
 }
 
 void TestForagerArrays(Checker& c) {

@@ -31,14 +31,15 @@ DataDecision Router::routeOutput(NodeAddress dest, ForagerType type) {
     if (searches_.contains(dest)) return {RouteAction::Queue, {}};
     if (searches_.size() >= config_.scoutRetransmitListLength) return {RouteAction::Drop, {}};
     Search& search = searches_[dest];
-    search.ttl = std::min(config_.initialScoutTtl, config_.maxScoutTtl);
+    // A TTL of 0 would never grow, so the ring could never give up: at least 1.
+    search.ttl = std::max<std::uint8_t>(std::min(config_.initialScoutTtl, config_.maxScoutTtl), 1);
     sendScout(dest, search);
     return {RouteAction::Queue, {}};
 }
 
 void Router::sendScout(NodeAddress dest, Search& search) {
     search.id = nextScoutId_++;
-    if (search.ttl >= config_.maxScoutTtl) ++search.roundsAtMax;
+    if (search.ttl >= std::max<std::uint8_t>(config_.maxScoutTtl, 1)) ++search.roundsAtMax;
     Scout s;
     s.mode = ScoutMode::Forward;
     s.source = self_;
@@ -56,13 +57,14 @@ void Router::onResendTimer(NodeAddress dest, std::uint32_t id) {
     auto it = searches_.find(dest);
     if (it == searches_.end() || it->second.id != id) return;  // answered or superseded
     Search& search = it->second;
-    if (search.ttl >= config_.maxScoutTtl && search.roundsAtMax >= config_.maxRoundsAtMaxTtl) {
+    if (search.ttl >= std::max<std::uint8_t>(config_.maxScoutTtl, 1) &&
+        search.roundsAtMax >= config_.maxRoundsAtMaxTtl) {
         searches_.erase(it);
         sink_(ScoutDecision::discardPending(dest));
         return;
     }
     search.ttl = static_cast<std::uint8_t>(
-        std::min<int>(2 * static_cast<int>(search.ttl), config_.maxScoutTtl));
+        std::min<int>(2 * static_cast<int>(search.ttl), std::max<int>(config_.maxScoutTtl, 1)));
     sendScout(dest, search);
 }
 
