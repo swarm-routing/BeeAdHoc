@@ -7,7 +7,7 @@ before changing anything. Org-wide conventions:
 
 ## What this repo is
 
-**Status: empty, populated in Phase 4.** The layout below is the plan; update this file in the PR that creates it.
+**Status: empty, populated in Phase 4.** Only `docs/fidelity.md` exists (#13); the rest of the layout below is the plan; update this file in the PR that creates each part.
 
 BeeAdHoc, the honeybee-inspired routing protocol of Wedde & Farooq (2005),
 in the version the PG 460 report's Linux kernel module specifies (chs. 12–13,
@@ -22,7 +22,7 @@ default-off mechanism with its own A/B.
 ```
 core/       simulator-agnostic agents, forager arrays, metrics + unit tests (MIT OR GPL-2.0-only)
 ns3/        contrib module `beeadhoc` (GPL-2.0-only): header codec, adapter, energy hook use, test suite
-docs/       fidelity sheet against PG 460's Linux module (chs. 12–13); GECCO 2005, PG 439 and Farooq's thesis where they agree
+docs/       fidelity.md: the fidelity sheet (#13), every row against PG 460's Linux module (chs. 12–13); GECCO 2005 once in hand (#5); PG 439 and Farooq's thesis do not specify BeeAdHoc
 ```
 
 ## Build & verify
