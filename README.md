@@ -19,7 +19,8 @@ as specified by the PG 460 report's Linux kernel module (scouts, foragers
 drawn from per-destination forager arrays, battery and delay metrics; #16),
 as a simulator-agnostic `core/` plus the ns-3 contrib module `beeadhoc` on
 [`swarm-core`](https://github.com/swarm-routing/ns3-swarm-core). **Status:**
-empty, populated in the org's Phase 4.
+empty, populated in the org's Phase 4. What the source specifies, row by
+row, and what is still open: [docs/fidelity.md](docs/fidelity.md).
 
 How to work here, for people and AI agents alike: [AGENTS.md](AGENTS.md) has
 the rules and how to build and verify; the org conventions are in
