@@ -1,0 +1,47 @@
+# Copyright (c) 2026 Daniel Joppi (https://github.com/swarm-routing)
+# SPDX-License-Identifier: GPL-2.0-only
+name: Core
+
+# BeeAdHoc's simulator-free core/ on its own (plain CMake + ctest, no ns-3
+# tree), with the org's quality gates for C++: strict warnings as errors (in
+# core/CMakeLists.txt), the tests under ASan + UBSan, and clang-format with the
+# org .clang-format. swarm-core's primitives come from the commit
+# core/CMakeLists.txt pins. Once ns3/ exists, reusable-ns3-ci.yml builds the
+# same sources inside ns-3 as well. The check name is `core`.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    name: core
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: swarm-routing/.github
+          path: .org
+          sparse-checkout: .clang-format
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Build and test (debug, strict warnings)
+        run: |
+          cmake -S core -B build/debug -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build/debug -j "$(nproc)"
+          ctest --test-dir build/debug --output-on-failure
+      - name: Build and test (ASan + UBSan)
+        run: |
+          cmake -S core -B build/sanitized -DCMAKE_BUILD_TYPE=Debug -DBEEADHOC_CORE_SANITIZE=ON \
+            -DSWARM_CORE_DIR="$PWD/build/debug/_deps/swarm_core_src-src/core"
+          cmake --build build/sanitized -j "$(nproc)"
+          ctest --test-dir build/sanitized --output-on-failure
+      - name: Format (org .clang-format)
+        run: git ls-files 'core/*.h' 'core/*.cc' | xargs clang-format-18 --style=file:.org/.clang-format --dry-run --Werror

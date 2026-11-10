@@ -18,8 +18,9 @@ arm's code, which stays GPL-2.0-only and never reaches `core/` (golden rule 12).
 
 **Implementation** describes AntHocNet's `beeadhoc` arm
 (`ns3/baselines/adaptive/model/beeadhoc-routing-protocol.{h,cc}`), the only
-implementation so far. `core/` is not written yet; it follows the rows that are
-settled and the repo choices, and waits on the open ones.
+implementation that runs. `core/` is being written (#36): its first slice
+(scouts, the forager arrays, the rating) follows the rows that are settled and
+the repo choices; where a row names what `core/` does, that is what it does.
 
 **Status** says how each row stands against the source (#13):
 
@@ -110,13 +111,14 @@ version (ch. 3 or ch. 6) ch. 7 ran. See *Anchor candidate*.
 | Info field | 24 bits, 3 bits per hop | [PG460] §12.1.2 | settled: room for 8 values |
 | Rating divisor | 44 | [PG460] Listing 13.15 | settled |
 | `SCOUTLISTLENGTH` (scout seen list) | 30 | [PG460] §14.3.2 | settled |
-| `RXMTLISTLENGTH` (scout retransmit list) | 30 | [PG460] §14.3.2 | settled; the arm keeps one pending scout per destination and does not size a list |
+| `RXMTLISTLENGTH` (scout retransmit list) | 30 | [PG460] §14.3.2 | settled; the arm keeps one pending scout per destination and does not size a list. `core/` keeps one search per destination, at most 30; a packet for a further destination is dropped (repo choice, #36: the report does not say what a full list does) |
 | `SCOUTRESENDRATE` | 500 | [PG460] §14.3.2 | settled for the value; jiffies (Listing 13.25 adds it to `jiffies`); 500 ms at HZ = 1000, which the report does not state (the arm's reading) |
 | `IPT_BEEADHOC_SWARMSIZE` | 20 | [PG460] §14.3.2 | settled |
 | `IPT_BEEADHOC_SWARMSIZE_OWN` | 11 | [PG460] §14.3.2 | settled |
 | `HASHSIZE` (destination hash table) | 256 | [PG460] §13.3 | settled; an implementation detail of the kernel table, no behaviour depends on it |
-| `IPT_BEEADHOC_ARRAYSIZE` (foragers per destination and type) | 64 | repo choice (maintainer decision 2026-11-10, [#13](https://github.com/swarm-routing/BeeAdHoc/issues/13#issuecomment-6756886273)): the arm's `ForagerArraySize` | Named in §13.3 (Listing 13.11), no value |
-| `IPT_BEEADHOC_MAXAGE` (garbage collection) | 30 s | repo choice (maintainer decision 2026-11-10, [#13](https://github.com/swarm-routing/BeeAdHoc/issues/13#issuecomment-6756886273)): new (the arm has no collector); well above the 2 s forager lifetime and the gaps of a steady flow, and equal to the hold-queue timeout | Named in §13.3, no value. A destination without traffic for `MAXAGE` is removed (Listing 13.14): a flow that sends less often than every 30 s can lose its foragers between packets (if a collection runs during the gap), and then its next packet waits for a scout. §13.3 also says a timer "will free all foragers after `MAXAGE` seconds"; `core/` reads that as the same age-based collection run every `MAXAGE` (a repo reading, not the report's words). The collection removes idle entries by age; it does not cap the number of destinations held (each destination's arrays are capped by `ARRAYSIZE`). A cap on destinations, and what to evict at it (golden rule 7), is unresolved |
+| `IPT_BEEADHOC_ARRAYSIZE` (foragers per destination and type) | 64 | repo choice (maintainer decision 2026-11-10, [#13](https://github.com/swarm-routing/BeeAdHoc/issues/13#issuecomment-6756886273)): the arm's `ForagerArraySize` | Named in §13.3 (Listing 13.11), no value. A full array drops its oldest forager to take a new one (repo choice, #36: the report does not say) |
+| `IPT_BEEADHOC_MAXAGE` (garbage collection) | 30 s | repo choice (maintainer decision 2026-11-10, [#13](https://github.com/swarm-routing/BeeAdHoc/issues/13#issuecomment-6756886273)): new (the arm has no collector); well above the 2 s forager lifetime and the gaps of a steady flow, and equal to the hold-queue timeout | Named in §13.3, no value. A destination without traffic for `MAXAGE` is removed (Listing 13.14): a flow that sends less often than every 30 s can lose its foragers between packets (if a collection runs during the gap), and then its next packet waits for a scout. §13.3 also says a timer "will free all foragers after `MAXAGE` seconds"; `core/` reads that as the same age-based collection run every `MAXAGE` (a repo reading, not the report's words). The collection removes idle entries by age; it does not cap the number of destinations held (each destination's arrays are capped by `ARRAYSIZE`); `Destinations held` below does |
+| Destinations held in the forager store | 256, the least recently used (put or take) evicted at the cap | repo choice (#36): golden rule 7 needs a cap and the report gives none; 256 is `HASHSIZE`, the kernel table's bucket count, and least recently used is the destination `MAXAGE` would collect first | Not in the report: the kernel's hash table grows until `MAXAGE` collects |
 | `IPT_BEEADHOC_GARBAGE_PROBAB` | 1 (collect on every put) | repo choice (maintainer decision 2026-11-10, [#13](https://github.com/swarm-routing/BeeAdHoc/issues/13#issuecomment-6756886273)): new (the arm has no collector); the probability spreads the kernel's CPU cost, which does not matter in simulation, and at 1 the collector draws no random number (golden rule 5) | Named in §13.3, no value |
 | Battery bins for levels 2–6 | five equal bins of 10.2 % over (14, 65] % | repo choice (maintainer decision 2026-11-10, [#13](https://github.com/swarm-routing/BeeAdHoc/issues/13#issuecomment-6756886273)): the arm's `BeeBatteryLevel` | Listing 13.7 elides them. (14, 24.2] → 2, (24.2, 34.4] → 3, (34.4, 44.6] → 4, (44.6, 54.8] → 5, (54.8, 65] → 6 |
 | Initial scout TTL | 2 | repo choice (maintainer decision 2026-11-10, [#5](https://github.com/swarm-routing/BeeAdHoc/issues/5#issuecomment-6756882422)): the arm's `InitialScoutTtl`, the value `v270a` ran | §13.5: "a small TTL". AntHocNet #806 found it decides the arm's delay (52.8 ms with it, 24.3 ms with TTL 10) |

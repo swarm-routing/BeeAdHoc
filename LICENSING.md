@@ -28,7 +28,9 @@ MIT option). Each source file states its licence in its
   nothing for it.
 - **The dependency only goes one way.** GPL code may use the dual-licensed
   parts; they never pull GPL-only code in. A `core/` file includes only the C++
-  standard library and other `core/` files. CI enforces it.
+  standard library, other `core/` files and the dual-licensed primitives of
+  [`swarm-core`](https://github.com/swarm-routing/ns3-swarm-core)'s `core/`.
+  CI enforces it.
 - **Combined artifacts** (an ns-3 build, a published image, the site) are
   distributed under GPL-2.0; each dual-licensed file inside keeps its notice.
 - **Contributions** to the dual-licensed paths are accepted under both
