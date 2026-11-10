@@ -7,7 +7,7 @@ before changing anything. Org-wide conventions:
 
 ## What this repo is
 
-**Status: empty, populated in Phase 4.** Only `docs/fidelity.md` exists (#13); the rest of the layout below is the plan; update this file in the PR that creates each part.
+**Status: `core/` in progress (Phase 4, #36).** Its first slice, route discovery (scouts with the seen list and the expanding ring, the three-type forager arrays, the Listing 13.15 rating, the `MAXAGE` collector, the scout wire header), builds and tests on its own; the data path (source-route trailer, foreign foragers, piggybacking), swarms and link failure come next. `ns3/` is still the plan (marked below); update this file in the PR that creates it.
 
 BeeAdHoc, the honeybee-inspired routing protocol of Wedde & Farooq (2005),
 in the version the PG 460 report's Linux kernel module specifies (chs. 12–13,
@@ -20,12 +20,31 @@ recruitment (PG 460 ch. 4) are out of scope; adding them later is a
 default-off mechanism with its own A/B.
 
 ```
-core/       simulator-agnostic agents, forager arrays, metrics + unit tests (MIT OR GPL-2.0-only)
-ns3/        contrib module `beeadhoc` (GPL-2.0-only): header codec, adapter, energy hook use, test suite
+core/       simulator-agnostic agents, forager arrays, metrics + unit tests (MIT OR GPL-2.0-only, core/LICENSE),
+            on swarm-core's dual-licensed core/ primitives (pinned: SWARM_CORE_REF in core/CMakeLists.txt)
+  beeadhoc-config.h    the protocol constants, each citing its docs/fidelity.md row or decision
+  beeadhoc-scout.*     the scout and its versioned wire header
+  beeadhoc-forager.*   battery levels, the rating, the forager store (three types, own/foreign, MAXAGE)
+  beeadhoc-router.*    per-node state and decisions (ports in, RouteDecisions out)
+  test/                the core tests (plain CMake + ctest; the ns-3 suite will run the same list)
+ns3/        (planned) contrib module `beeadhoc` (GPL-2.0-only): header codec, adapter, energy hook use, test suite
 docs/       fidelity.md: the fidelity sheet (#13), every row against PG 460's Linux module (chs. 12–13); GECCO 2005 once in hand (#5); PG 439 and Farooq's thesis do not specify BeeAdHoc
+.github/workflows/core.yml   core/ alone: strict warnings, tests, ASan + UBSan, clang-format (check `core`)
 ```
 
 ## Build & verify
+
+`core/` builds and tests alone, with no ns-3 tree (CI: `.github/workflows/core.yml`):
+
+```bash
+make core-test    # cmake -S core -B build/core && cmake --build build/core && ctest --test-dir build/core
+cmake -S core -B build/asan -DBEEADHOC_CORE_SANITIZE=ON -DSWARM_CORE_DIR=/path/to/ns3-swarm-core/core   # a local swarm-core
+```
+
+It fetches swarm-core at `SWARM_CORE_REF` unless `SWARM_CORE_DIR` names a
+checkout's `core/`; bump the pin together with `core-deps` in
+`.github/workflows/licence.yml` and `SWARM_CORE_REF` in the `Makefile`.
+Once `ns3/` exists:
 
 CI is [`reusable-ns3-ci.yml`](https://github.com/swarm-routing/.github/blob/main/.github/workflows/reusable-ns3-ci.yml):
 the module builds inside `ghcr.io/swarm-routing/ns3-dev:latest-{debug,sanitized}`
