@@ -14,3 +14,12 @@ limitations = """
   traffic. Out of scope; AntHocNet ADR-0020's default-off profile applies if a
   security profile is ever added.
 - A simulation protocol for ns-3, not a network stack for real radios."""
+
+[settings]
+# GitHub settings as code: swarm-routing/.github tools/repo-settings (#117).
+description = "BeeAdHoc, the honeybee-inspired routing protocol of Wedde & Farooq (2005), as a standalone swarm routing protocol for MANETs: scouts, foragers and an energy metric, as a simulator-agnostic C++ core and an ns-3 contrib module on swarm-core."
+homepage = "https://swarm-routing.github.io/arena/BeeAdHoc/"
+topics = ["beeadhoc", "bee-colony", "swarm-intelligence", "manet", "ad-hoc-routing", "routing-protocol", "energy-aware-routing", "ns-3", "network-simulation"]
+ruleset = "protocol"
+# The PR-title and licence checks are added here once this repository runs them (#117).
+required_checks = ["check / org-sync"]
