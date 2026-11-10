@@ -3,10 +3,11 @@ kind = "protocol"
 title = "BeeAdHoc"
 dual = ["core/", "tools/"]
 trust_boundary = """
-The decoder of the scout and forager headers (and the dance-floor state they
-feed), to be built on `swarm-core`'s bounds-checked little-endian readers
-with roundtrip and fuzz tests (org invariant 3). It is not written yet: until
-it is, nothing in this repository parses untrusted input."""
+The decoder of the scout header (`decodeScout` in `core/`, which feeds the
+forager arrays), built on `swarm-core`'s bounds-checked little-endian readers
+with roundtrip and fuzz tests (org invariant 3). The data-packet trailer that
+carries the route and piggybacked foragers is not written yet; its decoder
+will get the same tests."""
 limitations = """
 - **BeeAdHoc has no authentication** (Wedde & Farooq, 2005). Any node can forge
   scouts or foragers, and the battery and delay metrics they carry are
