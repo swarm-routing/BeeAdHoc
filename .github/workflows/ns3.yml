@@ -24,7 +24,12 @@ on:
         description: 'On demand: JSON list of older ns-3 releases (3.42+), e.g. ["3.48"]'
         default: ''
       profiles:
-        description: 'On demand: JSON list of image profiles. Older releases have a debug image; a sanitized one only where it was built on request (e.g. 3.48)'
+        description: 'On demand: image profiles. Older releases have a debug image; a sanitized one only where it was built on request (e.g. 3.48). Never optimized: CI runs debug or sanitized only'
+        type: choice
+        options:
+          - '["debug"]'
+          - '["sanitized"]'
+          - '["debug", "sanitized"]'
         default: '["debug"]'
 
 permissions:
