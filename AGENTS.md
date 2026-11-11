@@ -274,6 +274,7 @@ here is undone by the next `org_sync.py apply`).
 | You want to… | Go to |
 |--------------|-------|
 | The existing arm (GPL-2.0-only) | AntHocNet `ns3/baselines/adaptive/model/beeadhoc-routing-protocol.{h,cc}`, AntHocNet #589 (closed), #801, #806 |
+| Know which release a piece of work serves, or why something is not planned | [`docs/roadmap.md`](docs/roadmap.md): the release ladder v0.2.0 → v1.0.0 (maintainer decision 2026-11-11), exit criteria per release, `release:` labels |
 | Open anchor / fidelity work | AntHocNet #800, #807, #815 (migrating here) |
 | Residual-energy hook | `swarm-routing/ns3-swarm-core` (`EnergyMetricHook`) |
 | The org's invariants, labels, issue shape | [`swarm-routing/.github` CONTRIBUTING.md](https://github.com/swarm-routing/.github/blob/main/CONTRIBUTING.md) |
