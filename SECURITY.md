@@ -10,10 +10,13 @@ org-wide policy is [swarm-routing/.github SECURITY.md](https://github.com/swarm-
 code guarantees. A protocol: its wire-format decoder (org invariant 3). A
 tool: the parsers of files it reads. If nothing parses untrusted input, say
 so in one line. -->
-The decoder of the scout and forager headers (and the dance-floor state they
-feed), to be built on `swarm-core`'s bounds-checked little-endian readers
-with roundtrip and fuzz tests (org invariant 3). It is not written yet: until
-it is, nothing in this repository parses untrusted input.
+The decoder of the scout header (`core/beeadhoc-scout.cc`, read in ns-3
+through `ns3/model/beeadhoc-header.cc`), built on `swarm-core`'s
+bounds-checked little-endian readers with roundtrip and seeded fuzz tests
+(org invariant 3). It refuses a wrong version, an unknown mode, info bits
+above 24, a route longer than `MaxHops` + 1 nodes, a short buffer or trailing
+bytes. The data-path trailer and the swarm packet will be decoded the same
+way when they are written (#36).
 
 ## Known, by-design limitations (out of scope)
 

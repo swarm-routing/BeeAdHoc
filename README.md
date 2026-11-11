@@ -11,6 +11,7 @@
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=swarm-routing_BeeAdHoc&metric=bugs)](https://sonarcloud.io/summary/new_code?id=swarm-routing_BeeAdHoc)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=swarm-routing_BeeAdHoc&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=swarm-routing_BeeAdHoc)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=swarm-routing_BeeAdHoc&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=swarm-routing_BeeAdHoc)
+[![codecov](https://codecov.io/gh/swarm-routing/BeeAdHoc/graph/badge.svg)](https://codecov.io/gh/swarm-routing/BeeAdHoc)
 [![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/swarm-routing/BeeAdHoc?utm_source=oss&utm_medium=github&utm_campaign=swarm-routing%2FBeeAdHoc&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)](https://coderabbit.ai)
 <!-- org-sync:end badges -->
 
@@ -19,8 +20,10 @@ as specified by the PG 460 report's Linux kernel module (scouts, foragers
 drawn from per-destination forager arrays, a battery (energy) metric only; #16),
 as a simulator-agnostic `core/` plus the ns-3 contrib module `beeadhoc` on
 [`swarm-core`](https://github.com/swarm-routing/ns3-swarm-core). **Status:**
-the org's Phase 4; `core/` is being written (route discovery first, #36), the
-ns-3 module follows. What the source specifies, row by
+the org's Phase 4; route discovery, the first slice of `core/` (#36), runs in
+ns-3 as the module `beeadhoc` (scout codec, adapter, helper, example,
+`test.py -s beeadhoc`, and the `beeadhoc` arm of ns3-tools' `routing-compare`;
+#47); the data path, swarms and link failure follow, then the gates. What the source specifies, row by
 row, and what is still open: [docs/fidelity.md](docs/fidelity.md).
 
 **Release status:** the first release, v0.1.0, comes before the comparator gates (maintainer decision 2026-11-10): it has **not** cleared them (org golden rule 6: fidelity sheet, per-PR delivery smoke, anchor). It ships `core/` and `docs/`; the ns-3 module `beeadhoc` and the anchor are pending, so no number from v0.1.0 counts as a benchmark result. The gated release is proposed as v0.2.0. Releases are cut by [`release.yml`](https://github.com/swarm-routing/BeeAdHoc/blob/main/.github/workflows/release.yml) and listed under [Releases](https://github.com/swarm-routing/BeeAdHoc/releases).
@@ -38,7 +41,7 @@ What is planned and in progress here: the issues labelled [`epic`](https://githu
 
 | Epic | Status | Sub-issues closed |
 |------|--------|-------------------|
-| [#3](https://github.com/swarm-routing/BeeAdHoc/issues/3) BeeAdHoc as a standalone hexagonal protocol (Phase 4) | In progress | 3 / 6 |
+| [#3](https://github.com/swarm-routing/BeeAdHoc/issues/3) BeeAdHoc as a standalone hexagonal protocol (Phase 4) | In progress | 3 / 7 |
 
 <!-- epics:end -->
 
