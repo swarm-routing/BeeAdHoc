@@ -51,6 +51,7 @@ endif()
 
 add_library(swarm_core_primitives STATIC
   ${SWARM_CORE_DIR}/swarm-dedup-history.cc
+  ${SWARM_CORE_DIR}/swarm-observer.cc
 )
 target_include_directories(swarm_core_primitives PUBLIC ${SWARM_CORE_DIR})
 
@@ -67,6 +68,7 @@ add_executable(beeadhoc_core_tests
   test/all-tests.cc
   test/run-core-tests.cc
   test/test-forager.cc
+  test/test-observer.cc
   test/test-router.cc
   test/test-scout.cc
 )
