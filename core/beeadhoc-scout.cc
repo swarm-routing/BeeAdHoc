@@ -14,7 +14,7 @@ using swarm::core::WireWriter;
 
 std::vector<std::uint8_t> encodeScout(const Scout& s) {
     std::vector<std::uint8_t> out;
-    out.reserve(Scout::kFixedWireSize + 4 * s.route.size());
+    out.reserve(s.wireSize());
     WireWriter w(out);
     w.version(Scout::kWireVersion);
     w.u8(static_cast<std::uint8_t>(s.mode));

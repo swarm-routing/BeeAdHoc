@@ -70,14 +70,15 @@ public:
 /// path, as in the adapter. `log` records each send for determinism checks.
 class Network {
 public:
-    Network(int nodes, const Config& config, std::uint64_t seed, Time linkDelay = 0.001)
+    Network(int nodes, const Config& config, std::uint64_t seed, Time linkDelay = 0.001,
+            swarm::core::IRouterObserver* observer = nullptr)
         : config_(config), rng_(seed), linkDelay_(linkDelay), energy_(nodes) {
         for (int i = 0; i < nodes; ++i) {
             energy_[static_cast<std::size_t>(i)] = std::make_unique<FixedEnergy>();
             routers_.push_back(std::make_unique<Router>(
                 i, config_, clock_, rng_, clock_, *energy_[static_cast<std::size_t>(i)],
                 [this, i](const ScoutDecision& d) { send(i, d); },
-                [this, i](NodeAddress dest) { ready.push_back({i, dest}); }));
+                [this, i](NodeAddress dest) { ready.push_back({i, dest}); }, observer));
         }
     }
 

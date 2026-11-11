@@ -229,6 +229,13 @@ struct ChainRun {
     uint64_t backward = 0;  ///< backward scouts sent (each hop back)
     DeferredQueueStats queue0;
     uint32_t foragers0 = 0;  ///< node 0's foragers for node 3 after the run
+    // The base's trace sources, when the run connected them (#54).
+    uint32_t controlTx = 0;
+    uint32_t controlRx = 0;
+    uint32_t routeAdded = 0;
+    uint32_t dataDecisions = 0;
+    uint32_t stateSizes = 0;
+    std::string kindForward, kindBackward;
 };
 
 class Chain {
@@ -236,7 +243,7 @@ public:
     /// `drainRelay`: give node 1 a 10 J battery drained at 8 J/s until
     /// t = 0.85 s (the source's first update, at 0.1 s, starts the draw), so
     /// 4 J, 40 %, is left when the first scout passes at t = 1 s.
-    ChainRun Run(uint32_t seed, uint32_t packets, bool drainRelay = false) {
+    ChainRun Run(uint32_t seed, uint32_t packets, bool drainRelay = false, bool observe = false) {
         SwarmCoreSeed(seed);
         NodeContainer nodes;
         nodes.Create(4);
@@ -296,6 +303,16 @@ public:
         for (uint32_t i = 0; i < 4; ++i) {
             Proto(nodes.Get(i))
                 ->TraceConnect("ScoutTx", std::to_string(i), MakeCallback(&Chain::ScoutTx, this));
+            if (observe) {
+                auto p = Proto(nodes.Get(i));
+                p->TraceConnectWithoutContext("ControlTx", MakeCallback(&Chain::ControlTx, this));
+                p->TraceConnectWithoutContext("ControlRx", MakeCallback(&Chain::ControlRx, this));
+                p->TraceConnectWithoutContext("RouteChanged",
+                                              MakeCallback(&Chain::RouteChanged, this));
+                p->TraceConnectWithoutContext("DataDecision",
+                                              MakeCallback(&Chain::DataDecision, this));
+                p->TraceConnectWithoutContext("StateSize", MakeCallback(&Chain::StateSize, this));
+            }
         }
         Ptr<Socket> sink = Socket::CreateSocket(nodes.Get(3), UdpSocketFactory::GetTypeId());
         sink->Bind(InetSocketAddress(Ipv4Address::GetAny(), kDataPort));
@@ -309,6 +326,9 @@ public:
         Simulator::Run();
         m_run.queue0 = Proto(nodes.Get(0))->GetDeferredQueue()->Stats();
         m_run.foragers0 = Proto(nodes.Get(0))->Foragers(m_dst);
+        m_run.kindForward = Proto(nodes.Get(0))->KindName(static_cast<uint8_t>(ScoutMode::Forward));
+        m_run.kindBackward =
+            Proto(nodes.Get(0))->KindName(static_cast<uint8_t>(ScoutMode::Backward));
         m_src = nullptr;
         Simulator::Destroy();
         return m_run;
@@ -330,6 +350,13 @@ private:
            << (broadcast ? " bcast" : " ucast") << " info=" << info;
         m_run.trace.push_back(os.str());
     }
+    void ControlTx(uint8_t, bool, uint32_t) { ++m_run.controlTx; }
+    void ControlRx(uint8_t, uint32_t) { ++m_run.controlRx; }
+    void RouteChanged(Ipv4Address, Ipv4Address, bool added) {
+        if (added) ++m_run.routeAdded;
+    }
+    void DataDecision(Ipv4Address, swarm::core::RouteAction) { ++m_run.dataDecisions; }
+    void StateSize(uint32_t, uint32_t) { ++m_run.stateSizes; }
     void Send() {
         ++m_run.sent;
         m_src->SendTo(Create<Packet>(64), 0, InetSocketAddress(m_dst, kDataPort));
@@ -389,6 +416,28 @@ private:
     }
 };
 
+class ObserverTestCase : public TestCase {
+public:
+    ObserverTestCase()
+        : TestCase("observer: the base's trace sources fire and change no output (#54)") {}
+
+private:
+    void DoRun() override {
+        const ChainRun plain = Chain().Run(1, 10);
+        const ChainRun seen = Chain().Run(1, 10, false, true);
+        NS_TEST_ASSERT_MSG_GT(seen.controlTx, 0u, "ControlTx: scouts sent");
+        NS_TEST_EXPECT_MSG_GT(seen.controlRx, 0u, "ControlRx: scouts received");
+        NS_TEST_EXPECT_MSG_GT(seen.routeAdded, 0u, "RouteChanged: foragers added");
+        NS_TEST_EXPECT_MSG_GT(seen.dataDecisions, 0u, "DataDecision: data routed");
+        NS_TEST_EXPECT_MSG_GT(seen.stateSizes, 0u, "StateSize: the forager store grew");
+        NS_TEST_EXPECT_MSG_EQ(seen.kindForward, std::string("FORWARD_SCOUT"), "kind 0 named");
+        NS_TEST_EXPECT_MSG_EQ(seen.kindBackward, std::string("BACKWARD_SCOUT"), "kind 1 named");
+        // Connected sources never alter the run (org rule 5, observer contract).
+        NS_TEST_EXPECT_MSG_EQ((plain.trace == seen.trace), true, "identical trace");
+        NS_TEST_EXPECT_MSG_EQ(plain.received, seen.received, "identical delivery");
+    }
+};
+
 class DeterminismTestCase : public TestCase {
 public:
     DeterminismTestCase() : TestCase("determinism: same seed same trace, another seed another") {}
@@ -416,6 +465,7 @@ public:
         AddTestCase(new HeaderFuzzTestCase, TestCase::Duration::QUICK);
         AddTestCase(new ChainDeliveryTestCase, TestCase::Duration::QUICK);
         AddTestCase(new BatteryTestCase, TestCase::Duration::QUICK);
+        AddTestCase(new ObserverTestCase, TestCase::Duration::QUICK);
         AddTestCase(new DeterminismTestCase, TestCase::Duration::QUICK);
     }
 };

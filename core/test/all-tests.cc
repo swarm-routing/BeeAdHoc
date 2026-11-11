@@ -11,7 +11,7 @@ namespace beeadhoc::core::test {
 
 namespace {
 
-constexpr std::array<NamedTest, 13> kTests{{
+constexpr std::array<NamedTest, 16> kTests{{
     {"scout: wire roundtrip", TestScoutRoundtrip},
     {"scout: the decoder fails closed", TestScoutFailsClosed},
     {"scout: seeded fuzz (fails or round-trips to itself)", TestScoutFuzz},
@@ -25,6 +25,9 @@ constexpr std::array<NamedTest, 13> kTests{{
     {"discovery: expanding ring and give-up", TestExpandingRing},
     {"discovery: seen list, hop and search caps", TestScoutBounds},
     {"router: fixed seed, fixed trace", TestRouterDeterminism},
+    {"observer: every callback, kinds, bytes, footprint", TestObserverEvents},
+    {"observer: decisions and trace identical with and without", TestObserverReadOnly},
+    {"observer: store removals (array cap, LRU, MAXAGE, use)", TestObserverStore},
 }};
 
 }  // namespace
