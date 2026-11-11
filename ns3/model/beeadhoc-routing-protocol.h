@@ -32,7 +32,8 @@
 //    port; with none, the core reads "no battery data", level 7 (§13.1.2).
 // Every data packet is the energy type: the kernel module measures only
 // energy (§13.2.2), and the base hands the adapter no IP header to read a TOS
-// from (the TOS mapping is a question on the ns-3 issue).
+// from (accepted by the maintainer on 2026-11-11,
+// https://github.com/swarm-routing/BeeAdHoc/issues/47#issuecomment-6783813490).
 #ifndef BEEADHOC_ROUTING_PROTOCOL_H
 #define BEEADHOC_ROUTING_PROTOCOL_H
 

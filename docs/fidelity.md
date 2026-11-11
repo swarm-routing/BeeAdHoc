@@ -26,8 +26,8 @@ The ns-3 module `beeadhoc` (`ns3/`, #47) carries that slice out on swarm-core's
 5544 and the shared plumbing below (hold queue 64 packets / 30 s). Until #36's
 data-path slice lands, its data packets carry the forager's route as an ns-3
 packet tag, with no bytes on the air and no FORWARD-chain level writes, and
-every packet is the energy type; both are proposals awaiting the maintainer on
-[#47](https://github.com/swarm-routing/BeeAdHoc/issues/47). No parameter changed.
+every packet is the energy type; both are accepted by the maintainer on
+2026-11-11 ([#47](https://github.com/swarm-routing/BeeAdHoc/issues/47#issuecomment-6783813490)). No parameter changed.
 
 **Status** says how each row stands against the source (#13):
 
