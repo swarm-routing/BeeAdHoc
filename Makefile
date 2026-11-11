@@ -72,11 +72,11 @@ core-test: ## core/ alone, no ns-3: plain CMake + ctest with CI's strict warning
 # RELEASE_VERSION (locally: .cz.toml's version). A git archive of the commit, so
 # only tracked files, deterministically: beeadhoc-<ver>/ with
 # core/ with its LICENSE, docs/ (and ns3/ once it exists),
-# the licence files, README.md, AGENTS.md, the Makefile and CHANGELOG.md (once
+# the licence files, README.md, CITATION.cff, AGENTS.md, the Makefile and CHANGELOG.md (once
 # the first bump writes it).
 RELEASE_VERSION ?= $(shell sed -n 's/^version = "\(.*\)"$$/\1/p' .cz.toml)
 dist: ## the release asset in dist/: beeadhoc-<ver>.tar.gz
 	rm -rf dist && mkdir -p dist
 	git archive --format=tar.gz --prefix=beeadhoc-$(RELEASE_VERSION)/ -o dist/beeadhoc-$(RELEASE_VERSION).tar.gz HEAD \
-		$$(git ls-tree --name-only HEAD core ns3 docs LICENSE LICENSE-MIT LICENSING.md README.md AGENTS.md Makefile CHANGELOG.md)
+		$$(git ls-tree --name-only HEAD core ns3 docs LICENSE LICENSE-MIT LICENSING.md README.md CITATION.cff AGENTS.md Makefile CHANGELOG.md)
 	tar -tzf dist/beeadhoc-$(RELEASE_VERSION).tar.gz | grep -qx 'beeadhoc-$(RELEASE_VERSION)/core/LICENSE'
