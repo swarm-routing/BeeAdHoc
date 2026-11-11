@@ -73,12 +73,13 @@ flowchart TB
     I47 --> I41
     T2 --> I41
     I41 --> V02(["BeeAdHoc v0.2.0"])
-    SC2 -.->|"adopt the adapter additions"| V02
+    SC2 -->|"adopt the adapter additions"| V02
     V02 --> I5 & I27 & I55
     I5 & I27 & I55 --> V03(["BeeAdHoc v0.3.0"])
     T3 -.->|"contract v2 readers"| V03
-    V03 --> V10(["BeeAdHoc v1.0.0"])
-    V10 -.->|"released run recorded"| BM
+    V03 --> RUN["recorded released run<br/>(benchmarks global suite)"]
+    BM --> RUN
+    RUN --> V10(["BeeAdHoc v1.0.0"])
 
     style V02 fill:#fff8e6,stroke:#c48f00,stroke-dasharray:4 3
     style V03 fill:#fff8e6,stroke:#c48f00,stroke-dasharray:4 3
@@ -97,7 +98,7 @@ after its v0.3.0 review; they need a `reusable-release.yml` `increment` input
 | Release | Exit criteria |
 |---|---|
 | **v0.1.0** | `core/` and `docs/` released, ungated. **Shipped 2026-11-11** ([release v0.1.0](https://github.com/swarm-routing/BeeAdHoc/releases/tag/v0.1.0)). It has not cleared the comparator gates (org golden rule 6), so no number from it counts. |
-| **v0.2.0** | **Gated.** The ns-3 module `beeadhoc` is green on swarm-core; the router observer is adopted; the protocol has its own benchmark pipeline; the anchor has a verdict (PASS, or a written infeasibility verdict); the open items of `docs/fidelity.md` are settled.<br/>Scope: [#36](https://github.com/swarm-routing/BeeAdHoc/issues/36) the simulator-agnostic core (data path, swarms, link failure); [#47](https://github.com/swarm-routing/BeeAdHoc/issues/47) the `beeadhoc` contrib module; [#41](https://github.com/swarm-routing/BeeAdHoc/issues/41) the pipeline of paired smoke and anchor campaigns. The decision on the two Listing 13.15 interpretations, [#4](https://github.com/swarm-routing/BeeAdHoc/issues/4), is already closed (2026-11-10), so the anchor runs against the recorded reading. |
+| **v0.2.0** | **Gated.** The ns-3 module `beeadhoc` is green on swarm-core; the router observer is adopted; the protocol has its own benchmark pipeline; the anchor has a verdict (PASS, or a written infeasibility verdict); the rows of `docs/fidelity.md` that read `unknown: unresolved` (no issue owns them, such as the link-failure row) are each settled by a recorded reading or repo choice. The rows that wait on the papers (`unknown: open #5`, re-checked by [#5](https://github.com/swarm-routing/BeeAdHoc/issues/5) and [#27](https://github.com/swarm-routing/BeeAdHoc/issues/27)) are not a v0.2.0 prerequisite; they belong to v0.3.0.<br/>Scope: [#36](https://github.com/swarm-routing/BeeAdHoc/issues/36) the simulator-agnostic core (data path, swarms, link failure); [#47](https://github.com/swarm-routing/BeeAdHoc/issues/47) the `beeadhoc` contrib module; [#41](https://github.com/swarm-routing/BeeAdHoc/issues/41) the pipeline of paired smoke and anchor campaigns. The decision on the two Listing 13.15 interpretations, [#4](https://github.com/swarm-routing/BeeAdHoc/issues/4), is already closed (2026-11-10), so the anchor runs against the recorded reading. |
 | **v0.3.0** | **Reviewed.** Paper-review issues and perf follow-ups are closed, and any new mechanism is default-off with its A/B.<br/>Scope: [#5](https://github.com/swarm-routing/BeeAdHoc/issues/5) the anchor reviewed against GECCO 2005; [#27](https://github.com/swarm-routing/BeeAdHoc/issues/27) the fidelity sheet reviewed against GECCO 2005 and SIS 2005 (needs the GECCO paper); [#55](https://github.com/swarm-routing/BeeAdHoc/issues/55) forager take without copies, span-based route tag. |
 | **v1.0.0** | **Stability promise.** The wire format and the `core/` API are frozen; the protocol is paper-faithful with every deviation documented; the three comparator gates are passed; CI is green on the ns-3 release the org supports; a released run is recorded in the `benchmarks` global suite. |
 
@@ -123,5 +124,5 @@ None is open here today; add rows as such issues appear.
 
 - [Org ROADMAP](https://github.com/swarm-routing/.github/blob/main/ROADMAP.md): the cross-repo release train and the phases.
 - [CONTRIBUTING](https://github.com/swarm-routing/.github/blob/main/CONTRIBUTING.md): invariants, labels and issue shape.
-- [`docs/fidelity.md`](fidelity.md): paper section to implementation, and the open items v0.2.0 settles.
+- [`docs/fidelity.md`](fidelity.md): paper section to implementation, and the `unknown: unresolved` rows v0.2.0 settles.
 - [AntHocNet's roadmap](https://github.com/swarm-routing/AntHocNet/blob/main/docs/roadmap.md): the ladder this one follows.
