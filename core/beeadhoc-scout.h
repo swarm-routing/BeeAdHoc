@@ -17,8 +17,10 @@
 #define BEEADHOC_CORE_SCOUT_H
 
 #include "beeadhoc-config.h"
+#include "swarm-observer.h"
 
 #include <cstddef>
+#include <array>
 #include <cstdint>
 #include <optional>
 #include <span>
@@ -57,8 +59,20 @@ struct Scout {
     /// The source first, then each relay; on a backward scout the destination last.
     std::vector<NodeAddress> route;
 
+    /// The encoded size in bytes: what the router reports to its observer.
+    std::size_t wireSize() const { return kFixedWireSize + 4 * route.size(); }
+
     bool operator==(const Scout&) const = default;
 };
+
+/// The control kinds a reader names ("FORWARD_SCOUT", not "1"): the scout's
+/// wire mode byte is its kind. Foragers are not control messages in this
+/// slice (a forager is table state, built from a returned scout), so they
+/// have no kind yet; the data path (#36) adds one with its packet.
+inline constexpr std::array<swarm::core::KindName, 2> kKindNames{{
+    {static_cast<std::uint8_t>(ScoutMode::Forward), "FORWARD_SCOUT"},
+    {static_cast<std::uint8_t>(ScoutMode::Backward), "BACKWARD_SCOUT"},
+}};
 
 /// The encoded header.
 std::vector<std::uint8_t> encodeScout(const Scout& s);

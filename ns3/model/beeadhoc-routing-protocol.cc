@@ -25,6 +25,8 @@ TypeId RoutingProtocol::GetTypeId() {
             .AddTraceSource("ScoutTx", "A scout this node sent (mode byte, broadcast, info).",
                             MakeTraceSourceAccessor(&RoutingProtocol::m_scoutTx),
                             "ns3::beeadhoc::RoutingProtocol::ScoutTxCallback");
+    // The scout kinds' names for the observer's ControlTx/ControlRx readers (#54).
+    SwarmRoutingBase::SetKindNames(tid, core::kKindNames);
     return tid;
 }
 
@@ -52,7 +54,8 @@ void RoutingProtocol::DoInitialize() {
             NS_ASSERT_MSG(done, "the BeeAdHoc core sends scouts or DiscardPending only");
             (void)done;
         },
-        [this](swarm::core::NodeAddress dest) { ReleaseDeferred(ToIpv4Address(dest)); });
+        [this](swarm::core::NodeAddress dest) { ReleaseDeferred(ToIpv4Address(dest)); },
+        &Observer());
     SwarmRoutingBase::DoInitialize();
 }
 

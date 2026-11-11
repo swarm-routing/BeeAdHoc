@@ -24,6 +24,7 @@
 #include "beeadhoc-forager.h"
 #include "beeadhoc-scout.h"
 #include "swarm-dedup-history.h"
+#include "swarm-observer.h"
 #include "swarm-ports.h"
 #include "swarm-route-decision.h"
 
@@ -54,9 +55,17 @@ public:
 
     /// The ports must outlive the router, and the timers it schedules must
     /// not fire after it is destroyed (the adapter cancels them with it).
+    /// `observer` (optional, null: none, one pointer check per event) is only
+    /// read from: it hears each scout sent and received (kind = the scout's
+    /// mode byte, kKindNames; bytes = its encoded size), each forager added or
+    /// removed as a route change, each routeOutput decision (Unicast, Queue,
+    /// Drop; Deliver belongs to the data path, #36) and the forager store's
+    /// footprint when it changes. It never alters a decision or draws from
+    /// `rng`, so a fixed seed behaves the same with and without one.
     Router(NodeAddress self, const Config& config, swarm::core::IClock& clock,
            swarm::core::IRng& rng, swarm::core::ITimerScheduler& timers,
-           swarm::core::IEnergy& energy, Sink sink, RouteReady routeReady);
+           swarm::core::IEnergy& energy, Sink sink, RouteReady routeReady,
+           swarm::core::IRouterObserver* observer = nullptr);
 
     Router(const Router&) = delete;
     Router& operator=(const Router&) = delete;
@@ -83,6 +92,8 @@ private:
         int roundsAtMax = 0;  ///< scouts sent at maxScoutTtl
     };
 
+    DataDecision decide(NodeAddress dest, DataDecision d);
+    void emit(const ScoutDecision& d);
     std::uint8_t ownLevel() const;
     void sendScout(NodeAddress dest, Search& search);
     void onResendTimer(NodeAddress dest, std::uint32_t id);
@@ -98,6 +109,7 @@ private:
     swarm::core::IEnergy& energy_;
     Sink sink_;
     RouteReady routeReady_;
+    swarm::core::IRouterObserver* observer_;
 
     ForagerStore store_;
     swarm::core::DedupHistory seen_;          // SCOUTLISTLENGTH: (source, id)

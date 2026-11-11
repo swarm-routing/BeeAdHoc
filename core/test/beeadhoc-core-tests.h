@@ -25,6 +25,9 @@ void TestDestinationLevel(Checker& c);
 void TestExpandingRing(Checker& c);
 void TestScoutBounds(Checker& c);
 void TestRouterDeterminism(Checker& c);
+void TestObserverEvents(Checker& c);
+void TestObserverReadOnly(Checker& c);
+void TestObserverStore(Checker& c);
 
 struct NamedTest {
     const char* name;

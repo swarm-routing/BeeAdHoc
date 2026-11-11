@@ -12,10 +12,11 @@ using swarm::core::RouteAction;
 
 Router::Router(NodeAddress self, const Config& config, swarm::core::IClock& clock,
                swarm::core::IRng& rng, swarm::core::ITimerScheduler& timers,
-               swarm::core::IEnergy& energy, Sink sink, RouteReady routeReady)
+               swarm::core::IEnergy& energy, Sink sink, RouteReady routeReady,
+               swarm::core::IRouterObserver* observer)
     : self_(self), config_(config), clock_(clock), rng_(rng), timers_(timers), energy_(energy),
-      sink_(std::move(sink)), routeReady_(std::move(routeReady)), store_(config),
-      seen_(config.scoutSeenListLength) {
+      sink_(std::move(sink)), routeReady_(std::move(routeReady)), observer_(observer),
+      store_(config, observer), seen_(config.scoutSeenListLength) {
     // The MAXAGE timer of [PG460] §13.3, read as the same age-based collection
     // run every MAXAGE (fidelity row IPT_BEEADHOC_MAXAGE).
     if (config_.maxAge > 0.0) timers_.schedule(config_.maxAge, [this] { collectTimer(); });
@@ -25,16 +26,31 @@ std::uint8_t Router::ownLevel() const {
     return batteryLevel(energy_.residualEnergyFraction());
 }
 
+DataDecision Router::decide(NodeAddress dest, DataDecision d) {
+    if (observer_) observer_->onDataDecision(dest, d.action);
+    return d;
+}
+
+void Router::emit(const ScoutDecision& d) {
+    // DiscardPending is the adapter's cue to drop held packets, not a send.
+    if (observer_ && d.message)
+        observer_->onControlSent(static_cast<std::uint8_t>(d.message->mode),
+                                 d.action == RouteAction::Broadcast,
+                                 static_cast<std::uint32_t>(d.message->wireSize()));
+    sink_(d);
+}
+
 DataDecision Router::routeOutput(NodeAddress dest, ForagerType type) {
     if (auto f = store_.take(dest, type, clock_.now(), rng_); f && !f->route.empty())
-        return {RouteAction::Unicast, std::move(f->route)};
-    if (searches_.contains(dest)) return {RouteAction::Queue, {}};
-    if (searches_.size() >= config_.scoutRetransmitListLength) return {RouteAction::Drop, {}};
+        return decide(dest, {RouteAction::Unicast, std::move(f->route)});
+    if (searches_.contains(dest)) return decide(dest, {RouteAction::Queue, {}});
+    if (searches_.size() >= config_.scoutRetransmitListLength)
+        return decide(dest, {RouteAction::Drop, {}});
     Search& search = searches_[dest];
     // A TTL of 0 would never grow, so the ring could never give up: at least 1.
     search.ttl = std::max<std::uint8_t>(std::min(config_.initialScoutTtl, config_.maxScoutTtl), 1);
     sendScout(dest, search);
-    return {RouteAction::Queue, {}};
+    return decide(dest, {RouteAction::Queue, {}});
 }
 
 void Router::sendScout(NodeAddress dest, Search& search) {
@@ -48,7 +64,7 @@ void Router::sendScout(NodeAddress dest, Search& search) {
     s.ttl = search.ttl;
     s.route = {self_};
     seen_.record(self_, s.id);  // its own scout echoed back is a repeat
-    sink_(ScoutDecision::broadcast(std::move(s)));
+    emit(ScoutDecision::broadcast(std::move(s)));
     const std::uint32_t id = search.id;
     timers_.schedule(config_.scoutResendInterval, [this, dest, id] { onResendTimer(dest, id); });
 }
@@ -74,6 +90,9 @@ void Router::collectTimer() {
 }
 
 void Router::onScout(const Scout& scout, NodeAddress /*from*/) {
+    if (observer_)
+        observer_->onControlReceived(static_cast<std::uint8_t>(scout.mode),
+                                     static_cast<std::uint32_t>(scout.wireSize()));
     if (scout.route.empty() || scout.route.front() != scout.source) return;
     if (scout.mode == ScoutMode::Forward)
         onForwardScout(scout);
@@ -95,7 +114,7 @@ void Router::onForwardScout(const Scout& scout) {
         back.route.push_back(self_);
         back.info = pushInfo(scout.info, ownLevel());
         const NodeAddress previous = scout.route.back();
-        sink_(ScoutDecision::unicast(previous, std::move(back)));
+        emit(ScoutDecision::unicast(previous, std::move(back)));
         return;
     }
 
@@ -107,7 +126,7 @@ void Router::onForwardScout(const Scout& scout) {
     relay.info = pushInfo(scout.info, ownLevel());
     const Time delay = rng_.uniform() * config_.scoutJitterMax;
     timers_.schedule(delay, [this, s = std::move(relay)]() mutable {
-        sink_(ScoutDecision::broadcast(std::move(s)));
+        emit(ScoutDecision::broadcast(std::move(s)));
     });
 }
 
@@ -115,7 +134,7 @@ void Router::onBackwardScout(const Scout& scout) {
     const auto at = std::find(scout.route.begin(), scout.route.end(), self_);
     if (at == scout.route.end() || scout.route.back() != scout.destination) return;
     if (at != scout.route.begin()) {
-        sink_(ScoutDecision::unicast(*(at - 1), scout));
+        emit(ScoutDecision::unicast(*(at - 1), scout));
         return;
     }
     if (scout.source != self_) return;

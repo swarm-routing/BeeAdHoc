@@ -15,6 +15,7 @@
 #define BEEADHOC_CORE_FORAGER_H
 
 #include "beeadhoc-config.h"
+#include "swarm-observer.h"
 #include "swarm-ports.h"
 
 #include <array>
@@ -57,7 +58,10 @@ int rateForager(std::size_t routeLength, std::uint32_t info, const Config& confi
 
 class ForagerStore {
 public:
-    explicit ForagerStore(const Config& config);
+    /// `observer` (optional, null: none) hears every forager added or removed
+    /// as a route change toward its destination through route.front(), and the
+    /// store's footprint after each change (see footprint()).
+    explicit ForagerStore(const Config& config, swarm::core::IRouterObserver* observer = nullptr);
 
     /// Stores `f` for `dest`. A full array drops its oldest forager; a new
     /// destination at the cap evicts the least recently used one (ties: the
@@ -81,13 +85,31 @@ public:
     std::size_t destinations() const { return entries_.size(); }
     std::size_t size(NodeAddress dest, ForagerType type) const;
 
+    /// The routing-state footprint reported as onStateSize: `entries` is the
+    /// foragers held; `bytes` counts, per forager, its info, dances, creation
+    /// time and flag (17) plus 4 per hop, and per destination its address and
+    /// last use (12). A fixed model, not sizeof, so it is the same on every
+    /// build.
+    struct Footprint {
+        std::uint32_t entries = 0;
+        std::uint32_t bytes = 0;
+    };
+    Footprint footprint() const;
+
 private:
     struct Entry {
         std::array<std::vector<Forager>, kForagerTypes> arrays;
         Time lastUsed = 0.0;
     };
 
+    void added(NodeAddress dest, const Forager& f);
+    void removed(NodeAddress dest, const Forager& f);
+    void reportState();
+
     Config config_;
+    swarm::core::IRouterObserver* observer_;
+    Footprint reported_;
+    bool reportedAny_ = false;
     std::map<NodeAddress, Entry> entries_;  // ordered: iteration is deterministic
 };
 

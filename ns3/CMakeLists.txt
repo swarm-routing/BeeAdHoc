@@ -54,6 +54,7 @@ build_lib(
   TEST_SOURCES
     ${beeadhoc_core_dir}/test/all-tests.cc
     ${beeadhoc_core_dir}/test/test-forager.cc
+    ${beeadhoc_core_dir}/test/test-observer.cc
     ${beeadhoc_core_dir}/test/test-router.cc
     ${beeadhoc_core_dir}/test/test-scout.cc
     test/beeadhoc-test-suite.cc

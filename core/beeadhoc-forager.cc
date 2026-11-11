@@ -39,7 +39,43 @@ int rateForager(std::size_t routeLength, std::uint32_t info, const Config& confi
     return std::max(rating, 0);
 }
 
-ForagerStore::ForagerStore(const Config& config) : config_(config) {}
+ForagerStore::ForagerStore(const Config& config, swarm::core::IRouterObserver* observer)
+    : config_(config), observer_(observer) {}
+
+ForagerStore::Footprint ForagerStore::footprint() const {
+    Footprint f;
+    for (const auto& [dest, entry] : entries_) {
+        f.bytes += 12;
+        for (const auto& array : entry.arrays) {
+            for (const Forager& fg : array) {
+                ++f.entries;
+                f.bytes += 17 + 4 * static_cast<std::uint32_t>(fg.route.size());
+            }
+        }
+    }
+    return f;
+}
+
+void ForagerStore::added(NodeAddress dest, const Forager& f) {
+    if (observer_)
+        observer_->onRouteChanged(
+            dest, f.route.empty() ? swarm::core::kInvalidAddress : f.route.front(), true);
+}
+
+void ForagerStore::removed(NodeAddress dest, const Forager& f) {
+    if (observer_)
+        observer_->onRouteChanged(
+            dest, f.route.empty() ? swarm::core::kInvalidAddress : f.route.front(), false);
+}
+
+void ForagerStore::reportState() {
+    if (!observer_) return;
+    const Footprint now = footprint();
+    if (reportedAny_ && now.entries == reported_.entries && now.bytes == reported_.bytes) return;
+    reported_ = now;
+    reportedAny_ = true;
+    observer_->onStateSize(now.entries, now.bytes);
+}
 
 void ForagerStore::put(NodeAddress dest, ForagerType type, Forager f, Time now,
                        swarm::core::IRng& rng) {
@@ -49,19 +85,26 @@ void ForagerStore::put(NodeAddress dest, ForagerType type, Forager f, Time now,
             auto lru = std::min_element(
                 entries_.begin(), entries_.end(),
                 [](const auto& a, const auto& b) { return a.second.lastUsed < b.second.lastUsed; });
+            for (const auto& array : lru->second.arrays)
+                for (const Forager& old : array)
+                    removed(lru->first, old);
             entries_.erase(lru);
         }
         it = entries_.emplace(dest, Entry{}).first;
     }
     auto& array = it->second.arrays[static_cast<std::size_t>(type)];
-    if (array.size() >= std::max<std::size_t>(config_.foragerArraySize, 1))
+    if (array.size() >= std::max<std::size_t>(config_.foragerArraySize, 1)) {
+        removed(dest, array.front());
         array.erase(array.begin());
+    }
+    added(dest, f);
     array.push_back(std::move(f));
     it->second.lastUsed = now;
 
     if (config_.garbageProbability >= 1.0 ||
         (config_.garbageProbability > 0.0 && rng.uniform() < config_.garbageProbability))
         collect(now);
+    reportState();
 }
 
 std::optional<Forager> ForagerStore::take(NodeAddress dest, ForagerType type, Time now,
@@ -87,15 +130,27 @@ std::optional<Forager> ForagerStore::take(NodeAddress dest, ForagerType type, Ti
         }
         Forager used = std::move(*at);
         array.erase(at);
+        removed(dest, used);
         if (age > config_.foragerLifetime && !array.empty()) continue;
+        reportState();
         return used;
     }
+    reportState();
     return std::nullopt;
 }
 
 void ForagerStore::collect(Time now) {
-    std::erase_if(entries_,
-                  [&](const auto& e) { return now - e.second.lastUsed > config_.maxAge; });
+    for (auto it = entries_.begin(); it != entries_.end();) {
+        if (now - it->second.lastUsed > config_.maxAge) {
+            for (const auto& array : it->second.arrays)
+                for (const Forager& old : array)
+                    removed(it->first, old);
+            it = entries_.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    reportState();
 }
 
 std::size_t ForagerStore::size(NodeAddress dest, ForagerType type) const {

@@ -7,7 +7,7 @@ before changing anything. Org-wide conventions:
 
 ## What this repo is
 
-**Status: `core/` and `ns3/` in progress (Phase 4, #36, #47).** The core's first slice, route discovery (scouts with the seen list and the expanding ring, the three-type forager arrays, the Listing 13.15 rating, the `MAXAGE` collector, the scout wire header), builds and tests on its own and inside ns-3 as the contrib module `beeadhoc`, whose adapter carries it out on swarm-core's `SwarmRoutingBase`; the data path (source-route trailer, FORWARD-chain levels, foreign foragers, piggybacking), swarms and link failure come next (#36), then the gates (#47).
+**Status: `core/` and `ns3/` in progress (Phase 4, #36, #47).** The core's first slice, route discovery (scouts with the seen list and the expanding ring, the three-type forager arrays, the Listing 13.15 rating, the `MAXAGE` collector, the scout wire header), builds and tests on its own and inside ns-3 as the contrib module `beeadhoc`, whose adapter carries it out on swarm-core's `SwarmRoutingBase`; the core reports through swarm-core's optional `IRouterObserver*` (scouts sent and received by kind and bytes, forager adds and removes as route changes, `routeOutput` decisions, the forager store's footprint; `kKindNames` in `beeadhoc-scout.h`, #54) and the adapter hands it the base's observer; the data path (source-route trailer, FORWARD-chain levels, foreign foragers, piggybacking), swarms and link failure come next (#36), then the gates (#47).
 
 BeeAdHoc, the honeybee-inspired routing protocol of Wedde & Farooq (2005),
 in the version the PG 460 report's Linux kernel module specifies (chs. 12–13,
