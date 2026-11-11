@@ -17,6 +17,10 @@ ORG_REF   ?= main
 # swarm-core's core/ at the commit core/CMakeLists.txt pins (SWARM_CORE_REF), for the include check.
 SWARM_CORE_SRC ?= $(HOME)/.cache/swarm-routing/ns3-swarm-core
 SWARM_CORE_REF ?= ea0de23cc7d8e2b99ad9a6832c42d24c2f22a3bc
+# A checkout of swarm-routing/ns3-swarm-core (its main, as ns3.yml) for the ns-3 build.
+SWARM_CORE_NS3 ?= $(CURDIR)/../ns3-swarm-core
+NS3_RUN = docker run --rm -v "$(CURDIR):/src/beeadhoc:ro" -v "$(SWARM_CORE_NS3):/src/ns3-swarm-core:ro" $(NS3_IMAGE) \
+	ns3-build-contrib --strict-warnings --quality-modules beeadhoc
 
 .DEFAULT_GOAL := help
 .PHONY: help build test lint format check clean shell ci headers org-sync-check org-tools core-test swarm-core dist
@@ -25,10 +29,10 @@ help: ## list the targets
 	@awk 'BEGIN{FS=":.*## "} /^[a-zA-Z0-9_-]+:.*## /{printf "  %-16s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 build: ## build what this repo ships
-	if [ -d ns3 ]; then docker run --rm -v "$(CURDIR):/src:ro" $(NS3_IMAGE) ns3-build-contrib beeadhoc=/src/ns3; else echo "make build: no ns3/ module yet"; fi
+	$(NS3_RUN) swarm-core=/src/ns3-swarm-core beeadhoc=/src/beeadhoc/ns3
 
 test: core-test ## the fast tests CI runs on every PR
-	if [ -d ns3 ]; then docker run --rm -v "$(CURDIR):/src:ro" $(NS3_IMAGE) ns3-build-contrib --test beeadhoc=/src/ns3; else echo "make test: no ns3/ module yet"; fi
+	$(NS3_RUN) --test swarm-core=/src/ns3-swarm-core beeadhoc=/src/beeadhoc/ns3
 
 lint: ## static checks, no changes
 	git ls-files "*.h" "*.cc" "*.cpp" "*.hpp" | xargs -r clang-format --dry-run --Werror
