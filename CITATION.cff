@@ -1,5 +1,6 @@
 # Citation File Format (https://citation-file-format.github.io), seeded by
-# swarm-routing/.github org-sync (`citation = true`); the repository's own once
+# swarm-routing/.github org-sync (`citation = true`; `citation_type` and
+# `[[references]]` in .github/org-sync.toml); the repository's own once
 # written. Commitizen keeps `version:` in step (`.cz.toml` version_files
 # "CITATION.cff:^version:"); swarm-routing/.github tools/zenodo reads the
 # concept DOI from `doi:` once the first release is archived on Zenodo.
@@ -26,3 +27,42 @@ identifiers:
   - type: doi
     value: "10.5281/zenodo.24124821"
     description: "Concept DOI: always resolves to the latest released version."
+references:
+  - type: report
+    title: "BeeAdHoc: an Efficient, Secure and Scalable Routing Framework for Mobile AdHoc Networks"
+    authors:
+      - family-names: "Farooq"
+        given-names: "Muddassar"
+      - family-names: "Wedde"
+        given-names: "Horst F."
+    institution:
+      name: "University of Dortmund"
+    year: 2006
+    url: "https://hdl.handle.net/2003/22405"
+    notes: "The version this repository implements (its Linux kernel module, chs. 12-13): the source of every row in docs/fidelity.md. No DOI: Project Group 460's final report, in TU Dortmund's Eldorado repository."
+  - type: conference-paper
+    title: "BeeAdHoc: an energy efficient routing algorithm for mobile ad hoc networks inspired by bee behavior"
+    authors:
+      - family-names: "Wedde"
+        given-names: "Horst F."
+      - family-names: "Farooq"
+        given-names: "Muddassar"
+      - family-names: "Pannenbaecker"
+        given-names: "Thorsten"
+      - family-names: "Vogel"
+        given-names: "Bjoern"
+      - family-names: "Mueller"
+        given-names: "Christian"
+      - family-names: "Meth"
+        given-names: "Johannes"
+      - family-names: "Jeruschkat"
+        given-names: "Rene"
+    collection-title: "Proceedings of the 7th annual conference on Genetic and evolutionary computation"
+    collection-type: proceedings
+    start: "153"
+    end: "160"
+    year: 2005
+    publisher:
+      name: "ACM"
+    doi: "10.1145/1068009.1068034"
+    notes: "The protocol's citation of record (GECCO 2005)."

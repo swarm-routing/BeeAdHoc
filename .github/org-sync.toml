@@ -33,3 +33,28 @@ required_checks = ["check / org-sync", "title / title", "headers / licence", "co
 # Merge through a merge queue (swarm-routing/.github#130); every workflow behind a required
 # check also runs on merge_group.
 merge_queue = true
+
+# The work this repository implements or builds on: the README's Releases &
+# citing list and CITATION.cff's references (swarm-routing/.github org-sync,
+# #228). Every DOI confirmed with lit_search.py confirm; fields from Crossref.
+
+[[references]]
+type = "report"
+title = "BeeAdHoc: an Efficient, Secure and Scalable Routing Framework for Mobile AdHoc Networks"
+authors = ["Farooq, Muddassar", "Wedde, Horst F."]
+year = 2006
+venue = "University of Dortmund"
+url = "https://hdl.handle.net/2003/22405"
+no_doi = "Project Group 460's final report, in TU Dortmund's Eldorado repository."
+role = "The version this repository implements (its Linux kernel module, chs. 12-13): the source of every row in docs/fidelity.md."
+
+[[references]]
+type = "conference-paper"
+title = "BeeAdHoc: an energy efficient routing algorithm for mobile ad hoc networks inspired by bee behavior"
+authors = ["Wedde, Horst F.", "Farooq, Muddassar", "Pannenbaecker, Thorsten", "Vogel, Bjoern", "Mueller, Christian", "Meth, Johannes", "Jeruschkat, Rene"]
+year = 2005
+venue = "Proceedings of the 7th annual conference on Genetic and evolutionary computation"
+pages = "153-160"
+publisher = "ACM"
+doi = "10.1145/1068009.1068034"
+role = "The protocol's citation of record (GECCO 2005)."
