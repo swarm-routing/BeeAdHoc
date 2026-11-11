@@ -16,7 +16,7 @@ ORG_DIR   ?= $(HOME)/.cache/swarm-routing/dotgithub
 ORG_REF   ?= main
 # swarm-core's core/ at the commit core/CMakeLists.txt pins (SWARM_CORE_REF), for the include check.
 SWARM_CORE_SRC ?= $(HOME)/.cache/swarm-routing/ns3-swarm-core
-SWARM_CORE_REF ?= ea0de23cc7d8e2b99ad9a6832c42d24c2f22a3bc
+SWARM_CORE_REF ?= 3ced81506bd906163dc83f5825d77ca170609dfb
 # A checkout of swarm-routing/ns3-swarm-core (its main, as ns3.yml) for the ns-3 build.
 SWARM_CORE_NS3 ?= $(CURDIR)/../ns3-swarm-core
 NS3_RUN = docker run --rm -v "$(CURDIR):/src/beeadhoc:ro" -v "$(SWARM_CORE_NS3):/src/ns3-swarm-core:ro" $(NS3_IMAGE) \
@@ -72,11 +72,11 @@ core-test: ## core/ alone, no ns-3: plain CMake + ctest with CI's strict warning
 # RELEASE_VERSION (locally: .cz.toml's version). A git archive of the commit, so
 # only tracked files, deterministically: beeadhoc-<ver>/ with
 # core/ with its LICENSE, docs/ (and ns3/ once it exists),
-# the licence files, README.md, AGENTS.md, the Makefile and CHANGELOG.md (once
+# the licence files, README.md, CITATION.cff, AGENTS.md, the Makefile and CHANGELOG.md (once
 # the first bump writes it).
 RELEASE_VERSION ?= $(shell sed -n 's/^version = "\(.*\)"$$/\1/p' .cz.toml)
 dist: ## the release asset in dist/: beeadhoc-<ver>.tar.gz
 	rm -rf dist && mkdir -p dist
 	git archive --format=tar.gz --prefix=beeadhoc-$(RELEASE_VERSION)/ -o dist/beeadhoc-$(RELEASE_VERSION).tar.gz HEAD \
-		$$(git ls-tree --name-only HEAD core ns3 docs LICENSE LICENSE-MIT LICENSING.md README.md AGENTS.md Makefile CHANGELOG.md)
+		$$(git ls-tree --name-only HEAD core ns3 docs LICENSE LICENSE-MIT LICENSING.md README.md CITATION.cff AGENTS.md Makefile CHANGELOG.md)
 	tar -tzf dist/beeadhoc-$(RELEASE_VERSION).tar.gz | grep -qx 'beeadhoc-$(RELEASE_VERSION)/core/LICENSE'
