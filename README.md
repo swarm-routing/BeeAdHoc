@@ -36,6 +36,29 @@ How to work here, for people and AI agents alike: [AGENTS.md](AGENTS.md) has
 the rules and how to build and verify; the org conventions are in
 [CONTRIBUTING.md](https://github.com/swarm-routing/.github/blob/main/CONTRIBUTING.md).
 
+<!-- org-sync:begin citing -->
+## Releases & citing
+
+Versions follow [SemVer](https://semver.org) ([CHANGELOG.md](CHANGELOG.md)). Each release is listed under [Releases](https://github.com/swarm-routing/BeeAdHoc/releases), built by the org's release workflow and archived on [Zenodo](https://zenodo.org) with its own DOI.
+
+To cite this repository, use the “Cite this repository” button (from [CITATION.cff](CITATION.cff)):
+
+| DOI | resolves to |
+|---|---|
+| [`10.5281/zenodo.24124821`](https://doi.org/10.5281/zenodo.24124821) | **concept DOI**: always the latest release. This is the badge above, and the right citation when you mean this project. |
+
+Each release also has its own **version DOI**, listed on [its Zenodo record](https://doi.org/10.5281/zenodo.24124821): cite that one when you reproduce a number measured at that release.
+
+Please also cite the work it builds on:
+
+- M. Farooq, H. F. Wedde, *BeeAdHoc: an Efficient, Secure and Scalable Routing Framework for Mobile AdHoc Networks*, University of Dortmund, 2006, <https://hdl.handle.net/2003/22405> (no DOI: Project Group 460's final report, in TU Dortmund's Eldorado repository). The version this repository implements (its Linux kernel module, chs. 12-13): the source of every row in docs/fidelity.md.
+- H. F. Wedde et al., *BeeAdHoc: an energy efficient routing algorithm for mobile ad hoc networks inspired by bee behavior*, Proceedings of the 7th annual conference on Genetic and evolutionary computation, pp. 153–160, 2005, [doi:10.1145/1068009.1068034](https://doi.org/10.1145/1068009.1068034). The protocol's citation of record (GECCO 2005).
+
+What this implementation reproduces from its sources, and every deliberate deviation, is in [docs/fidelity.md](docs/fidelity.md).
+
+Using it in your work? Contributions are welcome, and citing the DOI helps just as much.
+<!-- org-sync:end citing -->
+
 ## Epics
 
 <!-- epics:begin -->
