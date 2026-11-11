@@ -23,6 +23,8 @@ the org's Phase 4; `core/` is being written (route discovery first, #36), the
 ns-3 module follows. What the source specifies, row by
 row, and what is still open: [docs/fidelity.md](docs/fidelity.md).
 
+**Release status:** the first release, v0.1.0, comes before the comparator gates (maintainer decision 2026-11-10): it has **not** cleared them (org golden rule 6: fidelity sheet, per-PR delivery smoke, anchor). It ships `core/` and `docs/`; the ns-3 module `beeadhoc` and the anchor are pending, so no number from v0.1.0 counts as a benchmark result. The gated release is proposed as v0.2.0. Releases are cut by [`release.yml`](https://github.com/swarm-routing/BeeAdHoc/blob/main/.github/workflows/release.yml) and listed under [Releases](https://github.com/swarm-routing/BeeAdHoc/releases).
+
 How to work here, for people and AI agents alike: [AGENTS.md](AGENTS.md) has
 the rules and how to build and verify; the org conventions are in
 [CONTRIBUTING.md](https://github.com/swarm-routing/.github/blob/main/CONTRIBUTING.md).
@@ -36,7 +38,7 @@ What is planned and in progress here: the issues labelled [`epic`](https://githu
 
 | Epic | Status | Sub-issues closed |
 |------|--------|-------------------|
-| [#3](https://github.com/swarm-routing/BeeAdHoc/issues/3) BeeAdHoc as a standalone hexagonal protocol (Phase 4) | In progress | 3 / 5 |
+| [#3](https://github.com/swarm-routing/BeeAdHoc/issues/3) BeeAdHoc as a standalone hexagonal protocol (Phase 4) | In progress | 3 / 6 |
 
 <!-- epics:end -->
 
