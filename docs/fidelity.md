@@ -52,7 +52,7 @@ Parameters carry the same status at the start of their Notes.
 | F06 | Farooq, *From the wisdom of the hive to intelligent routing in telecommunication networks: a step towards intelligent network management through natural engineering*, PhD thesis, Technische Universität Dortmund, 2006 | <https://doi.org/10.17877/DE290R-58> |
 | PG439 | Bensmann et al., *BEEhive - an Energy-Aware Scheduling and Routing Framework*, Technical report, Universität Dortmund, Fachbereich Informatik, 2005 | <https://doi.org/10.17877/DE290R-14353> |
 | PG460 | Farooq & Wedde, *BeeAdHoc: an efficient, secure and scalable routing framework for mobile adhoc networks*, Technical report, Technische Universität Dortmund, 2006 | <https://doi.org/10.17877/DE290R-14312> |
-| SwarmCore | Joppi, *ns3-swarm-core*, version v0.1.0, Zenodo, 2026 | <https://doi.org/10.5281/zenodo.24138628> |
+| SwarmCore | Joppi, *ns3-swarm-core*, Zenodo, 2026 | <https://doi.org/10.5281/zenodo.24138628> |
 | W05 | Wedde et al., *BeeAdHoc: an energy efficient routing algorithm for mobile ad hoc networks inspired by bee behavior*, Proceedings of the 7th annual conference on Genetic and evolutionary computation, 2005, pp. 153–160 | <https://doi.org/10.1145/1068009.1068034> |
 | WF05 | Wedde & Farooq, *The wisdom of the hive applied to mobile ad-hoc networks*, Proceedings 2005 IEEE Swarm Intelligence Symposium, 2005. SIS 2005., 2005, pp. 341–348 | <https://doi.org/10.1109/sis.2005.1501641> |
 <!-- fidelity:sources:end -->
