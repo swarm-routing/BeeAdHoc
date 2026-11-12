@@ -51,8 +51,8 @@ Each release also has its own **version DOI**, listed on [its Zenodo record](htt
 
 Please also cite the work it builds on:
 
-- M. Farooq, H. F. Wedde, *BeeAdHoc: an Efficient, Secure and Scalable Routing Framework for Mobile AdHoc Networks*, University of Dortmund, 2006, <https://hdl.handle.net/2003/22405> (no DOI: Project Group 460's final report, in TU Dortmund's Eldorado repository). The version this repository implements (its Linux kernel module, chs. 12-13): the source of every row in docs/fidelity.md.
-- H. F. Wedde et al., *BeeAdHoc: an energy efficient routing algorithm for mobile ad hoc networks inspired by bee behavior*, Proceedings of the 7th annual conference on Genetic and evolutionary computation, pp. 153–160, 2005, [doi:10.1145/1068009.1068034](https://doi.org/10.1145/1068009.1068034). The protocol's citation of record (GECCO 2005).
+- M. Farooq, H. F. Wedde, *BeeAdHoc: an efficient, secure and scalable routing framework for mobile adhoc networks*, Technische Universität Dortmund, 2006, [doi:10.17877/DE290R-14312](https://doi.org/10.17877/DE290R-14312). The version this repository implements (Project Group 460's final report, its Linux kernel module, chs. 12-13): the source of every row in docs/fidelity.md.
+- D. H. Joppi, *ns3-swarm-core*, 2026, [doi:10.5281/zenodo.24138628](https://doi.org/10.5281/zenodo.24138628). The shared primitives core/ builds on (pinned by commit: SWARM_CORE_REF) and the ns-3 base the adapter derives from (SwarmRoutingBase).
 
 What this implementation reproduces from its sources, and every deliberate deviation, is in [docs/fidelity.md](docs/fidelity.md).
 
