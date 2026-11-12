@@ -46,13 +46,26 @@ Parameters carry the same status at the start of their Notes.
 
 ## Sources
 
-| Key | Citation | Access |
+<!-- fidelity:sources:begin -->
+| Key | Citation | Link |
 |---|---|---|
-| PG460 | M. Farooq, H. F. Wedde (instructors), J. Fischer, M. Kowalski, M. Langhans, N. Range, C. Schletter, R. Tarak, M. Tchatcheu, C. Timm, F. Volmering, S. Werner, K. Wang, *BeeAdHoc: an Efficient, Secure and Scalable Routing Framework for Mobile AdHoc Networks*, Project Group 460 Final Report, University of Dortmund, 2006, hdl 2003/22405 (TU Dortmund Eldorado; no DOI). The source of every row below | in hand |
-| W05 | H. F. Wedde, M. Farooq, T. Pannenbaecker, B. Vogel, C. Mueller, J. Meth, R. Jeruschkat, *BeeAdHoc: an energy efficient routing algorithm for mobile ad hoc networks inspired by bee behavior*, Proc. GECCO 2005, ACM, pp. 153–160, DOI 10.1145/1068009.1068034 (authors, year, venue and pages agree across Crossref, Semantic Scholar and OpenAlex). The citation of record; **not held** (ACM 403, no open copy). No row cites it (#5) | institution |
-| WF05 | H. F. Wedde, M. Farooq, *The wisdom of the hive applied to mobile ad-hoc networks*, Proc. IEEE Swarm Intelligence Symposium (SIS 2005), pp. 341–348, DOI 10.1109/SIS.2005.1501641 (authors, venue and pages agree across the three indexes). **Not held**; may carry the multi-protocol evaluation (#5). No row cites it | institution |
-| F06 | M. Farooq, *From the Wisdom of the Hive to Intelligent Routing in Telecommunication Networks*, PhD dissertation, University of Dortmund, 2006, hdl 2003/22186. Mostly BeeHive on fixed networks; BeeAdHoc appears only as the MANET prototype (§1.3). Not a BeeAdHoc specification; no row cites it | in hand |
-| PG439 | H. F. Wedde, M. Farooq (instructors) et al., *BEEhive: an Energy-Aware Scheduling and Routing Framework*, Project Group 439 Final Report, University of Dortmund, 2004, hdl 2003/21407. PG 460's predecessor (BeeHive); it does not specify the Linux module. No row cites it | in hand |
+| F06 | Farooq, *From the wisdom of the hive to intelligent routing in telecommunication networks: a step towards intelligent network management through natural engineering*, PhD thesis, Technische Universität Dortmund, 2006 | <https://doi.org/10.17877/DE290R-58> |
+| PG439 | Bensmann et al., *BEEhive - an Energy-Aware Scheduling and Routing Framework*, Technical report, Universität Dortmund, Fachbereich Informatik, 2005 | <https://doi.org/10.17877/DE290R-14353> |
+| PG460 | Farooq & Wedde, *BeeAdHoc: an efficient, secure and scalable routing framework for mobile adhoc networks*, Technical report, Technische Universität Dortmund, 2006 | <https://doi.org/10.17877/DE290R-14312> |
+| SwarmCore | Joppi, *ns3-swarm-core*, version v0.1.0, Zenodo, 2026 | <https://doi.org/10.5281/zenodo.24138628> |
+| W05 | Wedde et al., *BeeAdHoc: an energy efficient routing algorithm for mobile ad hoc networks inspired by bee behavior*, Proceedings of the 7th annual conference on Genetic and evolutionary computation, 2005, pp. 153–160 | <https://doi.org/10.1145/1068009.1068034> |
+| WF05 | Wedde & Farooq, *The wisdom of the hive applied to mobile ad-hoc networks*, Proceedings 2005 IEEE Swarm Intelligence Symposium, 2005. SIS 2005., 2005, pp. 341–348 | <https://doi.org/10.1109/sis.2005.1501641> |
+<!-- fidelity:sources:end -->
+
+The entries live in [`references.bib`](references.bib); the table is
+generated from it (`fidelity.py bib sources`). [PG460] (chs. 12–13, the Linux
+kernel module) is the source of every row below. [W05] is the protocol's
+citation of record; it has not been read for this sheet, and no row cites it
+(#5). [WF05] may carry the multi-protocol evaluation (#5); not read, no row
+cites it. [F06] is mostly BeeHive on fixed networks, with BeeAdHoc only as the
+MANET prototype (§1.3): not a BeeAdHoc specification, no row cites it. [PG439]
+is PG 460's predecessor (BeeHive); it does not specify the Linux module, and
+no row cites it.
 
 ## Which version of BeeAdHoc
 
@@ -140,8 +153,8 @@ version (ch. 3 or ch. 6) ch. 7 ran. See *Anchor candidate*.
 |---|---|---|---|---|
 | BeeAdHoc sends the fewest control packets, flat over pause time | ns-2, 100 nodes, 3000 × 1000 m, 900 s, 20 CBR flows of four 512-byte packets/s, random waypoint 0–10 m/s, pause 1, 30, 100, 500, 1000 s (AntHocNet's scalability setup); results in figures only | Control packets sent (§7.2.5 counts packets, not NRL) | AODV, DSR, DSDV ("left out in some cases due to errors", §7.1.4). The org has no DSR arm | [PG460] §7.1.4, §7.2.5, Fig. 7.3, Fig. 7.14 |
 
-Status: **open: #5**. The citation of record is [W05], which we do not hold;
-#5 re-reads this anchor against it once it is in the papers library. Two
+Status: **open: #5**. The citation of record is [W05], which has not been read;
+#5 re-reads this anchor against it once it has been. Two
 cautions stand until then: ch. 7 measured an ns-2 BeeAdHoc, not the kernel
 module this sheet follows (*Which version*), and its DSDV comparison may be
 thin by the report's own account.

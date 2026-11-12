@@ -151,7 +151,7 @@ Org-wide (1–9), then this repo's own.
 <!-- org-sync:end org-rules -->
 10. **`core/` never includes a simulator header**; the adapter carries out decisions only (AntHocNet golden rules 1–2).
 11. **Interpretations are pre-registered.** Where the sources disagree (e.g. PG 460 Listing 13.15), the choice and its evidence go in an issue before the code (AntHocNet #800, #807).
-12. **Mind the licence split when promoting AntHocNet's `beeadhoc` arm** (GPL-2.0-only): ns-3 code may land in `ns3/` as-is; anything in `core/` (dual) is written fresh or carries a recorded dual-licence grant. Papers stay in the private `swarm-routing/papers` repo, never in this public one.
+12. **Mind the licence split when promoting AntHocNet's `beeadhoc` arm** (GPL-2.0-only): ns-3 code may land in `ns3/` as-is; anything in `core/` (dual) is written fresh or carries a recorded dual-licence grant. Paper copies stay in a private paper store the maintainer keeps, never in this public repository.
 
 ## Conventions
 
