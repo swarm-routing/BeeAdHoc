@@ -101,6 +101,7 @@ changes `core/` or `ns3/`, copy it with a new `generation` and the PR's base
 and head commits in `pins`, then:
 
 ```bash
+pip install pyyaml                                    # a YAML plan needs PyYAML
 C="python3 ../ns3-tools/python/ns3_tool/campaign.py"   # or ns3-campaign (pip install ../ns3-tools/python)
 $C plan P.yaml                                        # every job; dispatches nothing
 $C dispatch P.yaml --cap 4                            # resumable: re-run until every label is logged
