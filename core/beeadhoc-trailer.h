@@ -61,7 +61,9 @@ struct RouteTrailer {
     bool operator==(const RouteTrailer&) const = default;
 };
 
-/// The encoded trailer.
+/// The encoded trailer; empty (a frame no decoder accepts) when a route is
+/// longer than the u16 count can say. The router never builds one: its routes
+/// are capped at Config::maxHops + 1 nodes.
 std::vector<std::uint8_t> encodeTrailer(const RouteTrailer& t);
 
 /// Decodes untrusted bytes. Fails (nullopt) on a wrong version, info bits
