@@ -23,9 +23,12 @@
 #   $C verdicts $P --dir ".campaign/$G/cells"
 #
 # `verdicts` prints the paired 95 % CI of head minus base per cell
-# (bench_parse --ab --proto beeadhoc). The pins below are the pair this pipeline
-# was first proven on (base 2bd8133, #48; head 43b4611, #65: the router observer of #58 and the swarm-core pin bump, expected to change no beeadhoc row).
-generation: smoke-43b4611
+# (bench_parse --ab --proto beeadhoc). The pipeline was first proven on base
+# 2bd8133 (#48) vs head 43b4611 (#65), generation smoke-43b4611 (PAIRED-NOISE in
+# both cells, #41). The pins below are #108's merge commit (062d3cc: the core's
+# trailer, foreign foragers, piggybacks and swarms in the adapter, expected to
+# change every beeadhoc row) against its parent (7570629, #109: CI only).
+generation: smoke-062d3cc
 ref: main
 repo: swarm-routing/BeeAdHoc
 workflow: benchmark-cell.yml
@@ -34,8 +37,8 @@ cap: 4
 control: base
 image: ghcr.io/swarm-routing/ns3-dev@sha256:5585a93c5cea1980592539e2d26a4e111e0ff4b0cc63b3dfd6ea5de459d80d3f
 pins:
-  base: {source_sha: 2bd8133b4af94fec180a91fce95def68d2164066}
-  head: {source_sha: 43b4611e1a3a91f6caab9fd13b9b8f331ce29233}
+  base: {source_sha: 757062940b21980de112292339d4978919fc0b57}
+  head: {source_sha: 062d3cc81404bd5cb4b6b3605f4523830938dcbc}
 
 arms:
   base: ""
