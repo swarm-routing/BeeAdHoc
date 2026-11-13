@@ -37,6 +37,8 @@ ns3/        contrib module `beeadhoc` (GPL-2.0-only), compiling core/ on swarm-c
 docs/       fidelity.md: the fidelity sheet (#13), every row against PG 460's Linux module (chs. 12–13); GECCO 2005 once in hand (#5); PG 439 and Farooq's thesis do not specify BeeAdHoc
 .github/workflows/core.yml   core/ alone: strict warnings, tests, ASan + UBSan, clang-format (check `core`)
 .github/workflows/ns3.yml    ns3/ in ns3-dev latest debug + sanitized (reusable-ns3-ci.yml; checks `ci / ns-latest debug`, `ci / ns-latest sanitized`, `ci / format`)
+.github/workflows/benchmark-cell.yml   one benchmark cell at a pinned source_sha (reusable-benchmark-cell.yml, build mode); dispatched by ns3-campaign
+tools/bench/campaigns/   campaign plans: smoke.yaml (the change-test smoke against the base)
 ```
 
 ## Build & verify
@@ -83,6 +85,41 @@ swarm-core=swarm-routing/ns3-swarm-core@main` and
 `routing-compare --scenario=paper --nNodes=20 --time=30 --runs=1
 --protocols=beeadhoc` as the smoke and `beeadhoc-example --seed={seed}` as the
 determinism program.
+
+Benchmarks (#41, swarm-routing/.github#156): change tests and the anchor
+run here, released versions in swarm-routing/benchmarks (its ADR-0002).
+`.github/workflows/benchmark-cell.yml` is a thin caller of
+swarm-routing/.github's `reusable-benchmark-cell.yml` in build mode: each cell
+checks out its `source_sha`, builds `beeadhoc` with swarm-core at
+`SWARM_CORE_REF` and routing-bench at a pinned ns3-tools commit on the ns3-dev
+image given by digest, and runs `routing-compare`. Campaign plans live in
+`tools/bench/campaigns/` and run through `ns3-campaign` (swarm-routing/ns3-tools
+`python/ns3_tool/change_plan.py`; its docstring is the plan format).
+`smoke.yaml` is the change-test smoke: BeeAdHoc at a PR's head against its base,
+two families (`grid-rwp`, `static-mesh`), 20 paired seeds. For a PR that
+changes `core/` or `ns3/`, copy it with a new `generation` and the PR's base
+and head commits in `pins`, then:
+
+```bash
+pip install pyyaml                                    # a YAML plan needs PyYAML
+C="python3 ../ns3-tools/python/ns3_tool/campaign.py"   # or ns3-campaign (pip install ../ns3-tools/python)
+$C plan P.yaml                                        # every job; dispatches nothing
+$C dispatch P.yaml --cap 4                            # resumable: re-run until every label is logged
+$C status P.yaml --brief                              # poll lightly (15 min)
+G=$(python3 -c 'import sys,yaml; print(yaml.safe_load(open(sys.argv[1]))["generation"])' P.yaml)
+$C collect P.yaml --out ".campaign/$G/cells"          # rejects a cell whose ##PROV## is not its pin
+grep -ho '\(swarm-core\|routing-bench\)@[0-9a-f]*' ".campaign/$G/cells"/*.txt | sort -u   # must print 2 lines
+$C verdicts P.yaml --dir ".campaign/$G/cells"         # head minus base, paired 95 % CI per cell
+```
+
+and put the `verdicts` lines in the PR (no hand numbers, ns3-tools rule 13).
+The dependency commits come from `benchmark-cell.yml` at the dispatch ref
+(`main`), not from the plan, and `collect` checks only `source_sha` and the
+image: do not merge a change to that file's `dependencies` while a campaign
+is in flight, and the `grep` above (one swarm-core and one routing-bench
+commit across every cell) is the check that none did.
+State lives in `.campaign/<generation>/` (git-ignored); a cell's artifact is
+kept 7 days.
 
 ## Golden rules (invariants — do not break)
 
