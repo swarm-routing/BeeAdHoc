@@ -7,7 +7,7 @@ before changing anything. Org-wide conventions:
 
 ## What this repo is
 
-**Status: `core/` and `ns3/` in progress (Phase 4, #36, #47).** The core's first slice, route discovery (scouts with the seen list and the expanding ring, the three-type forager arrays, the Listing 13.15 rating, the `MAXAGE` collector, the scout wire header), builds and tests on its own and inside ns-3 as the contrib module `beeadhoc`, whose adapter carries it out on swarm-core's `SwarmRoutingBase`; the core reports through swarm-core's optional `IRouterObserver*` (scouts sent and received by kind and bytes, forager adds and removes as route changes, `routeOutput` decisions, the forager store's footprint; `kKindNames` in `beeadhoc-scout.h`, #54) and the adapter hands it the base's observer; the data path (source-route trailer, FORWARD-chain levels, foreign foragers, piggybacking), swarms and link failure come next (#36), then the gates (#47).
+**Status: `core/` and `ns3/` in progress (Phase 4, #36, #47).** The core's first slice, route discovery (scouts with the seen list and the expanding ring, the three-type forager arrays, the Listing 13.15 rating, the `MAXAGE` collector, the scout wire header), builds and tests on its own and inside ns-3 as the contrib module `beeadhoc`, whose adapter carries it out on swarm-core's `SwarmRoutingBase`; the core reports through swarm-core's optional `IRouterObserver*` (scouts sent and received by kind and bytes, forager adds and removes as route changes, `routeOutput` decisions, the forager store's footprint; `kKindNames` in `beeadhoc-scout.h`, #54) and the adapter hands it the base's observer; the core's data path (`RouteTrailer`: the source-route trailer as a versioned POD, FORWARD-chain levels, the INPUT chain's foreign foragers, piggybacking) is in, and the adapter still carries the route as an ns-3 tag until it adopts the trailer (#47); swarms and link failure come next (#36), then the gates (#47).
 
 BeeAdHoc, the honeybee-inspired routing protocol of Wedde & Farooq (2005),
 in the version the PG 460 report's Linux kernel module specifies (chs. 12–13,
@@ -25,6 +25,7 @@ core/       simulator-agnostic agents, forager arrays, metrics + unit tests (MIT
   beeadhoc-config.h    the protocol constants, each citing its docs/fidelity.md row or decision
   beeadhoc-scout.*     the scout and its versioned wire header
   beeadhoc-forager.*   battery levels, the rating, the forager store (three types, own/foreign, MAXAGE)
+  beeadhoc-trailer.*   the data packet's source-route trailer (route, info, one piggybacked forager) and its versioned wire format
   beeadhoc-router.*    per-node state and decisions (ports in, RouteDecisions out)
   test/                the core tests (plain CMake + ctest; the ns-3 suite will run the same list)
 ns3/        contrib module `beeadhoc` (GPL-2.0-only), compiling core/ on swarm-core

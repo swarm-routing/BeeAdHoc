@@ -59,6 +59,7 @@ add_library(beeadhoc_core STATIC
   beeadhoc-forager.cc
   beeadhoc-router.cc
   beeadhoc-scout.cc
+  beeadhoc-trailer.cc
 )
 target_include_directories(beeadhoc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(beeadhoc_core PUBLIC swarm_core_primitives)
@@ -67,6 +68,7 @@ target_compile_options(beeadhoc_core PRIVATE ${BEEADHOC_WARNINGS})
 add_executable(beeadhoc_core_tests
   test/all-tests.cc
   test/run-core-tests.cc
+  test/test-data.cc
   test/test-forager.cc
   test/test-observer.cc
   test/test-router.cc

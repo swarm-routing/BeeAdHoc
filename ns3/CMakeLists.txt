@@ -43,6 +43,7 @@ build_lib(
     ${beeadhoc_core_dir}/beeadhoc-forager.cc
     ${beeadhoc_core_dir}/beeadhoc-router.cc
     ${beeadhoc_core_dir}/beeadhoc-scout.cc
+    ${beeadhoc_core_dir}/beeadhoc-trailer.cc
     model/beeadhoc-header.cc
     model/beeadhoc-routing-protocol.cc
     helper/beeadhoc-helper.cc
@@ -53,6 +54,7 @@ build_lib(
   LIBRARIES_TO_LINK ${libswarm-core} ${libcore} ${libnetwork} ${libinternet} ${beeadhoc_bench_libs}
   TEST_SOURCES
     ${beeadhoc_core_dir}/test/all-tests.cc
+    ${beeadhoc_core_dir}/test/test-data.cc
     ${beeadhoc_core_dir}/test/test-forager.cc
     ${beeadhoc_core_dir}/test/test-observer.cc
     ${beeadhoc_core_dir}/test/test-router.cc

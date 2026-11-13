@@ -40,17 +40,100 @@ void Router::emit(const ScoutDecision& d) {
     sink_(d);
 }
 
+std::size_t Router::maxRouteNodes() const {
+    return static_cast<std::size_t>(std::max(config_.maxHops, 1)) + 1;
+}
+
 DataDecision Router::routeOutput(NodeAddress dest, ForagerType type) {
-    if (auto f = store_.take(dest, type, clock_.now(), rng_); f && !f->route.empty())
-        return decide(dest, {RouteAction::Unicast, std::move(f->route)});
-    if (searches_.contains(dest)) return decide(dest, {RouteAction::Queue, {}});
+    if (auto f = store_.take(dest, type, clock_.now(), rng_); f && !f->route.empty()) {
+        DataDecision d{RouteAction::Unicast, std::move(f->route), {}};
+        d.trailer.route.reserve(d.route.size() + 1);
+        d.trailer.route.push_back(self_);
+        d.trailer.route.insert(d.trailer.route.end(), d.route.begin(), d.route.end());
+        d.trailer.info = 0;  // the source writes no level (Listing 13.6)
+        // One foreign forager rides home to its owner, `dest` (§13.7.1;
+        // fidelity row "Foreign foragers piggybacked per data packet").
+        if (auto home = store_.takeForeign(dest, type, clock_.now())) {
+            RouteTrailer::Piggyback p;
+            p.route.reserve(home->route.size() + 1);
+            p.route.push_back(self_);
+            p.route.insert(p.route.end(), home->route.begin(), home->route.end());
+            p.info = home->info;
+            d.trailer.piggyback = std::move(p);
+        }
+        return decide(dest, std::move(d));
+    }
+    if (searches_.contains(dest)) return decide(dest, {RouteAction::Queue, {}, {}});
     if (searches_.size() >= config_.scoutRetransmitListLength)
-        return decide(dest, {RouteAction::Drop, {}});
+        return decide(dest, {RouteAction::Drop, {}, {}});
     Search& search = searches_[dest];
     // A TTL of 0 would never grow, so the ring could never give up: at least 1.
     search.ttl = std::max<std::uint8_t>(std::min(config_.initialScoutTtl, config_.maxScoutTtl), 1);
     sendScout(dest, search);
-    return decide(dest, {RouteAction::Queue, {}});
+    return decide(dest, {RouteAction::Queue, {}, {}});
+}
+
+NodeAddress Router::forwardData(RouteTrailer& trailer) {
+    const NodeAddress dest =
+        trailer.route.empty() ? swarm::core::kInvalidAddress : trailer.route.back();
+    const auto at = std::find(trailer.route.begin(), trailer.route.end(), self_);
+    if (trailer.route.size() > maxRouteNodes() || at == trailer.route.end() ||
+        at == trailer.route.begin() || at + 1 == trailer.route.end()) {
+        if (observer_) observer_->onDataDecision(dest, RouteAction::Drop);
+        return swarm::core::kInvalidAddress;
+    }
+    // FORWARD chain (Listing 13.7): shift left 3 bits, write this host's level.
+    trailer.info = pushInfo(trailer.info, ownLevel());
+    if (observer_) observer_->onDataDecision(dest, RouteAction::Unicast);
+    return *(at + 1);
+}
+
+void Router::deliverData(const RouteTrailer& trailer, ForagerType type) {
+    const auto& route = trailer.route;
+    if (route.size() < 2 || route.size() > maxRouteNodes() || route.back() != self_ ||
+        route.front() == self_)
+        return;
+    if (observer_) observer_->onDataDecision(self_, RouteAction::Deliver);
+    const NodeAddress source = route.front();
+    const Time now = clock_.now();
+
+    // INPUT chain (§12.1.3, §13.7.1): the packet's route, reversed, is a
+    // 'foreign' forager for its source. Its L values are the L - 1 forwarders'
+    // levels and this node's own, the L-th (maintainer decision 2026-11-10,
+    // #4). The rating reads only their minimum and average, so the order the
+    // levels were written in does not matter for the reversed route.
+    Forager foreign;
+    foreign.route.assign(route.rbegin() + 1, route.rend());
+    foreign.info = pushInfo(trailer.info, ownLevel());
+    foreign.dances = rateForager(foreign.route.size(), foreign.info, config_);
+    foreign.created = now;
+    foreign.own = false;
+    store_.put(source, type, std::move(foreign), now, rng_);
+
+    // A forager of this node's that rode home on the packet (§13.7.1): from
+    // the source back to this node, so reversed it leads from here to the
+    // source. It is 'own' again, rated afresh from the info it carries (repo
+    // choice, #36: the report does not say how a returning forager's dances
+    // are set; a fresh rating is what a returned scout gets, Listing 13.28).
+    if (const auto& p = trailer.piggyback; p && p->route.size() >= 2 &&
+                                           p->route.size() <= maxRouteNodes() &&
+                                           p->route.front() == source && p->route.back() == self_) {
+        Forager mine;
+        mine.route.assign(p->route.rbegin() + 1, p->route.rend());
+        mine.info = p->info;
+        mine.dances = rateForager(mine.route.size(), mine.info, config_);
+        mine.created = now;
+        mine.own = true;
+        store_.put(source, type, std::move(mine), now, rng_);
+    }
+    routeFound(source);
+}
+
+void Router::routeFound(NodeAddress dest) {
+    // Any route to `dest` ends its search, an earlier ring's scout included,
+    // and the held packets go.
+    if (searches_.erase(dest) == 0) return;
+    routeReady_(dest);
 }
 
 void Router::sendScout(NodeAddress dest, Search& search) {

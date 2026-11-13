@@ -78,6 +78,12 @@ public:
     std::optional<Forager> take(NodeAddress dest, ForagerType type, Time now,
                                 swarm::core::IRng& rng);
 
+    /// The oldest 'foreign' forager of the type for `dest`, removed: the one
+    /// a data packet to `dest` carries home ([PG460] §13.7.1; which one is a
+    /// repo choice, #36: the report does not say). Counts as traffic for
+    /// MAXAGE. No draw. nullopt when the array holds no foreign forager.
+    std::optional<Forager> takeForeign(NodeAddress dest, ForagerType type, Time now);
+
     /// Removes every destination without traffic (a put or a take) for more
     /// than MAXAGE ([PG460] §13.3, Listing 13.14).
     void collect(Time now);

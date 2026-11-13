@@ -117,6 +117,29 @@ void TestObserverEvents(Checker& c) {
     c.check(count(rec.changes, false) == 3 && rec.states.back() == std::make_pair(0u, 0u),
             "collection: removes reported, footprint back to zero");
 
+    // The data path: each forwarder reports Unicast, the destination Deliver,
+    // all toward the packet's destination; a stray route is a reported Drop.
+    {
+        Recorder rec4;
+        Config cfg;
+        cfg.initialScoutTtl = 4;
+        Network net4(4, cfg, 3, 0.001, &rec4);
+        net4.chain();
+        net4.at(0).routeOutput(3, ForagerType::Energy);
+        net4.clock().runUntil(1.0);
+        const auto out = net4.at(0).routeOutput(3, ForagerType::Energy);
+        rec4.decisions.clear();
+        c.check(net4.carry(out.trailer, ForagerType::Energy).has_value(), "carried");
+        using D = std::pair<NodeAddress, RouteAction>;
+        c.check(rec4.decisions == std::vector<D>{{3, RouteAction::Unicast},
+                                                 {3, RouteAction::Unicast},
+                                                 {3, RouteAction::Deliver}},
+                "data decisions: forward, forward, deliver");
+        RouteTrailer stray{{0, 2, 3}, 0, std::nullopt};
+        net4.at(1).forwardData(stray);
+        c.check(rec4.decisions.back() == D{3, RouteAction::Drop}, "a stray route: drop");
+    }
+
     // RXMTLISTLENGTH: a Drop is a reported decision too.
     Config small;
     small.scoutRetransmitListLength = 1;
