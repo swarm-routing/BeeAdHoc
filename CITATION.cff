@@ -10,8 +10,8 @@ title: "BeeAdHoc"
 abstract: >-
   BeeAdHoc, the honeybee-inspired routing protocol of Wedde & Farooq (2005),
   as a standalone swarm routing protocol for MANETs: scouts, foragers and an
-  energy metric, as a planned simulator-agnostic C++ core and ns-3 contrib
-  module on swarm-core.
+  energy metric, as a simulator-agnostic C++ core and an ns-3 contrib module
+  on swarm-core.
 type: software
 authors:
   - family-names: Joppi

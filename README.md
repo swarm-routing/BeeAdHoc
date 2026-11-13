@@ -19,22 +19,69 @@
 [![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/swarm-routing/BeeAdHoc?utm_source=oss&utm_medium=github&utm_campaign=swarm-routing%2FBeeAdHoc&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)](https://coderabbit.ai)
 <!-- org-sync:end badges -->
 
-BeeAdHoc, the honeybee-inspired routing protocol of Wedde & Farooq (2005),
+BeeAdHoc, the honeybee-inspired routing protocol of
+[Wedde & Farooq (2005)](https://doi.org/10.1145/1068009.1068034),
 as specified by the PG 460 report's Linux kernel module (scouts, foragers
 drawn from per-destination forager arrays, a battery (energy) metric only; #16),
 as a simulator-agnostic `core/` plus the ns-3 contrib module `beeadhoc` on
 [`swarm-core`](https://github.com/swarm-routing/ns3-swarm-core). **Status:**
-the org's Phase 4; route discovery, the first slice of `core/` (#36), runs in
-ns-3 as the module `beeadhoc` (scout codec, adapter, helper, example,
-`test.py -s beeadhoc`, and the `beeadhoc` arm of ns3-tools' `routing-compare`;
-#47); the data path, swarms and link failure follow, then the gates. What the source specifies, row by
+the org's Phase 4. `core/` (#36) has route discovery, the data path (the
+versioned source-route trailer, FORWARD-chain levels, the INPUT chain's
+foreign foragers, piggybacking), swarms and link failure. The ns-3 module
+`beeadhoc` (scout codec, adapter, helper, example, `test.py -s beeadhoc`, and
+the `beeadhoc` arm of ns3-tools' `routing-compare`) carries all of it out:
+every data packet carries the core's trailer, and the adapter sends swarms
+and reacts to a link failure (#47). The gates come next (#41, #47). What the source specifies, row by
 row, and what is still open: [docs/fidelity.md](docs/fidelity.md).
 
-**Release status:** the first release, v0.1.0, comes before the comparator gates (maintainer decision 2026-11-10): it has **not** cleared them (org golden rule 6: fidelity sheet, per-PR delivery smoke, anchor). It ships `core/` and `docs/`; the ns-3 module `beeadhoc` and the anchor are pending, so no number from v0.1.0 counts as a benchmark result. The gated release is proposed as v0.2.0. The release ladder, with each release's exit criteria, is in [docs/roadmap.md](docs/roadmap.md). Releases are cut by [`release.yml`](https://github.com/swarm-routing/BeeAdHoc/blob/main/.github/workflows/release.yml) and listed under [Releases](https://github.com/swarm-routing/BeeAdHoc/releases).
+**Release status:** the first release, v0.1.0, comes before the comparator gates (maintainer decision 2026-11-10): it has **not** cleared them (org golden rule 6: fidelity sheet, per-PR delivery smoke, anchor). v0.1.0 shipped `core/` (route discovery only) and `docs/`, without an ns-3 module; `main` has since added the ns-3 module `beeadhoc` and the rest of `core/` (Status above), unreleased. The anchor is pending, so no number from v0.1.0 or from `main` counts as a benchmark result. The gated release is proposed as v0.2.0. The release ladder, with each release's exit criteria, is in [docs/roadmap.md](docs/roadmap.md). Releases are cut by [`release.yml`](https://github.com/swarm-routing/BeeAdHoc/blob/main/.github/workflows/release.yml) and listed under [Releases](https://github.com/swarm-routing/BeeAdHoc/releases).
 
 How to work here, for people and AI agents alike: [AGENTS.md](AGENTS.md) has
 the rules and how to build and verify; the org conventions are in
 [CONTRIBUTING.md](https://github.com/swarm-routing/.github/blob/main/CONTRIBUTING.md).
+
+## Try it
+
+`core/` alone, with no ns-3 tree (CMake and a C++20 compiler; it fetches
+swarm-core's `core/` at the pinned commit):
+
+```bash
+make core-test    # cmake -S core -B build/core && cmake --build build/core && ctest --test-dir build/core
+```
+
+The ns-3 module, in the org's `ns3-dev` image (docker), with
+[`swarm-routing/ns3-swarm-core`](https://github.com/swarm-routing/ns3-swarm-core)
+checked out beside this repository. The test suite (`test.py -s beeadhoc`):
+
+```bash
+docker run --rm -v "$PWD:/src/beeadhoc:ro" -v "$PWD/../ns3-swarm-core:/src/ns3-swarm-core:ro" \
+    ghcr.io/swarm-routing/ns3-dev:latest-debug \
+    ns3-build-contrib --strict-warnings --quality-modules beeadhoc --test \
+    swarm-core=/src/ns3-swarm-core beeadhoc=/src/beeadhoc/ns3
+```
+
+The example, a small random-waypoint MANET (replace `--test` with `--run`):
+
+```bash
+docker run --rm -v "$PWD:/src/beeadhoc:ro" -v "$PWD/../ns3-swarm-core:/src/ns3-swarm-core:ro" \
+    ghcr.io/swarm-routing/ns3-dev:latest-debug \
+    ns3-build-contrib --run "beeadhoc-example --seed=1" \
+    swarm-core=/src/ns3-swarm-core beeadhoc=/src/beeadhoc/ns3
+```
+
+The `beeadhoc` arm of the comparison harness, with
+[`swarm-routing/ns3-tools`](https://github.com/swarm-routing/ns3-tools) also
+checked out beside this repository:
+
+```bash
+docker run --rm -v "$PWD:/src/beeadhoc:ro" -v "$PWD/../ns3-swarm-core:/src/ns3-swarm-core:ro" \
+    -v "$PWD/../ns3-tools:/src/ns3-tools:ro" ghcr.io/swarm-routing/ns3-dev:latest-debug \
+    ns3-build-contrib \
+    --run "routing-compare --scenario=paper --nNodes=20 --time=30 --runs=1 --protocols=beeadhoc" \
+    swarm-core=/src/ns3-swarm-core routing-bench=/src/ns3-tools/ns3/routing-bench beeadhoc=/src/beeadhoc/ns3
+```
+
+More (sanitizers, the pin, benchmark campaigns): [AGENTS.md](AGENTS.md) "Build & verify".
 
 <!-- org-sync:begin citing -->
 ## Releases & citing

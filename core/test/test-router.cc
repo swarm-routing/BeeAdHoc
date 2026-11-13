@@ -129,6 +129,91 @@ void TestScoutBounds(Checker& c) {
     }
 }
 
+void TestScoutRouteRepeats(Checker& c) {
+    Config config;
+    config.initialScoutTtl = 4;
+    const auto maxNodes = static_cast<std::size_t>(config.maxHops) + 1;
+    // A returned scout through the codec, as a neighbour would hand it over.
+    const auto backward = [&](NodeAddress dest, std::vector<NodeAddress> route) {
+        Scout s;
+        s.mode = ScoutMode::Backward;
+        s.source = 0;
+        s.destination = dest;
+        s.id = 77;
+        s.ttl = 4;
+        s.route = std::move(route);
+        return decodeScout(encodeScout(s), maxNodes);
+    };
+    {
+        // At the source: a route that visits a node twice becomes no forager.
+        // The data path would drop every packet sent on it (forwardData).
+        Network net(4, config, 7);
+        net.chain();
+        const auto s = backward(3, {0, 1, 2, 1, 3});
+        c.check(s.has_value(), "the codec caps the route's length, not its content");
+        net.at(0).onScout(*s, 1);
+        c.check(net.at(0).foragers().destinations() == 0 && net.ready.empty(),
+                "a returned scout with a repeated node: no forager, no RouteReady");
+        c.check(net.at(0).routeOutput(3, ForagerType::Energy).action == RouteAction::Queue,
+                "so no route with a repeat is handed out");
+    }
+    {
+        // The receiving source as the scout's destination: its route can
+        // only be 0 .. 0, a repeat.
+        Network net(4, config, 7);
+        net.chain();
+        const auto s = backward(0, {0, 1, 0});
+        c.check(s.has_value(), "decodes");
+        net.at(0).onScout(*s, 1);
+        c.check(net.at(0).foragers().destinations() == 0 && net.ready.empty(),
+                "a scout whose destination is the receiving source: no forager toward itself");
+    }
+    {
+        // At a relay: not passed on toward the source.
+        Network net(4, config, 7);
+        net.chain();
+        const auto s = backward(3, {0, 1, 2, 1, 3});
+        net.at(1).onScout(*s, 2);
+        net.at(2).onScout(*s, 3);
+        net.clock().runUntil(1.0);
+        c.check(net.log.empty() && net.at(0).foragers().destinations() == 0,
+                "a relay does not forward a returned scout with a repeated node");
+        // The same scout without the repeat is relayed home.
+        const auto good = backward(3, {0, 1, 2, 3});
+        net.at(2).onScout(*good, 3);
+        net.clock().runUntil(2.0);
+        c.check(net.log.size() == 2 && net.at(0).foragers().size(3, ForagerType::Energy) == 1,
+                "a well-formed one is relayed and stored");
+    }
+}
+
+void TestLateScout(Checker& c) {
+    // A returned scout with no search out for its destination (a late answer
+    // to an earlier ring, after the search ended): its foragers are added, and
+    // RouteReady is called again (#104: kept, see Router::onBackwardScout).
+    Config config;
+    config.initialScoutTtl = 4;
+    Network net(4, config, 8);
+    net.chain();
+    net.at(0).routeOutput(3, ForagerType::Energy);
+    net.clock().runUntil(1.0);
+    c.check(!net.at(0).searching(3) && net.ready.size() == 1 &&
+                net.at(0).foragers().size(3, ForagerType::Energy) == 1,
+            "the search ended with one forager per type");
+    Scout late;
+    late.mode = ScoutMode::Backward;
+    late.source = 0;
+    late.destination = 3;
+    late.id = 1;
+    late.ttl = 4;
+    late.route = {0, 1, 2, 3};
+    net.at(0).onScout(late, 1);
+    c.check(net.at(0).foragers().size(3, ForagerType::Energy) == 2, "a late scout adds foragers");
+    c.check(net.ready == std::vector<std::pair<int, NodeAddress>>{{0, 3}, {0, 3}} &&
+                !net.at(0).searching(3),
+            "RouteReady again, with no search out; none is started");
+}
+
 namespace {
 
 std::vector<std::string> meshTrace(std::uint64_t seed) {

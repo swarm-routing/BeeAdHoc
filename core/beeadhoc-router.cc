@@ -308,6 +308,12 @@ void Router::onForwardScout(const Scout& scout) {
 void Router::onBackwardScout(const Scout& scout) {
     const auto at = std::find(scout.route.begin(), scout.route.end(), self_);
     if (at == scout.route.end() || scout.route.back() != scout.destination) return;
+    // The data path's rule (forwardData, deliverData), here too (#104): a
+    // route that visits a node twice is neither relayed nor stored, so the
+    // store never holds a route whose packets are certain to be dropped. It
+    // also covers a scout whose destination is its source (a route 0 .. 0).
+    // No relay of a well-formed run builds one (onForwardScout).
+    if (!loopFree(scout.route)) return;
     if (at != scout.route.begin()) {
         emit(ScoutDecision::unicast(*(at - 1), scout));
         return;
@@ -325,6 +331,11 @@ void Router::onBackwardScout(const Scout& scout) {
     for (std::size_t t = 0; t < kForagerTypes; ++t)
         store_.put(scout.destination, static_cast<ForagerType>(t), f, clock_.now(), rng_);
     // Any of the search's scouts answering ends it, an earlier ring's included.
+    // RouteReady is called for every returned scout that stored foragers, also
+    // one that arrives with no search out (a late answer to an earlier ring):
+    // unlike deliverData and onSwarm, this does not go through routeFound.
+    // Kept as it was (#104), so a well-formed run is unchanged: foragers did
+    // arrive, and releasing no held packet does nothing.
     searches_.erase(scout.destination);
     routeReady_(scout.destination);
 }
