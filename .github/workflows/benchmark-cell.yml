@@ -66,5 +66,5 @@ jobs:
       cell: ${{ inputs.cell }}
       modules: beeadhoc=ns3
       dependencies: |
-        swarm-core=swarm-routing/ns3-swarm-core@3ced81506bd906163dc83f5825d77ca170609dfb
+        swarm-core=swarm-routing/ns3-swarm-core@0919dbfe4a48495a2eda32335a1be6fae453c87c
         routing-bench=swarm-routing/ns3-tools@3d279b83392a00288050574cee4288f30205658b:ns3/routing-bench
