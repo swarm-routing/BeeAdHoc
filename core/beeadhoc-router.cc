@@ -139,6 +139,86 @@ void Router::deliverData(const RouteTrailer& trailer, ForagerType type) {
         store_.put(source, type, std::move(mine), now, rng_);
     }
     routeFound(source);
+    maybeSwarm(source, type);
+}
+
+void Router::maybeSwarm(NodeAddress source, ForagerType type) {
+    // Listing 13.30: more than SWARMSIZE foreign foragers and fewer than
+    // SWARMSIZE_OWN own ones for this source: the flow looks one-way.
+    if (!swarmSink_ || config_.swarmSize == 0) return;
+    if (store_.count(source, type, false) <= config_.swarmSize ||
+        store_.count(source, type, true) >= config_.swarmSizeOwn)
+        return;
+    Swarm swarm;
+    swarm.source = self_;
+    swarm.destination = source;
+    swarm.type = type;
+    const Time now = clock_.now();
+    for (std::size_t i = 0; i < config_.swarmSize; ++i) {
+        auto f = store_.takeForeign(source, type, now);  // the oldest first
+        if (!f) break;
+        // The swarm travels on its first forager's route (§13.7.3: "one
+        // source-routed packet"; which route is a repo choice, #36).
+        if (swarm.route.empty()) {
+            swarm.route.push_back(self_);
+            swarm.route.insert(swarm.route.end(), f->route.begin(), f->route.end());
+        }
+        // Reversed by the sender (§13.7.3): the owner first, this node last.
+        Swarm::Cargo c;
+        c.route.assign(f->route.rbegin(), f->route.rend());
+        c.route.push_back(self_);
+        c.info = f->info;
+        swarm.foragers.push_back(std::move(c));
+    }
+    if (swarm.route.size() < 2) return;
+    const NodeAddress next = swarm.route[1];
+    emitSwarm(SwarmDecision::unicast(next, std::move(swarm)));
+}
+
+void Router::emitSwarm(const SwarmDecision& d) {
+    if (observer_ && d.message)
+        observer_->onControlSent(Swarm::kKind, false,
+                                 static_cast<std::uint32_t>(d.message->wireSize()));
+    if (swarmSink_) swarmSink_(d);
+}
+
+void Router::onSwarm(const Swarm& swarm, NodeAddress /*from*/) {
+    if (observer_)
+        observer_->onControlReceived(Swarm::kKind, static_cast<std::uint32_t>(swarm.wireSize()));
+    const auto& route = swarm.route;
+    if (route.size() < 2 || route.size() > maxRouteNodes() || route.front() != swarm.source ||
+        route.back() != swarm.destination || swarm.foragers.size() > config_.swarmSize ||
+        !loopFree(route))
+        return;
+    const auto at = std::find(route.begin(), route.end(), self_);
+    if (at == route.end() || at == route.begin()) return;
+    if (at + 1 != route.end()) {
+        emitSwarm(SwarmDecision::unicast(*(at + 1), swarm));
+        return;
+    }
+    // Home (§13.7.5): each forager is 'own' again, a route from here to the
+    // swarm's sender, rated afresh from its info as a returned scout is
+    // (Listing 13.28; the same repo choice as a piggybacked forager, #36).
+    const Time now = clock_.now();
+    bool any = false;
+    for (const Swarm::Cargo& c : swarm.foragers) {
+        if (c.route.size() < 2 || c.route.size() > maxRouteNodes() || c.route.front() != self_ ||
+            c.route.back() != swarm.source || !loopFree(c.route))
+            continue;
+        Forager f;
+        f.route.assign(c.route.begin() + 1, c.route.end());
+        f.info = c.info;
+        f.dances = rateForager(f.route.size(), f.info, config_);
+        f.created = now;
+        f.own = true;
+        store_.put(swarm.source, swarm.type, std::move(f), now, rng_);
+        any = true;
+    }
+    if (any) routeFound(swarm.source);
+}
+
+std::size_t Router::onLinkFailure(NodeAddress neighbor) {
+    return store_.eraseFirstHop(neighbor);
 }
 
 void Router::routeFound(NodeAddress dest) {

@@ -43,6 +43,7 @@ build_lib(
     ${beeadhoc_core_dir}/beeadhoc-forager.cc
     ${beeadhoc_core_dir}/beeadhoc-router.cc
     ${beeadhoc_core_dir}/beeadhoc-scout.cc
+    ${beeadhoc_core_dir}/beeadhoc-swarm.cc
     ${beeadhoc_core_dir}/beeadhoc-trailer.cc
     model/beeadhoc-header.cc
     model/beeadhoc-routing-protocol.cc
@@ -59,5 +60,6 @@ build_lib(
     ${beeadhoc_core_dir}/test/test-observer.cc
     ${beeadhoc_core_dir}/test/test-router.cc
     ${beeadhoc_core_dir}/test/test-scout.cc
+    ${beeadhoc_core_dir}/test/test-swarm.cc
     test/beeadhoc-test-suite.cc
 )

@@ -12,7 +12,10 @@
 // forwarding host writes its level (FORWARD chain, Listing 13.7), and the
 // destination keeps the packet's reversed route as a foreign forager for the
 // source, adding its own level as the L-th value (INPUT chain, §12.1.3, #4).
-// Swarms and link failure are the next slices (#36).
+// Swarms (#36 slice 3): a destination holding more than SWARMSIZE foreign
+// foragers for a source and fewer than SWARMSIZE_OWN own ones sends SWARMSIZE
+// of them home in one source-routed swarm (Listing 13.30, §13.7.3). Link
+// failure (#36 slice 4): every forager over a failed next link is removed.
 //
 // The router never touches a simulator (golden rule 10). Time, randomness,
 // energy and deferred work come through swarm-core's ports; every scout leaves
@@ -26,6 +29,7 @@
 #include "beeadhoc-config.h"
 #include "beeadhoc-forager.h"
 #include "beeadhoc-scout.h"
+#include "beeadhoc-swarm.h"
 #include "beeadhoc-trailer.h"
 #include "swarm-dedup-history.h"
 #include "swarm-observer.h"
@@ -40,6 +44,7 @@
 namespace beeadhoc::core {
 
 using ScoutDecision = swarm::core::RouteDecision<Scout>;
+using SwarmDecision = swarm::core::RouteDecision<Swarm>;
 
 /// What to do with a data packet this node originates.
 struct DataDecision {
@@ -57,6 +62,8 @@ public:
     /// Receives every scout this node sends (Broadcast, or Unicast to a
     /// neighbour) and DiscardPending(dest) when a search gives up.
     using Sink = std::function<void(const ScoutDecision&)>;
+    /// Receives every swarm this node sends or relays (Unicast to a neighbour).
+    using SwarmSink = std::function<void(const SwarmDecision&)>;
     /// Called when foragers for `dest` arrived: send the packets held for it.
     using RouteReady = std::function<void(NodeAddress dest)>;
 
@@ -101,6 +108,22 @@ public:
     /// twice, changes nothing.
     void deliverData(const RouteTrailer& trailer, ForagerType type);
 
+    /// Where swarms go. Without one (the default) no swarm is built: the
+    /// foreign foragers stay in the store.
+    void setSwarmSink(SwarmSink sink) { swarmSink_ = std::move(sink); }
+
+    /// A swarm arrived from the one-hop neighbour `from`: relayed along its
+    /// route, or, at its destination, unpacked into the type's array as 'own'
+    /// foragers toward its sender (§13.7.3, §13.7.5). A search for the sender
+    /// ends, and RouteReady releases its held packets.
+    void onSwarm(const Swarm& swarm, NodeAddress from);
+
+    /// The link to the one-hop neighbour `neighbor` failed: every forager
+    /// whose first hop it is goes (fidelity row "A failed next link"; repo
+    /// choice, #36). Returns how many were removed. The packet under the
+    /// failed link is the adapter's to drop.
+    std::size_t onLinkFailure(NodeAddress neighbor);
+
     /// A scout arrived from the one-hop neighbour `from`.
     void onScout(const Scout& scout, NodeAddress from);
 
@@ -125,6 +148,9 @@ private:
     void collectTimer();
     void onForwardScout(const Scout& scout);
     void onBackwardScout(const Scout& scout);
+    /// Listing 13.30's trigger for the foragers of `type` held for `source`.
+    void maybeSwarm(NodeAddress source, ForagerType type);
+    void emitSwarm(const SwarmDecision& d);
     /// Ends a search for `dest` now that foragers for it exist.
     void routeFound(NodeAddress dest);
     std::size_t maxRouteNodes() const;
@@ -137,6 +163,7 @@ private:
     swarm::core::IEnergy& energy_;
     Sink sink_;
     RouteReady routeReady_;
+    SwarmSink swarmSink_;
     swarm::core::IRouterObserver* observer_;
 
     ForagerStore store_;

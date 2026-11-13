@@ -155,6 +155,26 @@ std::optional<Forager> ForagerStore::takeForeign(NodeAddress dest, ForagerType t
     return home;
 }
 
+std::size_t ForagerStore::eraseFirstHop(NodeAddress neighbor) {
+    std::size_t n = 0;
+    for (auto& [dest, entry] : entries_) {
+        for (auto& array : entry.arrays) {
+            for (auto it = array.begin(); it != array.end();) {
+                if (!it->route.empty() && it->route.front() == neighbor) {
+                    removed(dest, *it);
+                    it = array.erase(it);
+                    ++n;
+                } else {
+                    ++it;
+                }
+            }
+        }
+    }
+    // A destination left with no forager stays until MAXAGE collects it.
+    if (n > 0) reportState();
+    return n;
+}
+
 void ForagerStore::collect(Time now) {
     for (auto it = entries_.begin(); it != entries_.end();) {
         if (now - it->second.lastUsed > config_.maxAge) {
@@ -172,6 +192,14 @@ void ForagerStore::collect(Time now) {
 std::size_t ForagerStore::size(NodeAddress dest, ForagerType type) const {
     const auto it = entries_.find(dest);
     return it == entries_.end() ? 0 : it->second.arrays[static_cast<std::size_t>(type)].size();
+}
+
+std::size_t ForagerStore::count(NodeAddress dest, ForagerType type, bool own) const {
+    const auto it = entries_.find(dest);
+    if (it == entries_.end()) return 0;
+    const auto& array = it->second.arrays[static_cast<std::size_t>(type)];
+    return static_cast<std::size_t>(std::count_if(
+        array.begin(), array.end(), [own](const Forager& f) { return f.own == own; }));
 }
 
 }  // namespace beeadhoc::core

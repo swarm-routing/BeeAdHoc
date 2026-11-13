@@ -80,6 +80,7 @@ public:
                 i, config_, clock_, rng_, clock_, *energy_[static_cast<std::size_t>(i)],
                 [this, i](const ScoutDecision& d) { send(i, d); },
                 [this, i](NodeAddress dest) { ready.push_back({i, dest}); }, observer));
+            routers_.back()->setSwarmSink([this, i](const SwarmDecision& d) { sendSwarm(i, d); });
         }
     }
 
@@ -130,6 +131,7 @@ public:
     std::vector<std::pair<int, NodeAddress>> ready;     ///< (node, dest) RouteReady calls
     std::vector<std::pair<int, NodeAddress>> discards;  ///< (node, dest) DiscardPending
     std::vector<std::string> log;
+    std::vector<std::pair<int, NodeAddress>> swarms;  ///< (from, to) swarm sends
     int broadcasts(int node) const {
         auto it = broadcasts_.find(node);
         return it == broadcasts_.end() ? 0 : it->second;
@@ -154,6 +156,17 @@ private:
                 if (auto s = decodeScout(bytes, maxNodes)) at(to).onScout(*s, from);
             });
         }
+    }
+
+    void sendSwarm(int from, const SwarmDecision& d) {
+        swarms.push_back({from, d.nextHop});
+        if (!d.message || !links_.contains({from, d.nextHop})) return;
+        const auto bytes = encodeSwarm(*d.message);
+        const int to = d.nextHop;
+        clock_.schedule(linkDelay_, [this, from, to, bytes] {
+            const auto maxNodes = static_cast<std::size_t>(config_.maxHops) + 1;
+            if (auto s = decodeSwarm(bytes, maxNodes, config_.swarmSize)) at(to).onSwarm(*s, from);
+        });
     }
 
     Config config_;
