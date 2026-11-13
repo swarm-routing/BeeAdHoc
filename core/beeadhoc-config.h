@@ -58,6 +58,13 @@ struct Config {
     /// `IPT_BEEADHOC_GARBAGE_PROBAB`: 1, collect on every put without a draw
     /// (maintainer decision 2026-11-10, #13).
     double garbageProbability = 1.0;
+    /// `IPT_BEEADHOC_SWARMSIZE`: 20, settled ([PG460] §14.3.2): a swarm leaves
+    /// when more foreign foragers than this wait for one source, and carries
+    /// this many (Listing 13.30, §13.7.3).
+    std::size_t swarmSize = 20;
+    /// `IPT_BEEADHOC_SWARMSIZE_OWN`: 11, settled ([PG460] §14.3.2): ... and
+    /// fewer own foragers than this exist toward it (Listing 13.30).
+    std::size_t swarmSizeOwn = 11;
     /// Destinations held in the forager store: 256, the least recently used
     /// evicted at the cap (repo choice under golden rule 7, #36; fidelity row
     /// "Destinations held in the forager store").

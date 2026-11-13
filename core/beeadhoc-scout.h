@@ -65,13 +65,18 @@ struct Scout {
     bool operator==(const Scout&) const = default;
 };
 
+/// The swarm's kind byte (beeadhoc-swarm.h): after the scouts' two modes, so
+/// one control port tells the three apart.
+inline constexpr std::uint8_t kSwarmKind = 3;
+
 /// The control kinds a reader names ("FORWARD_SCOUT", not "1"): the scout's
-/// wire mode byte is its kind. Foragers are not control messages in this
-/// slice (a forager is table state, built from a returned scout), so they
-/// have no kind yet; the data path (#36) adds one with its packet.
-inline constexpr std::array<swarm::core::KindName, 2> kKindNames{{
+/// wire mode byte is its kind, and the swarm's kind byte is its own. Foragers
+/// on data packets are not control messages (they ride in the data packet's
+/// RouteTrailer), so they have no kind.
+inline constexpr std::array<swarm::core::KindName, 3> kKindNames{{
     {static_cast<std::uint8_t>(ScoutMode::Forward), "FORWARD_SCOUT"},
     {static_cast<std::uint8_t>(ScoutMode::Backward), "BACKWARD_SCOUT"},
+    {kSwarmKind, "SWARM"},
 }};
 
 /// The encoded header.

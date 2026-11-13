@@ -84,12 +84,19 @@ public:
     /// MAXAGE. No draw. nullopt when the array holds no foreign forager.
     std::optional<Forager> takeForeign(NodeAddress dest, ForagerType type, Time now);
 
+    /// Removes every forager whose first hop is `neighbor`, over every
+    /// destination and type: a failed next link (fidelity row "A failed next
+    /// link"; repo choice, #36). Returns how many.
+    std::size_t eraseFirstHop(NodeAddress neighbor);
+
     /// Removes every destination without traffic (a put or a take) for more
     /// than MAXAGE ([PG460] §13.3, Listing 13.14).
     void collect(Time now);
 
     std::size_t destinations() const { return entries_.size(); }
     std::size_t size(NodeAddress dest, ForagerType type) const;
+    /// The own (`own` true) or foreign foragers of the type for `dest`.
+    std::size_t count(NodeAddress dest, ForagerType type, bool own) const;
 
     /// The routing-state footprint reported as onStateSize: `entries` is the
     /// foragers held; `bytes` counts, per forager, its info, dances, creation
