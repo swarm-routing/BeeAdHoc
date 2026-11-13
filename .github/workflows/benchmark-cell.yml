@@ -1,0 +1,70 @@
+# Copyright (c) 2026 Daniel Joppi (https://github.com/swarm-routing)
+# SPDX-License-Identifier: GPL-2.0-only
+name: Benchmark cell
+# The label `ns3-campaign dispatch` finds the run by.
+run-name: ${{ inputs.label || inputs.cell || 'benchmark cell' }}
+
+# One benchmark cell (one routing-compare invocation, any number of seeds) of
+# a change test or an anchor (#41, swarm-routing/.github#156): a thin
+# caller of swarm-routing/.github's reusable-benchmark-cell.yml in build mode.
+# Every cell checks out `source_sha` whatever ref it is dispatched at (and
+# fails unless HEAD is that commit), and builds beeadhoc on the ns3-dev image
+# given by digest, together with its two dependencies at the commits below.
+# Campaigns dispatch it through `ns3-campaign` (swarm-routing/ns3-tools) from a
+# plan in tools/bench/campaigns/ (AGENTS.md "Build & verify").
+#
+# The dependencies are pinned by commit, so every cell of a campaign builds the
+# same code:
+#   - swarm-core at SWARM_CORE_REF: the `swarm-core / pin` check fails when
+#     this line names another commit, so a pin bump updates it too;
+#   - routing-bench (the harness) at an ns3-tools commit, bumped by PR.
+#
+# The safe pattern of the reusable workflow's header (swarm-routing/.github#160):
+# workflow_dispatch only, `contents: read, packages: read`, no secrets passed,
+# no cache step and no other job in this file.
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: 'ns3-dev image by digest, ghcr.io/swarm-routing/ns3-dev@sha256:<64 hex> (an optimized one for numbers)'
+        required: true
+      source_sha:
+        description: '40-char commit every cell checks out, whatever the dispatch ref'
+        required: true
+      harness:
+        description: 'The harness program'
+        default: routing-compare
+      args:
+        description: 'The harness flags, verbatim'
+        required: true
+      seeds:
+        description: 'RngRun range <first>-<last>; empty = in args'
+        default: ''
+      cell:
+        description: 'Cell name ([a-z0-9][a-z0-9._-]*)'
+        default: ''
+      label:
+        description: 'Run name (<generation>/<arm>/<cell>), set by ns3-campaign'
+        default: ''
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  cell:
+    permissions:
+      contents: read
+      packages: read
+    uses: swarm-routing/.github/.github/workflows/reusable-benchmark-cell.yml@main
+    with:
+      image: ${{ inputs.image }}
+      source_sha: ${{ inputs.source_sha }}
+      harness: ${{ inputs.harness }}
+      args: ${{ inputs.args }}
+      seeds: ${{ inputs.seeds }}
+      cell: ${{ inputs.cell }}
+      modules: beeadhoc=ns3
+      dependencies: |
+        swarm-core=swarm-routing/ns3-swarm-core@501dd7eca8c530dadaeb5d43c66e9c31d19fd8f5
+        routing-bench=swarm-routing/ns3-tools@3d279b83392a00288050574cee4288f30205658b:ns3/routing-bench
