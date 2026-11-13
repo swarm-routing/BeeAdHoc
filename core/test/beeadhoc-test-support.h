@@ -84,6 +84,10 @@ public:
         }
     }
 
+    // The routers and callbacks point at this object: it never moves.
+    Network(const Network&) = delete;
+    Network& operator=(const Network&) = delete;
+
     void link(int a, int b) {
         links_.insert({a, b});
         links_.insert({b, a});

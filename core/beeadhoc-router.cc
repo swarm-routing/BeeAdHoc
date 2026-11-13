@@ -44,6 +44,18 @@ std::size_t Router::maxRouteNodes() const {
     return static_cast<std::size_t>(std::max(config_.maxHops, 1)) + 1;
 }
 
+namespace {
+
+/// A route from the wire visits no node twice: a repeated address would send
+/// a packet back and forth between two of its nodes (a loop).
+bool loopFree(const std::vector<NodeAddress>& route) {
+    for (auto it = route.begin(); it != route.end(); ++it)
+        if (std::find(it + 1, route.end(), *it) != route.end()) return false;
+    return true;
+}
+
+}  // namespace
+
 DataDecision Router::routeOutput(NodeAddress dest, ForagerType type) {
     if (auto f = store_.take(dest, type, clock_.now(), rng_); f && !f->route.empty()) {
         DataDecision d{RouteAction::Unicast, std::move(f->route), {}};
@@ -78,7 +90,7 @@ NodeAddress Router::forwardData(RouteTrailer& trailer) {
         trailer.route.empty() ? swarm::core::kInvalidAddress : trailer.route.back();
     const auto at = std::find(trailer.route.begin(), trailer.route.end(), self_);
     if (trailer.route.size() > maxRouteNodes() || at == trailer.route.end() ||
-        at == trailer.route.begin() || at + 1 == trailer.route.end()) {
+        at == trailer.route.begin() || at + 1 == trailer.route.end() || !loopFree(trailer.route)) {
         if (observer_) observer_->onDataDecision(dest, RouteAction::Drop);
         return swarm::core::kInvalidAddress;
     }
@@ -91,7 +103,7 @@ NodeAddress Router::forwardData(RouteTrailer& trailer) {
 void Router::deliverData(const RouteTrailer& trailer, ForagerType type) {
     const auto& route = trailer.route;
     if (route.size() < 2 || route.size() > maxRouteNodes() || route.back() != self_ ||
-        route.front() == self_)
+        !loopFree(route))
         return;
     if (observer_) observer_->onDataDecision(self_, RouteAction::Deliver);
     const NodeAddress source = route.front();
@@ -115,9 +127,9 @@ void Router::deliverData(const RouteTrailer& trailer, ForagerType type) {
     // source. It is 'own' again, rated afresh from the info it carries (repo
     // choice, #36: the report does not say how a returning forager's dances
     // are set; a fresh rating is what a returned scout gets, Listing 13.28).
-    if (const auto& p = trailer.piggyback; p && p->route.size() >= 2 &&
-                                           p->route.size() <= maxRouteNodes() &&
-                                           p->route.front() == source && p->route.back() == self_) {
+    if (const auto& p = trailer.piggyback;
+        p && p->route.size() >= 2 && p->route.size() <= maxRouteNodes() &&
+        p->route.front() == source && p->route.back() == self_ && loopFree(p->route)) {
         Forager mine;
         mine.route.assign(p->route.rbegin() + 1, p->route.rend());
         mine.info = p->info;

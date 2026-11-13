@@ -36,6 +36,9 @@ std::vector<NodeAddress> readRoute(WireReader& r, std::size_t maxRouteNodes) {
 }  // namespace
 
 std::vector<std::uint8_t> encodeTrailer(const RouteTrailer& t) {
+    constexpr std::size_t kMaxCount = std::numeric_limits<std::uint16_t>::max();
+    if (t.route.size() > kMaxCount || (t.piggyback && t.piggyback->route.size() > kMaxCount))
+        return {};
     std::vector<std::uint8_t> out;
     out.reserve(t.wireSize());
     WireWriter w(out);

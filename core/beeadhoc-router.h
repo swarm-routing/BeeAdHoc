@@ -94,7 +94,8 @@ public:
     /// A data packet in transit at this node (FORWARD chain): the hop after
     /// this node on the trailer's route, having shifted this node's battery
     /// level into `trailer.info` (Listing 13.7). kInvalidAddress (drop it)
-    /// when the route does not name this node between its two ends.
+    /// when the route does not name this node between its two ends, or
+    /// visits a node twice.
     NodeAddress forwardData(RouteTrailer& trailer);
 
     /// A data packet of `type` delivered to this node, the trailer's last
@@ -103,7 +104,8 @@ public:
     /// the L-th (#4); a piggybacked forager whose owner is this node comes
     /// home as an 'own' forager toward the packet's source (§13.7.1). A search
     /// for the source ends, and RouteReady releases its held packets. A
-    /// trailer whose route is not source .. this node changes nothing.
+    /// trailer whose route is not source .. this node, or visits a node
+    /// twice, changes nothing.
     void deliverData(const RouteTrailer& trailer, ForagerType type);
 
     /// Where swarms go. Without one (the default) no swarm is built: the

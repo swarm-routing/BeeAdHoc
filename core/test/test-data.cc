@@ -25,14 +25,18 @@ RouteTrailer sample() {
     return t;
 }
 
-/// A chain 0 - 1 - ... - (n - 1) where 0 found n - 1 by a scout.
-Network discovered(int n, std::uint64_t seed, Config config = {}) {
+/// A config whose first scout reaches 10 hops.
+Config farScouts() {
+    Config config;
     config.initialScoutTtl = 10;
-    Network net(n, config, seed);
+    return config;
+}
+
+/// Makes `net` a chain 0 - 1 - ... - (n - 1) where 0 found n - 1 by a scout.
+void discover(Network& net, int n) {
     net.chain();
     net.at(0).routeOutput(n - 1, ForagerType::Energy);
     net.clock().runUntil(1.0);
-    return net;
 }
 
 }  // namespace
@@ -86,6 +90,12 @@ void TestTrailerFailsClosed(Checker& c) {
     bad.push_back(0);
     c.check(!decodeTrailer(bad, 11), "trailing byte");
     c.check(!decodeTrailer({}, 11), "empty buffer");
+    RouteTrailer huge;
+    huge.route.assign(65536, 1);
+    c.check(encodeTrailer(huge).empty(), "a route past the u16 count is not encoded");
+    RouteTrailer hugePiggy = sample();
+    hugePiggy.piggyback->route.assign(65536, 1);
+    c.check(encodeTrailer(hugePiggy).empty(), "nor is a piggybacked one");
 }
 
 void TestTrailerFuzz(Checker& c) {
@@ -119,7 +129,8 @@ void TestTrailerFuzz(Checker& c) {
 }
 
 void TestForwardChain(Checker& c) {
-    Network net = discovered(4, 11);
+    Network net(4, farScouts(), 11);
+    discover(net, 4);
     net.energy(1).fraction = 0.30;  // level 3
     net.energy(2).fraction = 0.12;  // level 1
     net.energy(3).fraction = 0.50;  // level 5, the destination's
@@ -154,10 +165,21 @@ void TestForwardChain(Checker& c) {
     RouteTrailer atSource{{1, 2, 3}, 0, std::nullopt};
     c.check(net.at(1).forwardData(atSource) == swarm::core::kInvalidAddress,
             "the source does not forward its own packet back in");
+    RouteTrailer loop{{0, 1, 2, 1, 3}, 0, std::nullopt};
+    c.check(net.at(2).forwardData(loop) == swarm::core::kInvalidAddress && loop.info == 0,
+            "a route that visits a node twice: drop");
+    c.check(!net.carry(loop, ForagerType::Energy).has_value(),
+            "carried, it ends at the first repeat instead of bouncing");
+    RouteTrailer loopHome{{0, 2, 0, 3}, 0, std::nullopt};
+    const std::size_t had = net.at(3).foragers().size(0, ForagerType::Throughput);
+    net.at(3).deliverData(loopHome, ForagerType::Throughput);
+    c.check(net.at(3).foragers().size(0, ForagerType::Throughput) == had,
+            "a delivered route with a repeat leaves no forager");
 }
 
 void TestForeignHome(Checker& c) {
-    Network net = discovered(3, 12);  // every level 7
+    Network net(3, farScouts(), 12);  // every level 7
+    discover(net, 3);
     const auto d = net.at(0).routeOutput(2, ForagerType::Energy);
     c.check(net.carry(d.trailer, ForagerType::Energy).has_value(), "0 -> 2 delivered");
     // 2 links at level 7: (9 * 7 * 7 + 1) / 44 = 10 dances.
