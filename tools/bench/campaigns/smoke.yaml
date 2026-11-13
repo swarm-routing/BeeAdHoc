@@ -16,8 +16,11 @@
 #   $C plan $P                                      # 4 jobs; dispatches nothing
 #   $C dispatch $P --cap 4                          # re-run until all are dispatched
 #   $C status $P                                    # every 15 min or so
-#   $C collect $P --out .campaign/<generation>/cells
-#   $C verdicts $P --dir .campaign/<generation>/cells
+#   G=$(python3 -c 'import sys,yaml; print(yaml.safe_load(open(sys.argv[1]))["generation"])' $P)
+#   $C collect $P --out ".campaign/$G/cells"
+#   grep -ho '\(swarm-core\|routing-bench\)@[0-9a-f]*' ".campaign/$G/cells"/*.txt | sort -u
+#                                                   # 2 lines: one dependency set in every cell
+#   $C verdicts $P --dir ".campaign/$G/cells"
 #
 # `verdicts` prints the paired 95 % CI of head minus base per cell
 # (bench_parse --ab --proto beeadhoc). The pins below are the pair this pipeline
