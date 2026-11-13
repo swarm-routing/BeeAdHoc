@@ -71,7 +71,7 @@ reviews:
       instructions: >-
         Fidelity sheet against GECCO 2005 / PG 439 / PG 460 / Farooq's thesis: each
         interpretation settled with its section or marked unresolved. Papers stay in
-        the private papers repository.
+        the private paper repository.
 # org-sync:begin coderabbit-tail
   tools:
     shellcheck:
