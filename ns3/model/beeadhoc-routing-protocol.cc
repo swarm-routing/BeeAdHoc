@@ -26,6 +26,17 @@ namespace {
 constexpr uint8_t kUdpProtocol = 17;
 using swarm::core::RouteAction;
 
+/// True when `dst` is the subnet-directed broadcast address of one of the
+/// node's interfaces (Ipv4Address::IsBroadcast knows 255.255.255.255 only).
+bool SubnetBroadcast(Ptr<Ipv4> ipv4, Ipv4Address dst) {
+    for (uint32_t i = 0; i < ipv4->GetNInterfaces(); ++i) {
+        for (uint32_t j = 0; j < ipv4->GetNAddresses(i); ++j) {
+            if (ipv4->GetAddress(i, j).GetBroadcast() == dst) return true;
+        }
+    }
+    return false;
+}
+
 }  // namespace
 
 TypeId RoutingProtocol::GetTypeId() {
@@ -158,12 +169,15 @@ bool RoutingProtocol::RouteInput(Ptr<const Packet> p, const Ipv4Header& header,
     if (header.GetProtocol() == kUdpProtocol) {
         // A control datagram leaves a socket bound to kBeeAdHocPort, so both
         // its ports are; a data datagram keeps its own UDP header first.
+        // A datagram shorter than a UDP header is no control (and not peeked).
         UdpHeader udp;
-        control = p->PeekHeader(udp) && udp.GetSourcePort() == kBeeAdHocPort &&
-                  udp.GetDestinationPort() == kBeeAdHocPort;
+        control = p->GetSize() >= udp.GetSerializedSize() && p->PeekHeader(udp) &&
+                  udp.GetSourcePort() == kBeeAdHocPort && udp.GetDestinationPort() == kBeeAdHocPort;
     }
-    // Control packets, broadcast and multicast are the base's.
-    if (!m_router || !ipv4 || control || dst.IsBroadcast() || dst.IsMulticast()) {
+    // Control packets, broadcast (limited or subnet-directed) and multicast
+    // are the base's: only unicast data carries a trailer.
+    if (!m_router || !ipv4 || control || dst.IsBroadcast() || dst.IsMulticast() ||
+        SubnetBroadcast(ipv4, dst)) {
         return SwarmRoutingBase::RouteInput(p, header, idev, ucb, mcb, lcb, ecb);
     }
     const int32_t iif = ipv4->GetInterfaceForDevice(idev);

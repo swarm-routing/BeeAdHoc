@@ -558,6 +558,73 @@ private:
     }
 };
 
+class GuardsTestCase : public TestCase {
+public:
+    GuardsTestCase()
+        : TestCase("adapter: short UDP payloads and subnet broadcasts reach no trailer reader") {}
+
+private:
+    void DoRun() override {
+        SwarmCoreSeed(1);
+        NodeContainer nodes;
+        nodes.Create(2);
+        MobilityHelper mobility;
+        mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+        mobility.Install(nodes);
+        WifiHelper wifi;
+        wifi.SetStandard(WIFI_STANDARD_80211b);
+        YansWifiChannelHelper channel = YansWifiChannelHelper::Default();
+        YansWifiPhyHelper phy;
+        phy.SetChannel(channel.Create());
+        WifiMacHelper mac;
+        mac.SetType("ns3::AdhocWifiMac");
+        NetDeviceContainer devs = wifi.Install(phy, mac, nodes);
+        BeeAdHocHelper bee;
+        bee.Install(nodes);
+        Ipv4AddressHelper a;
+        a.SetBase("10.1.0.0", "255.255.255.0");
+        a.Assign(devs);
+        Ptr<ns3::beeadhoc::RoutingProtocol> p1 =
+            nodes.Get(1)->GetObject<ns3::beeadhoc::RoutingProtocol>();
+
+        Simulator::Schedule(Seconds(0.1), [this, p1, devs]() {
+            const auto ucb = MakeCallback(&GuardsTestCase::Unicast, this);
+            const auto mcb = MakeCallback(&GuardsTestCase::Multicast, this);
+            const auto lcb = MakeCallback(&GuardsTestCase::Deliver, this);
+            const auto ecb = MakeCallback(&GuardsTestCase::Error, this);
+            Ipv4Header h;
+            h.SetSource(Ipv4Address("10.1.0.1"));
+            h.SetProtocol(17);
+            h.SetTtl(64);
+            // Three bytes of "UDP" for another node: no UDP header to peek, no
+            // trailer: dropped through the error callback, nothing read past it.
+            h.SetDestination(Ipv4Address("10.1.0.3"));
+            p1->RouteInput(Create<Packet>(3), h, devs.Get(1), ucb, mcb, lcb, ecb);
+            // A subnet-directed broadcast: the base's, delivered locally.
+            h.SetDestination(Ipv4Address("10.1.0.255"));
+            Ptr<Packet> b = Create<Packet>(16);
+            UdpHeader udp;
+            udp.SetSourcePort(49153);
+            udp.SetDestinationPort(9);
+            b->AddHeader(udp);
+            p1->RouteInput(b, h, devs.Get(1), ucb, mcb, lcb, ecb);
+        });
+        Simulator::Stop(Seconds(0.2));
+        Simulator::Run();
+        Simulator::Destroy();
+        NS_TEST_EXPECT_MSG_EQ(m_errors, 1u, "the short packet dropped");
+        NS_TEST_EXPECT_MSG_EQ(m_delivered, 1u, "the subnet broadcast delivered by the base");
+    }
+
+    void Unicast(Ptr<Ipv4Route>, Ptr<const Packet>, const Ipv4Header&) {}
+    void Multicast(Ptr<Ipv4MulticastRoute>, Ptr<const Packet>, const Ipv4Header&) {}
+    void Deliver(Ptr<const Packet>, const Ipv4Header&, uint32_t) { ++m_delivered; }
+    void Error(Ptr<const Packet>, const Ipv4Header&, Socket::SocketErrno) { ++m_errors; }
+
+    uint32_t m_delivered = 0;
+    uint32_t m_errors = 0;
+};
+
 class DeterminismTestCase : public TestCase {
 public:
     DeterminismTestCase() : TestCase("determinism: same seed same trace, another seed another") {}
@@ -587,6 +654,7 @@ public:
         AddTestCase(new SwarmTestCase, TestCase::Duration::QUICK);
         AddTestCase(new BatteryTestCase, TestCase::Duration::QUICK);
         AddTestCase(new ObserverTestCase, TestCase::Duration::QUICK);
+        AddTestCase(new GuardsTestCase, TestCase::Duration::QUICK);
         AddTestCase(new DeterminismTestCase, TestCase::Duration::QUICK);
     }
 };
