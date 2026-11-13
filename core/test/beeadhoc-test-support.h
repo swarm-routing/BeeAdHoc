@@ -15,6 +15,7 @@
 #include <functional>
 #include <limits>
 #include <map>
+#include <optional>
 #include <memory>
 #include <queue>
 #include <set>
@@ -82,6 +83,10 @@ public:
         }
     }
 
+    // The routers and callbacks point at this object: it never moves.
+    Network(const Network&) = delete;
+    Network& operator=(const Network&) = delete;
+
     void link(int a, int b) {
         links_.insert({a, b});
         links_.insert({b, a});
@@ -93,6 +98,31 @@ public:
     }
 
     Router& at(int i) { return *routers_[static_cast<std::size_t>(i)]; }
+
+    /// Carries a data packet of `type` with `trailer` hop by hop through the
+    /// codec, at once (no link delay): each forwarder runs forwardData, the
+    /// last node deliverData. Returns the trailer as the last node decoded it,
+    /// or nullopt when a hop dropped it or a link is missing.
+    std::optional<RouteTrailer> carry(RouteTrailer trailer, ForagerType type) {
+        const auto maxNodes = static_cast<std::size_t>(config_.maxHops) + 1;
+        if (trailer.route.size() < 2) return std::nullopt;
+        int from = trailer.route.front();
+        int to = trailer.route[1];
+        for (;;) {
+            if (!links_.contains({from, to})) return std::nullopt;
+            auto t = decodeTrailer(encodeTrailer(trailer), maxNodes);
+            if (!t) return std::nullopt;
+            if (to == t->route.back()) {
+                at(to).deliverData(*t, type);
+                return t;
+            }
+            const NodeAddress next = at(to).forwardData(*t);
+            if (next == swarm::core::kInvalidAddress) return std::nullopt;
+            trailer = std::move(*t);
+            from = to;
+            to = next;
+        }
+    }
     FixedEnergy& energy(int i) { return *energy_[static_cast<std::size_t>(i)]; }
     EventQueue& clock() { return clock_; }
     SeededRng& rng() { return rng_; }

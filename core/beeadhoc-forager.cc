@@ -139,6 +139,22 @@ std::optional<Forager> ForagerStore::take(NodeAddress dest, ForagerType type, Ti
     return std::nullopt;
 }
 
+std::optional<Forager> ForagerStore::takeForeign(NodeAddress dest, ForagerType type, Time now) {
+    auto it = entries_.find(dest);
+    if (it == entries_.end()) return std::nullopt;
+    auto& array = it->second.arrays[static_cast<std::size_t>(type)];
+    // The array is in arrival order (put appends): the first foreign is the oldest.
+    const auto at =
+        std::find_if(array.begin(), array.end(), [](const Forager& f) { return !f.own; });
+    if (at == array.end()) return std::nullopt;
+    it->second.lastUsed = now;
+    Forager home = std::move(*at);
+    array.erase(at);
+    removed(dest, home);
+    reportState();
+    return home;
+}
+
 void ForagerStore::collect(Time now) {
     for (auto it = entries_.begin(); it != entries_.end();) {
         if (now - it->second.lastUsed > config_.maxAge) {

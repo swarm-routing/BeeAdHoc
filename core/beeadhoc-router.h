@@ -3,26 +3,30 @@
 //
 // BeeAdHoc's per-node state and decisions, written fresh from PG 460's Linux
 // kernel module ([PG460] chs. 12-13) and docs/fidelity.md (golden rule 12).
-// This first slice is route discovery: a packet with no forager starts a
-// scout (§13.5), relays flood it with jitter and a seen list, the destination
-// turns it back with its own battery level (#4), the source turns the
-// returned scout into one own forager per type (Listing 13.28), and the
-// expanding ring resends it (#5). The data path (the source-route trailer,
-// FORWARD-chain levels, INPUT-chain foreign foragers, piggybacking), swarms
-// and link failure are the next slices (#36).
+// Route discovery: a packet with no forager starts a scout (§13.5), relays
+// flood it with jitter and a seen list, the destination turns it back with its
+// own battery level (#4), the source turns the returned scout into one own
+// forager per type (Listing 13.28), and the expanding ring resends it (#5).
+// The data path (#36 slice 2): the source writes the forager's route into the
+// packet's RouteTrailer with one foreign forager riding home (§13.7.1), each
+// forwarding host writes its level (FORWARD chain, Listing 13.7), and the
+// destination keeps the packet's reversed route as a foreign forager for the
+// source, adding its own level as the L-th value (INPUT chain, §12.1.3, #4).
+// Swarms and link failure are the next slices (#36).
 //
 // The router never touches a simulator (golden rule 10). Time, randomness,
 // energy and deferred work come through swarm-core's ports; every scout leaves
 // through the Sink as a swarm-core RouteDecision, which the adapter carries
 // out. A fixed seed of the injected IRng gives byte-identical behaviour (org
 // rule 5): the draws are the relay jitter (one uniform() per relayed scout) and
-// the forager choice (ForagerStore::take).
+// the forager choice (ForagerStore::take); the data path draws nothing else.
 #ifndef BEEADHOC_CORE_ROUTER_H
 #define BEEADHOC_CORE_ROUTER_H
 
 #include "beeadhoc-config.h"
 #include "beeadhoc-forager.h"
 #include "beeadhoc-scout.h"
+#include "beeadhoc-trailer.h"
 #include "swarm-dedup-history.h"
 #include "swarm-observer.h"
 #include "swarm-ports.h"
@@ -39,10 +43,13 @@ using ScoutDecision = swarm::core::RouteDecision<Scout>;
 
 /// What to do with a data packet this node originates.
 struct DataDecision {
-    /// Unicast (to route.front(), carrying `route`), Queue (hold it until
+    /// Unicast (to route.front(), carrying `trailer`), Queue (hold it until
     /// RouteReady or DiscardPending for the destination) or Drop.
     swarm::core::RouteAction action = swarm::core::RouteAction::Drop;
     std::vector<NodeAddress> route;  ///< the hops after this node, destination last
+    /// On Unicast, what the packet carries: the whole route (this node first),
+    /// info 0 (Listing 13.6) and at most one foreign forager riding home.
+    RouteTrailer trailer;
 };
 
 class Router {
@@ -58,8 +65,9 @@ public:
     /// `observer` (optional, null: none, one pointer check per event) is only
     /// read from: it hears each scout sent and received (kind = the scout's
     /// mode byte, kKindNames; bytes = its encoded size), each forager added or
-    /// removed as a route change, each routeOutput decision (Unicast, Queue,
-    /// Drop; Deliver belongs to the data path, #36) and the forager store's
+    /// removed as a route change, each data decision (routeOutput's Unicast,
+    /// Queue and Drop; forwardData's Unicast and Drop; deliverData's Deliver,
+    /// toward the packet's destination) and the forager store's
     /// footprint when it changes. It never alters a decision or draws from
     /// `rng`, so a fixed seed behaves the same with and without one.
     Router(NodeAddress self, const Config& config, swarm::core::IClock& clock,
@@ -75,6 +83,23 @@ public:
     /// and a scout goes out unless one for `dest` is already out; Drop when
     /// RXMTLISTLENGTH searches are already out.
     DataDecision routeOutput(NodeAddress dest, ForagerType type);
+
+    /// A data packet in transit at this node (FORWARD chain): the hop after
+    /// this node on the trailer's route, having shifted this node's battery
+    /// level into `trailer.info` (Listing 13.7). kInvalidAddress (drop it)
+    /// when the route does not name this node between its two ends, or
+    /// visits a node twice.
+    NodeAddress forwardData(RouteTrailer& trailer);
+
+    /// A data packet of `type` delivered to this node, the trailer's last
+    /// node (INPUT chain, §12.1.3): its reversed route becomes a 'foreign'
+    /// forager for its source, rated on its L values, this node's own level
+    /// the L-th (#4); a piggybacked forager whose owner is this node comes
+    /// home as an 'own' forager toward the packet's source (§13.7.1). A search
+    /// for the source ends, and RouteReady releases its held packets. A
+    /// trailer whose route is not source .. this node, or visits a node
+    /// twice, changes nothing.
+    void deliverData(const RouteTrailer& trailer, ForagerType type);
 
     /// A scout arrived from the one-hop neighbour `from`.
     void onScout(const Scout& scout, NodeAddress from);
@@ -100,6 +125,9 @@ private:
     void collectTimer();
     void onForwardScout(const Scout& scout);
     void onBackwardScout(const Scout& scout);
+    /// Ends a search for `dest` now that foragers for it exist.
+    void routeFound(NodeAddress dest);
+    std::size_t maxRouteNodes() const;
 
     NodeAddress self_;
     Config config_;
