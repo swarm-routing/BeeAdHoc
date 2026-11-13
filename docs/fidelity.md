@@ -22,12 +22,13 @@ implementation that runs. `core/` is being written (#36): its first slice
 (scouts, the forager arrays, the rating) and its data path (the route trailer,
 the FORWARD and INPUT chains, piggybacking) follow the rows that are settled and
 the repo choices; where a row names what `core/` does, that is what it does.
-The ns-3 module `beeadhoc` (`ns3/`, #47) carries that slice out on swarm-core's
+The ns-3 module `beeadhoc` (`ns3/`, #47) carries the core out on swarm-core's
 `SwarmRoutingBase` with no constant of its own, keeping the arm's control port
-5544 and the shared plumbing below (hold queue 64 packets / 30 s). Until the
-adapter adopts the core's trailer (#47), its data packets carry the forager's route as an ns-3
-packet tag, with no bytes on the air and no FORWARD-chain level writes, and
-every packet is the energy type; both are accepted by the maintainer on
+5544 and the shared plumbing below (hold queue 64 packets / 30 s). Its data
+packets carry the core's `RouteTrailer` right after the UDP header (in front of
+any other transport), so the harness, which counts routing control as UDP not
+addressed to the data port, still reads them as data; the trailer's bytes are
+on the air. Every packet is the energy type, accepted by the maintainer on
 2026-11-11 ([#47](https://github.com/swarm-routing/BeeAdHoc/issues/47#issuecomment-6783813490)). No parameter changed.
 
 **Status** says how each row stands against the source (#13):

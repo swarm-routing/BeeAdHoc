@@ -13,23 +13,26 @@
 // + 1 nodes, a short buffer or trailing bytes. ScoutHeader::Deserialize
 // cannot fail in ns-3's API, so it records whether the bytes decoded instead.
 //
-// RouteTag: the source route a data packet follows (core::DataDecision's
-// route: the hops after the source, the destination last). [PG460] §12.1.2
-// puts it in the packet; core/ has no data-path wire format yet (#36, slice
-// 2: the source-route trailer with the info field and the piggybacked
-// forager), so until it does the route rides as a packet tag, simulator
-// metadata with no bytes on the air. Control overhead in bytes is therefore
-// undercounted against the kernel module; replaced by the core's trailer when
-// slice 2 lands.
+// The swarm (core/beeadhoc-swarm.h) is the other control payload: MakeSwarmPacket
+// and DecodeSwarmPacket, fail-closed by core::decodeSwarm's rules. The kind
+// byte after the version tells a swarm (3) from a scout (1, 2) on one port.
+//
+// The route trailer (core/beeadhoc-trailer.h, [PG460] §12.1.2, §13.7.1) rides
+// on every data packet: in a UDP datagram right after the UDP header, so a
+// reader of the ports (the harness counts routing control as UDP not
+// addressed to the data port) still sees a data packet; in front of any other
+// IP payload. AddRouteTrailer, ReadRouteTrailer and StripRouteTrailer put it
+// on, read it without trusting the bytes, and take it off.
 #ifndef BEEADHOC_HEADER_H
 #define BEEADHOC_HEADER_H
 
 #include "beeadhoc-scout.h"
+#include "beeadhoc-swarm.h"
+#include "beeadhoc-trailer.h"
 
 #include "ns3/header.h"
 #include "ns3/packet.h"
 #include "ns3/ptr.h"
-#include "ns3/tag.h"
 
 #include <optional>
 #include <vector>
@@ -72,26 +75,55 @@ Ptr<Packet> MakeScoutPacket(const core::Scout& scout);
 /// is not exactly one valid scout (core::decodeScout's rules).
 std::optional<core::Scout> DecodeScoutPacket(Ptr<const Packet> p);
 
-/// The source route of a data packet (see the file comment: interim, no bytes
-/// on the air until core/'s data-path trailer exists).
-class RouteTag : public Tag {
+/// A packet holding exactly one swarm.
+Ptr<Packet> MakeSwarmPacket(const core::Swarm& swarm);
+
+/// The swarm a received control payload carries, or nullopt when the payload
+/// is not exactly one valid swarm (core::decodeSwarm's rules, at most
+/// SWARMSIZE foragers).
+std::optional<core::Swarm> DecodeSwarmPacket(Ptr<const Packet> p);
+
+/// The core's RouteTrailer as an ns3::Header (it is put in place with
+/// AddRouteTrailer). Deserialize cannot fail in ns-3's API, so it records
+/// whether the bytes decoded (IsValid).
+class RouteTrailerHeader : public Header {
 public:
-    RouteTag() = default;
-    explicit RouteTag(std::vector<core::NodeAddress> route) : m_route(std::move(route)) {}
+    RouteTrailerHeader() = default;
+    explicit RouteTrailerHeader(const core::RouteTrailer& t) : m_trailer(t), m_valid(true) {}
 
     static TypeId GetTypeId();
     TypeId GetInstanceTypeId() const override;
     uint32_t GetSerializedSize() const override;
-    void Serialize(TagBuffer i) const override;
-    /// Reads at most MaxScoutRouteNodes() addresses.
-    void Deserialize(TagBuffer i) override;
+    void Serialize(Buffer::Iterator start) const override;
+    uint32_t Deserialize(Buffer::Iterator start) override;
     void Print(std::ostream& os) const override;
 
-    const std::vector<core::NodeAddress>& Route() const { return m_route; }
+    const core::RouteTrailer& Get() const { return m_trailer; }
+    bool IsValid() const { return m_valid; }
 
 private:
-    std::vector<core::NodeAddress> m_route;
+    core::RouteTrailer m_trailer;
+    bool m_valid = false;
+    uint32_t m_size = 0;  ///< bytes Deserialize consumed
 };
+
+/// The route trailer of an IPv4 payload of `protocol` (after the UDP header
+/// for UDP, 17; at the front otherwise) and its size in bytes, or nullopt
+/// when there is not one valid trailer (core::decodeTrailer's rules, routes of
+/// at most MaxScoutRouteNodes() nodes). The bytes after it are not read.
+struct RouteTrailerAt {
+    core::RouteTrailer trailer;
+    uint32_t size = 0;
+};
+std::optional<RouteTrailerAt> ReadRouteTrailer(Ptr<const Packet> p, uint8_t protocol);
+
+/// A copy of `payload` (an IPv4 payload of `protocol`) carrying `t` where
+/// ReadRouteTrailer looks for it; its tags come along.
+Ptr<Packet> AddRouteTrailer(Ptr<const Packet> payload, uint8_t protocol,
+                            const core::RouteTrailer& t);
+
+/// A copy of `p` without the `size` bytes of the trailer ReadRouteTrailer read.
+Ptr<Packet> StripRouteTrailer(Ptr<const Packet> p, uint8_t protocol, uint32_t size);
 
 }  // namespace beeadhoc
 }  // namespace ns3
