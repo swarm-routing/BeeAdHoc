@@ -7,10 +7,13 @@
 //   legs run them inside ns-3 as core.yml runs them alone;
 // - the ns-3 scout header: roundtrip through a Packet with the byte layout
 //   pinned, and a seeded fuzz of the decoder a received control payload goes
-//   through (org rule 3); the route tag's roundtrip;
+//   through (org rule 3); the route trailer after a UDP header and the swarm
+//   payload, roundtrip, and a seeded fuzz of their readers;
 // - the adapter on a static four-node 802.11b chain: a scout flooded and
 //   returned, the packet that started it held and then sent, every packet
-//   delivered over the source route 0 -> 1 -> 2 -> 3;
+//   delivered over the source route 0 -> 1 -> 2 -> 3, and foreign foragers
+//   left at the destination (INPUT chain); one-way traffic past SWARMSIZE
+//   foreign foragers sends a swarm home;
 // - the battery port: a relay draining an ns-3 energy source shows up, through
 //   the EnergyMetricHook, as its 3-bit level in the returned scout's info;
 // - determinism: the same seed gives the same scout and delivery trace,
@@ -32,6 +35,7 @@
 #include "ns3/socket.h"
 #include "ns3/swarm-core-module.h"
 #include "ns3/test.h"
+#include "ns3/udp-header.h"
 #include "ns3/udp-socket-factory.h"
 #include "ns3/wifi-helper.h"
 #include "ns3/yans-wifi-helper.h"
@@ -142,14 +146,46 @@ private:
         ns3::beeadhoc::ScoutHeader(small).Print(os);
         NS_TEST_EXPECT_MSG_NE(os.str().find("SCOUT-BWD"), std::string::npos, "prints");
 
-        // The route tag: the hops after the source, through a Packet.
-        Ptr<Packet> d = Create<Packet>(8);
-        d->AddPacketTag(ns3::beeadhoc::RouteTag({2, 3, 4}));
-        ns3::beeadhoc::RouteTag t;
-        NS_TEST_ASSERT_MSG_EQ(d->Copy()->PeekPacketTag(t), true, "tag rides with a copy");
-        NS_TEST_EXPECT_MSG_EQ((t.Route() == std::vector<::beeadhoc::core::NodeAddress>{2, 3, 4}),
-                              true, "same route");
-        t.Print(os);
+        // The route trailer through a UDP datagram: right after the UDP
+        // header, so the ports read as before; stripped, the datagram as it was.
+        ::beeadhoc::core::RouteTrailer t;
+        t.route = {1, 2, 3, 4};
+        t.info = 0x3F;
+        t.piggyback = ::beeadhoc::core::RouteTrailer::Piggyback{{1, 2, 4}, 0x1FF};
+        Ptr<Packet> datagram = Create<Packet>(64);
+        UdpHeader udp;
+        udp.SetSourcePort(49153);
+        udp.SetDestinationPort(9);
+        datagram->AddHeader(udp);
+        const std::vector<uint8_t> plain = Bytes(datagram);
+        Ptr<Packet> d = ns3::beeadhoc::AddRouteTrailer(datagram, 17, t);
+        NS_TEST_EXPECT_MSG_EQ(d->GetSize(), datagram->GetSize() + t.wireSize(), "trailer bytes on");
+        UdpHeader first;
+        d->PeekHeader(first);
+        NS_TEST_EXPECT_MSG_EQ(first.GetDestinationPort(), 9u, "the UDP header stays first");
+        NS_TEST_EXPECT_MSG_EQ(Bytes(d)[8], ::beeadhoc::core::RouteTrailer::kWireVersion,
+                              "the trailer right after it");
+        const auto read = ns3::beeadhoc::ReadRouteTrailer(d, 17);
+        NS_TEST_ASSERT_MSG_EQ(read.has_value(), true, "the trailer reads back");
+        NS_TEST_EXPECT_MSG_EQ((read->trailer == t), true, "the same trailer");
+        NS_TEST_EXPECT_MSG_EQ(read->size, static_cast<uint32_t>(t.wireSize()), "its size");
+        NS_TEST_EXPECT_MSG_EQ((Bytes(ns3::beeadhoc::StripRouteTrailer(d, 17, read->size)) == plain),
+                              true, "stripped: the datagram as it was");
+        ns3::beeadhoc::RouteTrailerHeader th(t);
+        th.Print(os);
+
+        // A swarm through a control payload: kind 3, not a scout.
+        ::beeadhoc::core::Swarm sw;
+        sw.source = 4;
+        sw.destination = 1;
+        sw.route = {4, 3, 2, 1};
+        sw.foragers = {{{1, 2, 3, 4}, 0x1FF}};
+        Ptr<Packet> sp = ns3::beeadhoc::MakeSwarmPacket(sw);
+        NS_TEST_EXPECT_MSG_EQ(Bytes(sp)[1], ::beeadhoc::core::kSwarmKind, "the swarm's kind byte");
+        const auto swBack = ns3::beeadhoc::DecodeSwarmPacket(sp);
+        NS_TEST_EXPECT_MSG_EQ((swBack.has_value() && *swBack == sw), true, "the same swarm");
+        NS_TEST_EXPECT_MSG_EQ(ns3::beeadhoc::DecodeScoutPacket(sp).has_value(), false,
+                              "not a scout");
     }
 };
 
@@ -163,7 +199,8 @@ uint64_t Mix(uint64_t& s) {
 
 class HeaderFuzzTestCase : public TestCase {
 public:
-    HeaderFuzzTestCase() : TestCase("header: seeded fuzz of the control-payload decoder") {}
+    HeaderFuzzTestCase()
+        : TestCase("header: seeded fuzz of the scout, swarm and route-trailer readers") {}
 
 private:
     void DoRun() override {
@@ -197,6 +234,53 @@ private:
             NS_TEST_ASSERT_MSG_EQ(h.IsValid(), true, "the header accepts it too");
         }
         NS_TEST_EXPECT_MSG_GT(accepted, 0u, "the fuzz reaches the accepting path");
+
+        // The data packet's trailer and the swarm: the other two readers a
+        // received packet goes through.
+        ::beeadhoc::core::RouteTrailer tr;
+        tr.route = {1, 2, 3};
+        tr.piggyback = ::beeadhoc::core::RouteTrailer::Piggyback{{1, 3}, 7};
+        const std::vector<uint8_t> trailer = ::beeadhoc::core::encodeTrailer(tr);
+        ::beeadhoc::core::Swarm sw;
+        sw.source = 3;
+        sw.destination = 1;
+        sw.route = {3, 2, 1};
+        sw.foragers = {{{1, 2, 3}, 0x3F}, {{1, 3}, 0}};
+        const std::vector<uint8_t> swarm = ::beeadhoc::core::encodeSwarm(sw);
+        uint32_t trailers = 0;
+        uint32_t swarms = 0;
+        for (int i = 0; i < 6000; ++i) {
+            const std::vector<uint8_t>& seed = (i % 2 == 0) ? trailer : swarm;
+            std::vector<uint8_t> b;
+            if (i % 3 == 0) {
+                b.resize(Mix(s) % 80);
+                for (auto& x : b)
+                    x = static_cast<uint8_t>(Mix(s));
+            } else {
+                b = seed;
+                b[Mix(s) % b.size()] = static_cast<uint8_t>(Mix(s));
+                const uint64_t shape = Mix(s) % 3;
+                if (shape == 1) b.resize(Mix(s) % b.size());
+                if (shape == 2) b.push_back(static_cast<uint8_t>(Mix(s)));
+            }
+            if (const auto t = ns3::beeadhoc::ReadRouteTrailer(FromBytes(b), 0)) {
+                ++trailers;
+                const auto again = ::beeadhoc::core::encodeTrailer(t->trailer);
+                NS_TEST_ASSERT_MSG_EQ(again.size(), t->size, "the size read is the encoded size");
+                NS_TEST_ASSERT_MSG_EQ(
+                    (std::vector<uint8_t>(b.begin(), b.begin() + t->size) == again), true,
+                    "an accepted trailer re-encodes identically");
+            }
+            ns3::beeadhoc::RouteTrailerHeader th;  // the header path must not overrun either
+            FromBytes(b)->RemoveHeader(th);
+            if (const auto w = ns3::beeadhoc::DecodeSwarmPacket(FromBytes(b))) {
+                ++swarms;
+                NS_TEST_ASSERT_MSG_EQ((::beeadhoc::core::encodeSwarm(*w) == b), true,
+                                      "an accepted swarm re-encodes identically");
+            }
+        }
+        NS_TEST_EXPECT_MSG_GT(trailers, 0u, "the trailer fuzz reaches the accepting path");
+        NS_TEST_EXPECT_MSG_GT(swarms, 0u, "the swarm fuzz reaches the accepting path");
         NS_TEST_EXPECT_MSG_EQ(ns3::beeadhoc::DecodeScoutPacket(Create<Packet>()).has_value(), false,
                               "empty payload");
         std::vector<uint8_t> trailing = valid;
@@ -229,13 +313,16 @@ struct ChainRun {
     uint64_t backward = 0;  ///< backward scouts sent (each hop back)
     DeferredQueueStats queue0;
     uint32_t foragers0 = 0;  ///< node 0's foragers for node 3 after the run
+    uint32_t foragers3 = 0;  ///< node 3's (foreign) foragers for node 0 after the run
+    uint32_t swarms = 0;     ///< swarms sent or relayed
+    uint32_t swarmForagers = 0;
     // The base's trace sources, when the run connected them (#54).
     uint32_t controlTx = 0;
     uint32_t controlRx = 0;
     uint32_t routeAdded = 0;
     uint32_t dataDecisions = 0;
     uint32_t stateSizes = 0;
-    std::string kindForward, kindBackward;
+    std::string kindForward, kindBackward, kindSwarm;
 };
 
 class Chain {
@@ -303,6 +390,8 @@ public:
         for (uint32_t i = 0; i < 4; ++i) {
             Proto(nodes.Get(i))
                 ->TraceConnect("ScoutTx", std::to_string(i), MakeCallback(&Chain::ScoutTx, this));
+            Proto(nodes.Get(i))
+                ->TraceConnect("SwarmTx", std::to_string(i), MakeCallback(&Chain::SwarmTx, this));
             if (observe) {
                 auto p = Proto(nodes.Get(i));
                 p->TraceConnectWithoutContext("ControlTx", MakeCallback(&Chain::ControlTx, this));
@@ -326,9 +415,11 @@ public:
         Simulator::Run();
         m_run.queue0 = Proto(nodes.Get(0))->GetDeferredQueue()->Stats();
         m_run.foragers0 = Proto(nodes.Get(0))->Foragers(m_dst);
+        m_run.foragers3 = Proto(nodes.Get(3))->Foragers(ifs.GetAddress(0));
         m_run.kindForward = Proto(nodes.Get(0))->KindName(static_cast<uint8_t>(ScoutMode::Forward));
         m_run.kindBackward =
             Proto(nodes.Get(0))->KindName(static_cast<uint8_t>(ScoutMode::Backward));
+        m_run.kindSwarm = Proto(nodes.Get(0))->KindName(::beeadhoc::core::kSwarmKind);
         m_src = nullptr;
         Simulator::Destroy();
         return m_run;
@@ -348,6 +439,13 @@ private:
         std::ostringstream os;
         os << Simulator::Now().GetNanoSeconds() << " n" << node << " tx mode=" << int{mode}
            << (broadcast ? " bcast" : " ucast") << " info=" << info;
+        m_run.trace.push_back(os.str());
+    }
+    void SwarmTx(std::string node, uint32_t foragers) {
+        ++m_run.swarms;
+        if (node == "3") m_run.swarmForagers += foragers;
+        std::ostringstream os;
+        os << Simulator::Now().GetNanoSeconds() << " n" << node << " tx swarm=" << foragers;
         m_run.trace.push_back(os.str());
     }
     void ControlTx(uint8_t, bool, uint32_t) { ++m_run.controlTx; }
@@ -396,6 +494,27 @@ private:
         // backward scout carries 7, 7, 7 (relay 1, relay 2, itself).
         NS_TEST_ASSERT_MSG_GT(r.returnedInfo.size(), 0u, "the destination turned a scout back");
         NS_TEST_EXPECT_MSG_EQ(r.returnedInfo.front(), 0x1FFu, "levels 7, 7, 7");
+        // INPUT chain (§12.1.3): each delivered packet left node 3 a foreign
+        // forager for node 0, carried by the route trailer.
+        NS_TEST_EXPECT_MSG_GT(r.foragers3, 0u, "foreign foragers at the destination");
+        NS_TEST_EXPECT_MSG_EQ(r.swarms, 0u, "20 packets: not more than SWARMSIZE foreign");
+    }
+};
+
+class SwarmTestCase : public TestCase {
+public:
+    SwarmTestCase()
+        : TestCase("adapter: one-way traffic sends a swarm home (Listing 13.30, §13.7.3)") {}
+
+private:
+    void DoRun() override {
+        // 30 packets one way, one every 0.5 s: node 3's foreign foragers for
+        // node 0 pass SWARMSIZE (20) while it has no own forager for node 0.
+        const ChainRun r = Chain().Run(1, 30);
+        NS_TEST_EXPECT_MSG_EQ(r.received, r.sent, "every packet delivered");
+        NS_TEST_EXPECT_MSG_GT(r.swarms, 0u, "a swarm left node 3 and was relayed");
+        NS_TEST_EXPECT_MSG_EQ(r.swarmForagers % 20u, 0u, "SWARMSIZE foragers per swarm");
+        NS_TEST_EXPECT_MSG_GT(r.foragers0, 1u, "node 0 holds the foragers that came home");
     }
 };
 
@@ -432,10 +551,78 @@ private:
         NS_TEST_EXPECT_MSG_GT(seen.stateSizes, 0u, "StateSize: the forager store grew");
         NS_TEST_EXPECT_MSG_EQ(seen.kindForward, std::string("FORWARD_SCOUT"), "kind 0 named");
         NS_TEST_EXPECT_MSG_EQ(seen.kindBackward, std::string("BACKWARD_SCOUT"), "kind 1 named");
+        NS_TEST_EXPECT_MSG_EQ(seen.kindSwarm, std::string("SWARM"), "kind 3 named");
         // Connected sources never alter the run (org rule 5, observer contract).
         NS_TEST_EXPECT_MSG_EQ((plain.trace == seen.trace), true, "identical trace");
         NS_TEST_EXPECT_MSG_EQ(plain.received, seen.received, "identical delivery");
     }
+};
+
+class GuardsTestCase : public TestCase {
+public:
+    GuardsTestCase()
+        : TestCase("adapter: short UDP payloads and subnet broadcasts reach no trailer reader") {}
+
+private:
+    void DoRun() override {
+        SwarmCoreSeed(1);
+        NodeContainer nodes;
+        nodes.Create(2);
+        MobilityHelper mobility;
+        mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+        mobility.Install(nodes);
+        WifiHelper wifi;
+        wifi.SetStandard(WIFI_STANDARD_80211b);
+        YansWifiChannelHelper channel = YansWifiChannelHelper::Default();
+        YansWifiPhyHelper phy;
+        phy.SetChannel(channel.Create());
+        WifiMacHelper mac;
+        mac.SetType("ns3::AdhocWifiMac");
+        NetDeviceContainer devs = wifi.Install(phy, mac, nodes);
+        BeeAdHocHelper bee;
+        bee.Install(nodes);
+        Ipv4AddressHelper a;
+        a.SetBase("10.1.0.0", "255.255.255.0");
+        a.Assign(devs);
+        Ptr<ns3::beeadhoc::RoutingProtocol> p1 =
+            nodes.Get(1)->GetObject<ns3::beeadhoc::RoutingProtocol>();
+
+        Simulator::Schedule(Seconds(0.1), [this, p1, devs]() {
+            const auto ucb = MakeCallback(&GuardsTestCase::Unicast, this);
+            const auto mcb = MakeCallback(&GuardsTestCase::Multicast, this);
+            const auto lcb = MakeCallback(&GuardsTestCase::Deliver, this);
+            const auto ecb = MakeCallback(&GuardsTestCase::Error, this);
+            Ipv4Header h;
+            h.SetSource(Ipv4Address("10.1.0.1"));
+            h.SetProtocol(17);
+            h.SetTtl(64);
+            // Three bytes of "UDP" for another node: no UDP header to peek, no
+            // trailer: dropped through the error callback, nothing read past it.
+            h.SetDestination(Ipv4Address("10.1.0.3"));
+            p1->RouteInput(Create<Packet>(3), h, devs.Get(1), ucb, mcb, lcb, ecb);
+            // A subnet-directed broadcast: the base's, delivered locally.
+            h.SetDestination(Ipv4Address("10.1.0.255"));
+            Ptr<Packet> b = Create<Packet>(16);
+            UdpHeader udp;
+            udp.SetSourcePort(49153);
+            udp.SetDestinationPort(9);
+            b->AddHeader(udp);
+            p1->RouteInput(b, h, devs.Get(1), ucb, mcb, lcb, ecb);
+        });
+        Simulator::Stop(Seconds(0.2));
+        Simulator::Run();
+        Simulator::Destroy();
+        NS_TEST_EXPECT_MSG_EQ(m_errors, 1u, "the short packet dropped");
+        NS_TEST_EXPECT_MSG_EQ(m_delivered, 1u, "the subnet broadcast delivered by the base");
+    }
+
+    void Unicast(Ptr<Ipv4Route>, Ptr<const Packet>, const Ipv4Header&) {}
+    void Multicast(Ptr<Ipv4MulticastRoute>, Ptr<const Packet>, const Ipv4Header&) {}
+    void Deliver(Ptr<const Packet>, const Ipv4Header&, uint32_t) { ++m_delivered; }
+    void Error(Ptr<const Packet>, const Ipv4Header&, Socket::SocketErrno) { ++m_errors; }
+
+    uint32_t m_delivered = 0;
+    uint32_t m_errors = 0;
 };
 
 class DeterminismTestCase : public TestCase {
@@ -464,8 +651,10 @@ public:
         AddTestCase(new HeaderRoundtripTestCase, TestCase::Duration::QUICK);
         AddTestCase(new HeaderFuzzTestCase, TestCase::Duration::QUICK);
         AddTestCase(new ChainDeliveryTestCase, TestCase::Duration::QUICK);
+        AddTestCase(new SwarmTestCase, TestCase::Duration::QUICK);
         AddTestCase(new BatteryTestCase, TestCase::Duration::QUICK);
         AddTestCase(new ObserverTestCase, TestCase::Duration::QUICK);
+        AddTestCase(new GuardsTestCase, TestCase::Duration::QUICK);
         AddTestCase(new DeterminismTestCase, TestCase::Duration::QUICK);
     }
 };

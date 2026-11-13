@@ -7,7 +7,7 @@ before changing anything. Org-wide conventions:
 
 ## What this repo is
 
-**Status: `core/` and `ns3/` in progress (Phase 4, #36, #47).** The core's first slice, route discovery (scouts with the seen list and the expanding ring, the three-type forager arrays, the Listing 13.15 rating, the `MAXAGE` collector, the scout wire header), builds and tests on its own and inside ns-3 as the contrib module `beeadhoc`, whose adapter carries it out on swarm-core's `SwarmRoutingBase`; the core reports through swarm-core's optional `IRouterObserver*` (scouts sent and received by kind and bytes, forager adds and removes as route changes, `routeOutput` decisions, the forager store's footprint; `kKindNames` in `beeadhoc-scout.h`, #54) and the adapter hands it the base's observer; the core's data path (`RouteTrailer`: the source-route trailer as a versioned POD, FORWARD-chain levels, the INPUT chain's foreign foragers, piggybacking) is in, and the adapter still carries the route as an ns-3 tag until it adopts the trailer (#47); swarms (Listing 13.30, `beeadhoc-swarm.*`) and link failure (`onLinkFailure`) are in the core too, and wait for the adapter to wire them (#47); then the gates (#47).
+**Status: `core/` and `ns3/` in progress (Phase 4, #36, #47).** The core's first slice, route discovery (scouts with the seen list and the expanding ring, the three-type forager arrays, the Listing 13.15 rating, the `MAXAGE` collector, the scout wire header), builds and tests on its own and inside ns-3 as the contrib module `beeadhoc`, whose adapter carries it out on swarm-core's `SwarmRoutingBase`; the core reports through swarm-core's optional `IRouterObserver*` (scouts sent and received by kind and bytes, forager adds and removes as route changes, `routeOutput` decisions, the forager store's footprint; `kKindNames` in `beeadhoc-scout.h`, #54) and the adapter hands it the base's observer; the core's data path (`RouteTrailer`: the source-route trailer as a versioned POD, FORWARD-chain levels, the INPUT chain's foreign foragers, piggybacking), swarms (Listing 13.30, `beeadhoc-swarm.*`) and link failure (`onLinkFailure`) are in, and the adapter carries them all out (#36's four slices, #47); the gates come next (#41, #47).
 
 BeeAdHoc, the honeybee-inspired routing protocol of Wedde & Farooq (2005),
 in the version the PG 460 report's Linux kernel module specifies (chs. 12–13,
@@ -30,8 +30,8 @@ core/       simulator-agnostic agents, forager arrays, metrics + unit tests (MIT
   beeadhoc-router.*    per-node state and decisions (ports in, RouteDecisions out)
   test/                the core tests (plain CMake + ctest; the ns-3 suite runs the same list)
 ns3/        contrib module `beeadhoc` (GPL-2.0-only), compiling core/ on swarm-core
-  model/beeadhoc-header.*            ScoutHeader (core/'s scout codec as an ns3::Header) and RouteTag (the source route, interim until #36 slice 2's trailer, #47)
-  model/beeadhoc-routing-protocol.*  the adapter: one core::Router per node on SwarmRoutingBase; converts and carries out, no constant of its own
+  model/beeadhoc-header.*            ScoutHeader, the swarm payload, and the RouteTrailer right after each data packet's UDP header (core/'s codecs)
+  model/beeadhoc-routing-protocol.*  the adapter: one core::Router per node on SwarmRoutingBase; RouteInput takes every data packet; no constant of its own
   helper/beeadhoc-helper.*           BeeAdHocHelper (stack + protocol + monitors, EnergyMetricHook included)
   helper/beeadhoc-bench-arms.cc      the `beeadhoc` arm of ns3-tools' routing-bench (compiled only beside it)
   examples/beeadhoc-example.cc       a small RWP MANET; CI's determinism program

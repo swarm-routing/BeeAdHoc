@@ -29,10 +29,9 @@ the org's Phase 4. `core/` (#36) has route discovery, the data path (the
 versioned source-route trailer, FORWARD-chain levels, the INPUT chain's
 foreign foragers, piggybacking), swarms and link failure. The ns-3 module
 `beeadhoc` (scout codec, adapter, helper, example, `test.py -s beeadhoc`, and
-the `beeadhoc` arm of ns3-tools' `routing-compare`) carries out route
-discovery; its data packets still carry the route as an ns-3 packet tag, and
-it does not yet send swarms or react to a link failure, until it adopts the
-core's trailer (#47). Then the gates (#47). What the source specifies, row by
+the `beeadhoc` arm of ns3-tools' `routing-compare`) carries all of it out:
+every data packet carries the core's trailer, and the adapter sends swarms
+and reacts to a link failure (#47). The gates come next (#41, #47). What the source specifies, row by
 row, and what is still open: [docs/fidelity.md](docs/fidelity.md).
 
 **Release status:** the first release, v0.1.0, comes before the comparator gates (maintainer decision 2026-11-10): it has **not** cleared them (org golden rule 6: fidelity sheet, per-PR delivery smoke, anchor). v0.1.0 shipped `core/` (route discovery only) and `docs/`, without an ns-3 module; `main` has since added the ns-3 module `beeadhoc` and the rest of `core/` (Status above), unreleased. The anchor is pending, so no number from v0.1.0 or from `main` counts as a benchmark result. The gated release is proposed as v0.2.0. The release ladder, with each release's exit criteria, is in [docs/roadmap.md](docs/roadmap.md). Releases are cut by [`release.yml`](https://github.com/swarm-routing/BeeAdHoc/blob/main/.github/workflows/release.yml) and listed under [Releases](https://github.com/swarm-routing/BeeAdHoc/releases).

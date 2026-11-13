@@ -18,9 +18,9 @@ above 24, a route longer than `MaxHops` + 1 nodes, a short buffer or trailing
 bytes. The core's two other decoders are built and tested the same way:
 `decodeTrailer` (`core/beeadhoc-trailer.cc`, the data packet's source-route
 trailer) and `decodeSwarm` (`core/beeadhoc-swarm.cc`), each with fail-closed
-and seeded fuzz tests. Nothing reads them from packets yet: the ns-3 adapter
-carries the route as a packet tag and sends no swarm until it adopts them
-(#47), so today they parse test input only.
+and seeded fuzz tests. The ns-3 adapter reads both from packets (#47): the
+trailer on every data packet, the swarm as a control payload, each refused
+when it does not decode.
 
 ## Known, by-design limitations (out of scope)
 

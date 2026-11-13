@@ -12,6 +12,9 @@ run-name: ${{ inputs.label || inputs.cell || 'benchmark cell' }}
 # given by digest, together with its two dependencies at the commits below.
 # Campaigns dispatch it through `ns3-campaign` (swarm-routing/ns3-tools) from a
 # plan in tools/bench/campaigns/ (AGENTS.md "Build & verify").
+# `key` is the cell key ns3-campaign computes over every pinned input
+# (swarm-routing/ns3-tools#155): the cell writes it into ##PROV## and names its
+# artifact by it, so a re-dispatched campaign reuses a cell already run.
 #
 # The dependencies are pinned by commit, so every cell of a campaign builds the
 # same code:
@@ -46,6 +49,9 @@ on:
       label:
         description: 'Run name (<generation>/<arm>/<cell>), set by ns3-campaign'
         default: ''
+      key:
+        description: 'Cell key (64 hex) ns3-campaign computes over every pinned input; written into ##PROV## and the artifact name, so a later campaign reuses the cell; empty = none'
+        default: ''
 
 permissions:
   contents: read
@@ -64,6 +70,7 @@ jobs:
       args: ${{ inputs.args }}
       seeds: ${{ inputs.seeds }}
       cell: ${{ inputs.cell }}
+      key: ${{ inputs.key }}
       modules: beeadhoc=ns3
       dependencies: |
         swarm-core=swarm-routing/ns3-swarm-core@501dd7eca8c530dadaeb5d43c66e9c31d19fd8f5

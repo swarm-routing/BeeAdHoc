@@ -13,22 +13,25 @@
 // `beeadhoc` arm used.
 //
 // What the core decides, the adapter does:
-//  - data this node originates: core::Router::routeOutput. A Unicast carries
-//    the forager's whole route (a RouteTag on the packet) and goes to its
-//    first hop. A Queue holds the packet in the base's deferred queue while
-//    the core's scout is out; the core's RouteReady releases it, and its
-//    DiscardPending drops it. A Drop (RXMTLISTLENGTH searches already out)
-//    drops it at once: StartDiscovery discards whatever the core is not
-//    searching for.
-//  - data in transit: the packet follows the route its source wrote (strict
-//    source routing, [PG460] §12.1.2); a packet without a route, or whose
-//    route does not name this node, is dropped. The FORWARD-chain battery
-//    writes, the destination's foreign forager, piggybacking and swarms
-//    ([PG460] §12.1.3, §13.7) and link failure are in the core (forwardData,
-//    deliverData, onSwarm, onLinkFailure; #36) and not wired here yet (#47):
-//    until then the adapter neither writes levels into data packets, nor
-//    sends swarms, nor reacts to a link failure.
-//  - scouts: the core's Broadcast and Unicast decisions, as one-hop UDP sends.
+//  - data: RouteInput takes every unicast data packet (RouteOutput sends a
+//    node's own through the loopback first, so its transport header is on
+//    it). This node's own: core::Router::routeOutput. A Unicast carries the
+//    core's RouteTrailer (the route, the info field, at most one piggybacked
+//    foreign forager) right after the UDP header and goes to the route's
+//    first hop; a Queue holds the packet in the base's deferred queue while
+//    the core's scout is out, the core's RouteReady offers it to routeOutput
+//    again, and its DiscardPending drops it; a Drop drops it at once. In
+//    transit: core::Router::forwardData writes this node's level into the
+//    trailer (FORWARD chain, Listing 13.7) and names the next hop, or the
+//    packet is dropped. At the destination: core::Router::deliverData (INPUT
+//    chain: the foreign forager, a piggybacked forager home, Listing 13.30's
+//    swarm trigger), then the trailer comes off and the packet goes up.
+//  - scouts and swarms: the core's Broadcast and Unicast decisions, as one-hop
+//    UDP sends; a received control payload is a swarm when its kind byte says
+//    so (beeadhoc-header.h), else a scout.
+//  - link failure: core::Router::onLinkFailure removes the foragers over the
+//    failed link (fidelity row "A failed next link"); the packet under it is
+//    lost, as the row says.
 //  - the battery: the node's EnergyMetricHook through the base's Energy()
 //    port; with none, the core reads "no battery data", level 7 (§13.1.2).
 // Every data packet is the energy type: the kernel module measures only
@@ -48,7 +51,8 @@
 
 namespace beeadhoc::core {
 class Router;
-}
+struct RouteTrailer;
+}  // namespace beeadhoc::core
 
 namespace ns3 {
 namespace beeadhoc {
@@ -73,6 +77,13 @@ public:
     /// A scout this node sent: (core::ScoutMode as its wire byte, broadcast,
     /// the 24-bit info field it carries).
     typedef void (*ScoutTxCallback)(uint8_t mode, bool broadcast, uint32_t info);
+    /// A swarm this node sent or relayed: (foragers carried).
+    typedef void (*SwarmTxCallback)(uint32_t foragers);
+
+    // Ipv4RoutingProtocol: every unicast data packet passes through here.
+    bool RouteInput(Ptr<const Packet> p, const Ipv4Header& header, Ptr<const NetDevice> idev,
+                    const UnicastForwardCallback& ucb, const MulticastForwardCallback& mcb,
+                    const LocalDeliverCallback& lcb, const ErrorCallback& ecb) override;
 
 protected:
     void DoInitialize() override;
@@ -83,6 +94,7 @@ protected:
                               Ptr<const Packet> p) override;
     void StartDiscovery(Ipv4Address dst) override;
     void RecvControl(Ptr<Packet> p, Ipv4Address from, Ipv4Address receiver) override;
+    void OnLinkFailure(Ipv4Address neighbor) override;
 
 private:
     /// The core's energy port: the base's Energy() read on every call, so an
@@ -96,12 +108,23 @@ private:
         const RoutingProtocol& m_owner;
     };
 
+    /// The core's RouteReady: offers the packets held for `dest` to
+    /// routeOutput again.
+    void Resume(Ipv4Address dest);
+    /// Sends `payload` (an IPv4 payload) with `trailer` to `next`.
+    void SendData(Ptr<const Packet> payload, const Ipv4Header& header,
+                  const core::RouteTrailer& trailer, Ipv4Address next,
+                  const UnicastForwardCallback& ucb);
+    static void DropData(Ptr<const Packet> payload, const Ipv4Header& header,
+                         const ErrorCallback& ecb);
+
     /// The core's clock port. Clock() is const and the router takes a
     /// mutable reference; SwarmClock is stateless, so this one reads the same.
     SwarmClock m_clock;
     EnergyPort m_energy{*this};
     std::unique_ptr<core::Router> m_router;
     TracedCallback<uint8_t, bool, uint32_t> m_scoutTx;
+    TracedCallback<uint32_t> m_swarmTx;
 };
 
 }  // namespace beeadhoc

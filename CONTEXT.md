@@ -13,10 +13,9 @@ short form:
 
 - `core/` (#36) has route discovery, the data path (the source-route
   trailer), swarms and link failure, each with its tests.
-- `ns3/` is the contrib module `beeadhoc` (#47): it carries out route
-  discovery on swarm-core's `SwarmRoutingBase`. Its data packets carry the
-  route as an ns-3 packet tag; it does not yet use the core's trailer, send
-  swarms or react to a link failure.
+- `ns3/` is the contrib module `beeadhoc` (#47): it carries the core out on
+  swarm-core's `SwarmRoutingBase`. Every data packet carries the core's
+  trailer; the adapter sends swarms and reacts to a link failure.
 - The comparator gates (org golden rule 6) are not cleared: the fidelity
   sheet exists ([`docs/fidelity.md`](docs/fidelity.md)), the delivery smoke
   and the anchor are #47's.
@@ -69,7 +68,6 @@ Terms as [`docs/fidelity.md`](docs/fidelity.md) and `core/` use them.
   (the rating's values, the dance cap, the scout TTL, the battery bins)? #27.
   The sheet has no `unknown` row left: every reading the report leaves open
   is a repo choice recorded on #4, #5, #13 or #36, and #27 reviews them.
-- The adapter's adoption of the core's trailer, swarms and link failure, and
-  the two remaining gates: #47.
+- The two remaining gates (the delivery smoke, the anchor): #47.
 - Should a returned scout with no search out call RouteReady? Today it does
   (`Router::onBackwardScout`), while `deliverData` and `onSwarm` do not: #104.
