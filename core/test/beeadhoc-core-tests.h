@@ -24,6 +24,8 @@ void TestDiscovery(Checker& c);
 void TestDestinationLevel(Checker& c);
 void TestExpandingRing(Checker& c);
 void TestScoutBounds(Checker& c);
+void TestScoutRouteRepeats(Checker& c);
+void TestLateScout(Checker& c);
 void TestRouterDeterminism(Checker& c);
 void TestTrailerRoundtrip(Checker& c);
 void TestTrailerFailsClosed(Checker& c);
