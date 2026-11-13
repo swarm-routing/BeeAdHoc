@@ -28,7 +28,7 @@ core/       simulator-agnostic agents, forager arrays, metrics + unit tests (MIT
   beeadhoc-swarm.*     the swarm (Listing 13.30, §13.7.3): SWARMSIZE foreign foragers sent home, its versioned wire format
   beeadhoc-trailer.*   the data packet's source-route trailer (route, info, one piggybacked forager) and its versioned wire format
   beeadhoc-router.*    per-node state and decisions (ports in, RouteDecisions out)
-  test/                the core tests (plain CMake + ctest; the ns-3 suite will run the same list)
+  test/                the core tests (plain CMake + ctest; the ns-3 suite runs the same list)
 ns3/        contrib module `beeadhoc` (GPL-2.0-only), compiling core/ on swarm-core
   model/beeadhoc-header.*            ScoutHeader (core/'s scout codec as an ns3::Header) and RouteTag (the source route, interim until #36 slice 2's trailer, #47)
   model/beeadhoc-routing-protocol.*  the adapter: one core::Router per node on SwarmRoutingBase; converts and carries out, no constant of its own
@@ -39,6 +39,7 @@ ns3/        contrib module `beeadhoc` (GPL-2.0-only), compiling core/ on swarm-c
 docs/       fidelity.md: the fidelity sheet (#13), every row against PG 460's Linux module (chs. 12–13); GECCO 2005 once in hand (#5); PG 439 and Farooq's thesis do not specify BeeAdHoc
 .github/workflows/core.yml   core/ alone: strict warnings, tests, ASan + UBSan, clang-format (check `core`)
 .github/workflows/ns3.yml    ns3/ in ns3-dev latest debug + sanitized (reusable-ns3-ci.yml; checks `ci / ns-latest debug`, `ci / ns-latest sanitized`, `ci / format`)
+.github/workflows/swarm-core-pin.yml   the swarm-core pin is one SHA and current (reusable-swarm-core-pin.yml; check `swarm-core / pin`)
 .github/workflows/benchmark-cell.yml   one benchmark cell at a pinned source_sha (reusable-benchmark-cell.yml, build mode); dispatched by ns3-campaign
 tools/bench/campaigns/   campaign plans: smoke.yaml (the change-test smoke against the base)
 ```

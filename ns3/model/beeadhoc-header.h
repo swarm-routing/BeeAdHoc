@@ -15,12 +15,12 @@
 //
 // RouteTag: the source route a data packet follows (core::DataDecision's
 // route: the hops after the source, the destination last). [PG460] §12.1.2
-// puts it in the packet; core/ has no data-path wire format yet (#36, slice
-// 2: the source-route trailer with the info field and the piggybacked
-// forager), so until it does the route rides as a packet tag, simulator
-// metadata with no bytes on the air. Control overhead in bytes is therefore
-// undercounted against the kernel module; replaced by the core's trailer when
-// slice 2 lands.
+// puts it in the packet, and core/ has the wire format for it (RouteTrailer,
+// beeadhoc-trailer.h: the source route, the info field and the piggybacked
+// forager; #36 slice 2). This adapter does not use it yet (#47): until it
+// does, the route rides as a packet tag, simulator metadata with no bytes on
+// the air. Control overhead in bytes is therefore undercounted against the
+// kernel module.
 #ifndef BEEADHOC_HEADER_H
 #define BEEADHOC_HEADER_H
 

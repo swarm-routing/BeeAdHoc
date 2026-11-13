@@ -15,8 +15,12 @@ through `ns3/model/beeadhoc-header.cc`), built on `swarm-core`'s
 bounds-checked little-endian readers with roundtrip and seeded fuzz tests
 (org invariant 3). It refuses a wrong version, an unknown mode, info bits
 above 24, a route longer than `MaxHops` + 1 nodes, a short buffer or trailing
-bytes. The data-path trailer and the swarm packet will be decoded the same
-way when they are written (#36).
+bytes. The core's two other decoders are built and tested the same way:
+`decodeTrailer` (`core/beeadhoc-trailer.cc`, the data packet's source-route
+trailer) and `decodeSwarm` (`core/beeadhoc-swarm.cc`), each with fail-closed
+and seeded fuzz tests. Nothing reads them from packets yet: the ns-3 adapter
+carries the route as a packet tag and sends no swarm until it adopts them
+(#47), so today they parse test input only.
 
 ## Known, by-design limitations (out of scope)
 

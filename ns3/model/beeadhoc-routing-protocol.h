@@ -23,10 +23,11 @@
 //  - data in transit: the packet follows the route its source wrote (strict
 //    source routing, [PG460] §12.1.2); a packet without a route, or whose
 //    route does not name this node, is dropped. The FORWARD-chain battery
-//    writes, the destination's foreign forager and piggybacking ([PG460]
-//    §12.1.3, §13.7) arrive with the core's data-path slice (#36, slice 2),
-//    link failure with slice 4; until then the adapter neither writes levels
-//    into data packets nor reacts to a link failure.
+//    writes, the destination's foreign forager, piggybacking and swarms
+//    ([PG460] §12.1.3, §13.7) and link failure are in the core (forwardData,
+//    deliverData, onSwarm, onLinkFailure; #36) and not wired here yet (#47):
+//    until then the adapter neither writes levels into data packets, nor
+//    sends swarms, nor reacts to a link failure.
 //  - scouts: the core's Broadcast and Unicast decisions, as one-hop UDP sends.
 //  - the battery: the node's EnergyMetricHook through the base's Energy()
 //    port; with none, the core reads "no battery data", level 7 (§13.1.2).
