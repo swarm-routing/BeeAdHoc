@@ -67,7 +67,10 @@ struct Swarm {
     bool operator==(const Swarm&) const = default;
 };
 
-/// The encoded swarm.
+/// The encoded swarm; empty (a frame no decoder accepts) when a route or the
+/// cargo is longer than its u16 count can say. The router never builds one:
+/// its routes are capped at Config::maxHops + 1 nodes and its cargo at
+/// SWARMSIZE.
 std::vector<std::uint8_t> encodeSwarm(const Swarm& s);
 
 /// Decodes untrusted bytes. Fails (nullopt) on a wrong version or kind, an

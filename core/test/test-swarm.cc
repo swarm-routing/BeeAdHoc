@@ -27,12 +27,16 @@ Swarm sample() {
     return s;
 }
 
-/// Node 0 found `last` by a scout on a chain, then sent it `packets` data
-/// packets along the chain (one-way traffic; the trailer is written here so
-/// that the source's forager supply does not matter).
-Network oneWay(int nodes, int packets, Config config = {}) {
+/// A config whose first scout reaches 10 hops.
+Config farScouts(Config config = {}) {
     config.initialScoutTtl = 10;
-    Network net(nodes, config, 21);
+    return config;
+}
+
+/// On `net`, a chain of `nodes`, node 0 finds the last by a scout, then sends
+/// it `packets` data packets along the chain (one-way traffic; the trailer is
+/// written here so that the source's forager supply does not matter).
+void oneWay(Network& net, int nodes, int packets) {
     net.chain();
     const int last = nodes - 1;
     net.at(0).routeOutput(last, ForagerType::Energy);
@@ -45,7 +49,6 @@ Network oneWay(int nodes, int packets, Config config = {}) {
         net.clock().runUntil(net.clock().now() + 0.01);
     }
     net.clock().runUntil(net.clock().now() + 0.1);
-    return net;
 }
 
 }  // namespace
@@ -93,6 +96,9 @@ void TestSwarmFailsClosed(Checker& c) {
     c.check(!decodeSwarm(bad, 11, 20), "trailing byte");
     c.check(!decodeSwarm({}, 11, 20), "empty buffer");
     c.check(!decodeScout(good, 11), "the scout decoder refuses a swarm");
+    Swarm huge = sample();
+    huge.foragers[0].route.assign(65536, 1);
+    c.check(encodeSwarm(huge).empty(), "a carried route past the u16 count is not encoded");
 }
 
 void TestSwarmFuzz(Checker& c) {
@@ -129,12 +135,14 @@ void TestSwarmTrigger(Checker& c) {
     const Config config;
     {
         // 20 packets leave 20 foreign foragers at 3: not more than SWARMSIZE.
-        Network net = oneWay(4, 20);
+        Network net(4, farScouts(), 21);
+        oneWay(net, 4, 20);
         c.check(net.swarms.empty() &&
                     net.at(3).foragers().count(0, ForagerType::Energy, false) == 20,
                 "20 foreign foragers: no swarm yet (Listing 13.30: more than SWARMSIZE)");
     }
-    Network net = oneWay(4, 21);
+    Network net(4, farScouts(), 21);
+    oneWay(net, 4, 21);
     // The 21st packet tips it: 21 > 20 foreign, 0 < 11 own at 3.
     c.check(net.swarms == std::vector<std::pair<int, NodeAddress>>{{3, 2}, {2, 1}, {1, 0}},
             "one swarm, relayed hop by hop along its source route");
@@ -151,7 +159,8 @@ void TestSwarmTrigger(Checker& c) {
 
     Config noOwnRoom = config;
     noOwnRoom.swarmSizeOwn = 0;  // "own < 0" never holds
-    Network quiet = oneWay(3, 25, noOwnRoom);
+    Network quiet(3, farScouts(noOwnRoom), 21);
+    oneWay(quiet, 3, 25);
     c.check(quiet.swarms.empty(), "no swarm while own foragers reach SWARMSIZE_OWN");
 
     Network unsunk(3, Config{}, 22);
@@ -183,6 +192,12 @@ void TestSwarmReceive(Checker& c) {
             "only the cargo that leads from here to the sender is unpacked");
     c.check(!net.at(0).searching(2) && !net.ready.empty() && net.ready.back().second == 2,
             "a swarm from 2 ends the search for 2");
+    Swarm looped = s;
+    looped.route = {2, 1, 2, 0};
+    const std::size_t before0 = net.at(0).foragers().count(2, ForagerType::Throughput, true);
+    net.at(0).onSwarm(looped, 1);
+    c.check(net.at(0).foragers().count(2, ForagerType::Throughput, true) == before0,
+            "a swarm whose route visits a node twice is refused");
     Swarm stray = s;
     stray.route = {2, 5, 0};
     const std::size_t before = net.swarms.size();

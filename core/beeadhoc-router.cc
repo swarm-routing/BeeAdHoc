@@ -187,7 +187,8 @@ void Router::onSwarm(const Swarm& swarm, NodeAddress /*from*/) {
         observer_->onControlReceived(Swarm::kKind, static_cast<std::uint32_t>(swarm.wireSize()));
     const auto& route = swarm.route;
     if (route.size() < 2 || route.size() > maxRouteNodes() || route.front() != swarm.source ||
-        route.back() != swarm.destination || swarm.foragers.size() > config_.swarmSize)
+        route.back() != swarm.destination || swarm.foragers.size() > config_.swarmSize ||
+        !loopFree(route))
         return;
     const auto at = std::find(route.begin(), route.end(), self_);
     if (at == route.end() || at == route.begin()) return;
@@ -202,7 +203,7 @@ void Router::onSwarm(const Swarm& swarm, NodeAddress /*from*/) {
     bool any = false;
     for (const Swarm::Cargo& c : swarm.foragers) {
         if (c.route.size() < 2 || c.route.size() > maxRouteNodes() || c.route.front() != self_ ||
-            c.route.back() != swarm.source)
+            c.route.back() != swarm.source || !loopFree(c.route))
             continue;
         Forager f;
         f.route.assign(c.route.begin() + 1, c.route.end());

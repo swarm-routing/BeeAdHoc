@@ -39,6 +39,10 @@ std::vector<NodeAddress> readRoute(WireReader& r, std::size_t maxRouteNodes) {
 }  // namespace
 
 std::vector<std::uint8_t> encodeSwarm(const Swarm& s) {
+    constexpr std::size_t kMaxCount = std::numeric_limits<std::uint16_t>::max();
+    if (s.route.size() > kMaxCount || s.foragers.size() > kMaxCount) return {};
+    for (const Swarm::Cargo& c : s.foragers)
+        if (c.route.size() > kMaxCount) return {};
     std::vector<std::uint8_t> out;
     out.reserve(s.wireSize());
     WireWriter w(out);
