@@ -82,5 +82,6 @@ RELEASE_VERSION ?= $(shell sed -n 's/^version = "\(.*\)"$$/\1/p' .cz.toml)
 dist: ## the release asset in dist/: beeadhoc-<ver>.tar.gz
 	rm -rf dist && mkdir -p dist
 	git archive --format=tar.gz --prefix=beeadhoc-$(RELEASE_VERSION)/ -o dist/beeadhoc-$(RELEASE_VERSION).tar.gz HEAD \
-		$$(git ls-tree --name-only HEAD core ns3 docs LICENSE LICENSE-MIT LICENSING.md README.md CITATION.cff AGENTS.md Makefile CHANGELOG.md)
+		$$(git ls-tree --name-only HEAD core swarm-core.lock ns3 docs LICENSE LICENSE-MIT LICENSING.md README.md CITATION.cff AGENTS.md Makefile CHANGELOG.md)
 	tar -tzf dist/beeadhoc-$(RELEASE_VERSION).tar.gz | grep -qx 'beeadhoc-$(RELEASE_VERSION)/core/LICENSE'
+	tar -tzf dist/beeadhoc-$(RELEASE_VERSION).tar.gz | grep -qx 'beeadhoc-$(RELEASE_VERSION)/swarm-core.lock'
