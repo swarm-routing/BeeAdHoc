@@ -53,8 +53,11 @@ endif()
 
 # The strict warnings the org CI applies (ns3-containers' swarm-quality.cmake),
 # on BeeAdHoc's own sources only.
+# A swarm-core deprecation ([[deprecated]], its docs/api-policy.md
+# "Deprecation") stays a warning: it shows in every build, never fails one.
 set(BEEADHOC_WARNINGS -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -Wold-style-cast
-                      -Wcast-align -Woverloaded-virtual -Wnull-dereference -Wformat=2 -Werror)
+                      -Wcast-align -Woverloaded-virtual -Wnull-dereference -Wformat=2 -Werror
+                      -Wno-error=deprecated-declarations)
 
 add_library(beeadhoc_core STATIC
   beeadhoc-forager.cc
