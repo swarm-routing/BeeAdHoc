@@ -43,7 +43,7 @@ the rules and how to build and verify; the org conventions are in
 ## Try it
 
 `core/` alone, with no ns-3 tree (CMake and a C++20 compiler; it fetches
-swarm-core's `core/` at the pinned commit):
+swarm-core's `core/` at the release `swarm-core.lock` names):
 
 ```bash
 make core-test    # cmake -S core -B build/core && cmake --build build/core && ctest --test-dir build/core
@@ -99,7 +99,7 @@ Each release also has its own **version DOI**, listed on [its Zenodo record](htt
 Please also cite the work it builds on:
 
 - M. Farooq, H. F. Wedde, *BeeAdHoc: an efficient, secure and scalable routing framework for mobile adhoc networks*, Technische Universität Dortmund, 2006, [doi:10.17877/DE290R-14312](https://doi.org/10.17877/DE290R-14312). The version this repository implements (Project Group 460's final report, its Linux kernel module, chs. 12-13): the source of every row in docs/fidelity.md.
-- D. H. Joppi, *ns3-swarm-core*, 2026, [doi:10.5281/zenodo.24138628](https://doi.org/10.5281/zenodo.24138628). The shared primitives core/ builds on (pinned by commit: SWARM_CORE_REF) and the ns-3 base the adapter derives from (SwarmRoutingBase).
+- D. H. Joppi, *ns3-swarm-core*, 2026, [doi:10.5281/zenodo.24138628](https://doi.org/10.5281/zenodo.24138628). The shared primitives core/ builds on (pinned by release: swarm-core.lock) and the ns-3 base the adapter derives from (SwarmRoutingBase).
 
 What this implementation reproduces from its sources, and every deliberate deviation, is in [docs/fidelity.md](docs/fidelity.md).
 
