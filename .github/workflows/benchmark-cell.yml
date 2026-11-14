@@ -73,5 +73,5 @@ jobs:
       key: ${{ inputs.key }}
       modules: beeadhoc=ns3
       dependencies: |
-        swarm-core=swarm-routing/ns3-swarm-core@69664219b2edc63995614332cf9f651b1720622b
+        swarm-core=swarm-routing/ns3-swarm-core@6419567d98544c6b146a6b62c29c6c8594202098
         routing-bench=swarm-routing/ns3-tools@3d279b83392a00288050574cee4288f30205658b:ns3/routing-bench
