@@ -1,0 +1,77 @@
+# Copyright (c) 2026 Daniel Joppi (https://github.com/swarm-routing)
+# SPDX-License-Identifier: MIT OR GPL-2.0-only
+#
+# BeeAdHoc's anchor (the third gate of org rule 6; #41, #5): the trend of
+# [PG460] §7.2.5 (Fig. 7.14), "BeeAdHoc sends the smallest number of control
+# packet[s]", flat over pause time, on this repository's own core/.
+#
+# Pre-registered on #5 before any dispatch. The scenario, the arms, the seeds,
+# the image and the pass rule are those of generation `bee-anchor-1`
+# (https://github.com/swarm-routing/BeeAdHoc/issues/5#issuecomment-6841625121,
+# maintainer decision 2026-11-13: AntHocNet's `v270a` scenario and rule,
+# swarm-routing/AntHocNet#800, re-registered on seeds 1-20). `bee-anchor-1`
+# was never dispatched; it named the main commit that first carried #36's
+# data path (062d3cc, #108) with "swarm-core at SWARM_CORE_REF of that
+# commit" (501dd7e), while every cell builds swarm-core at the commit
+# benchmark-cell.yml names (now v0.4.0, 111a673). Its own rule ("nothing
+# changes except by a new id") makes this a new generation in which only the
+# commits differ, as ARA did with its anchor-3 (swarm-routing/ARA#113):
+#   - source_sha bc9cb7d: main on 2026-11-15, the code BeeAdHoc v0.2.0
+#     would ship. Between 062d3cc and it, core/ and ns3/ change only by #110
+#     (a returned scout's route checked for repeats, which no well-formed run
+#     builds) and build files (swarm-core by release, C++23, the CMake
+#     package); swarm-core.lock names the commit below;
+#   - swarm-core@111a67385fbcdaecff5efa49cbdd66b20a355a09 (v0.4.0);
+#   - routing-bench@3d279b83392a00288050574cee4288f30205658b.
+# Any later run is a new plan with another generation, never an edit of this
+# one.
+#
+#   Rule (PRIMARY, gates the anchor, v270a's verbatim): at each pause time,
+#   beeadhoc's NRL is below AODV's and below DSDV's, paired by seed: the
+#   paired 95 % CI of (beeadhoc - other), n = 20, lies wholly below zero.
+#   PASS if this holds against both AODV and DSDV at >= 4 of the 5 pause
+#   times; otherwise MISS, recorded in docs/fidelity.md "Anchor history" as a
+#   written verdict. SECONDARY (reported, not gated): PDR, delay and the
+#   rest of the ##RUN## line, beeadhoc minus each reference.
+#
+# Cells: v270a's command line, seeds 1-20 (RngRun) in four jobs of five
+# (blocks --firstRun=1, 6, 11, 16), as v270a split its five-seed blocks, so no
+# job nears the hosted runner's 6 h ceiling. 20 jobs, at most 4 at once, so
+# PR CI keeps runners.
+#
+#   P=tools/bench/campaigns/anchor.yaml
+#   C="python3 ../ns3-tools/python/ns3_tool/campaign.py"   # or `ns3-campaign`
+#   $C plan $P                                      # 20 jobs; dispatches nothing
+#   $C dispatch $P --cap 4                          # re-run until all are dispatched
+#   $C status $P
+#   $C collect $P --out .campaign/bee-anchor-2/cells
+#   grep -ho '\(swarm-core\|routing-bench\)@[0-9a-f]*' .campaign/bee-anchor-2/cells/*.txt | sort -u
+#                                                   # 2 lines, the commits above
+#   $C verdicts $P --dir .campaign/bee-anchor-2/cells   # beeadhoc - aodv, beeadhoc - dsdv per cell
+generation: bee-anchor-2
+ref: main
+repo: swarm-routing/BeeAdHoc
+source_sha: bc9cb7d9b296db01c3bd7cdb822bf3966c37e326
+workflow: benchmark-cell.yml
+program: routing-compare
+# ns3-dev 3.48-optimized (fb7596b), the image the smoke pins: AODV stays on
+# 3.48 while ns-3.49's AODV livelocks (swarm-routing/ns3-containers#35).
+image: ghcr.io/swarm-routing/ns3-dev@sha256:5585a93c5cea1980592539e2d26a4e111e0ff4b0cc63b3dfd6ea5de459d80d3f
+cap: 4
+control: beeadhoc
+# `verdicts` prints beeadhoc minus each, paired by seed (swarm-routing/ns3-tools#152).
+reference: [aodv, dsdv]
+
+arms:
+  beeadhoc: ""
+
+x-field: &field "--scenario=paper --runs=5 --nNodes=100 --time=900 --areaX=3000 --areaY=1000 --flows=20 --cbrBps=2048 --speed=10 --speedMin=0 --propagation=tworay --range=250 --diag --mobility=rwp --transport=udp --protocols=aodv,dsdv,beeadhoc"
+cells:
+  bee-anchor-p1: {workflow: benchmark-cell.yml, inputs: {harness: routing-compare, args: *field, extraArgs: "--pause=1"}, blocks: [1, 6, 11, 16]}
+  bee-anchor-p30: {workflow: benchmark-cell.yml, inputs: {harness: routing-compare, args: *field, extraArgs: "--pause=30"}, blocks: [1, 6, 11, 16]}
+  bee-anchor-p100: {workflow: benchmark-cell.yml, inputs: {harness: routing-compare, args: *field, extraArgs: "--pause=100"}, blocks: [1, 6, 11, 16]}
+  bee-anchor-p500: {workflow: benchmark-cell.yml, inputs: {harness: routing-compare, args: *field, extraArgs: "--pause=500"}, blocks: [1, 6, 11, 16]}
+  bee-anchor-p1000: {workflow: benchmark-cell.yml, inputs: {harness: routing-compare, args: *field, extraArgs: "--pause=1000"}, blocks: [1, 6, 11, 16]}
+
+jobs:
+  - {arms: [beeadhoc], cells: "*"}
