@@ -7,6 +7,7 @@
 | Path | What | Licence |
 |------|------|---------|
 | `core/` | the simulator-free BeeAdHoc algorithm and its unit tests (carries `core/LICENSE`) | `MIT OR GPL-2.0-only` |
+| `core/test/consumer-package/` | the scratch `find_package(beeadhoc-core)` consumer of the installed package | `MIT OR GPL-2.0-only` |
 | `tools/` | standalone scripts (checks, release, data handling) | `MIT OR GPL-2.0-only` |
 | `ns3/` | the `beeadhoc` ns-3 contrib module | `GPL-2.0-only` |
 | `docs/`, `README.md`, `AGENTS.md`, `CLAUDE.md` | docs | `GPL-2.0-only` |

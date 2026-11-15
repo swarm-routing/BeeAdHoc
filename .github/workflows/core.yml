@@ -49,5 +49,18 @@ jobs:
             -DSWARM_CORE_DIR="$PWD/build/debug/_deps/swarm_core_src-src/core"
           cmake --build build/sanitized -j "$(nproc)"
           ctest --test-dir build/sanitized --output-on-failure
+      - name: The CMake package beeadhoc-core (find_package, swarm-core from its package; swarm-routing/.github#436)
+        run: |
+          prefix="$PWD/build/prefix"
+          cmake -S build/debug/_deps/swarm_core_src-src/core -B build/swarm-core-pkg -DCMAKE_BUILD_TYPE=Release -DSWARM_CORE_TESTS=OFF
+          cmake --build build/swarm-core-pkg -j "$(nproc)" && cmake --install build/swarm-core-pkg --prefix "$prefix"
+          cmake -S core -B build/pkg -DCMAKE_BUILD_TYPE=Release -DBEEADHOC_CORE_SWARM_CORE_FROM_PACKAGE=ON \
+            -DBEEADHOC_CORE_INSTALL=ON -DBEEADHOC_CORE_TESTS=OFF -DCMAKE_PREFIX_PATH="$prefix"
+          cmake --build build/pkg -j "$(nproc)" && cmake --install build/pkg --prefix "$prefix"
+          for f in lib/libbeeadhoc_core.a lib/cmake/beeadhoc-core/beeadhoc-coreConfig.cmake lib/cmake/beeadhoc-core/beeadhoc-coreConfigVersion.cmake lib/cmake/beeadhoc-core/beeadhoc-coreTargets.cmake; do
+            test -f "$prefix/$f" || { echo "::error::the install has no $f"; exit 1; }
+          done
+          cmake -S core/test/consumer-package -B build/consumer -DCMAKE_PREFIX_PATH="$prefix"
+          cmake --build build/consumer && build/consumer/consumer
       - name: Format (org .clang-format)
         run: git ls-files 'core/*.h' 'core/*.cc' | xargs clang-format-18 --style=file:.org/.clang-format --dry-run --Werror
