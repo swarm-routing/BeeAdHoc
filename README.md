@@ -1,22 +1,14 @@
 # BeeAdHoc
 
 <!-- org-sync:begin badges -->
-[![Release](https://img.shields.io/github/v/release/swarm-routing/BeeAdHoc?sort=semver&cacheSeconds=1800)](https://github.com/swarm-routing/BeeAdHoc/releases)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24124821.svg)](https://doi.org/10.5281/zenodo.24124821)
-[![Cite](https://img.shields.io/badge/cite-CITATION.cff-blue)](CITATION.cff)
-[![Licence: GPL-2.0-only, core/ tools/ MIT OR GPL-2.0-only](https://img.shields.io/badge/licence-GPL--2.0--only%2C%20core%2F%20tools%2F%20MIT%20OR%20GPL--2.0--only-blue)](LICENSING.md)
-[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow)](https://www.conventionalcommits.org)
-[![Colony Arena: BeeAdHoc](https://img.shields.io/badge/Colony%20Arena-project%20page-orange)](https://swarm-routing.github.io/projects/BeeAdHoc/)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/swarm-routing/BeeAdHoc/badge)](https://scorecard.dev/viewer/?uri=github.com/swarm-routing/BeeAdHoc)
-[![C++20](https://img.shields.io/badge/C%2B%2B-20-blue?logo=cplusplus)](AGENTS.md)
-[![Runs on ns-3](https://img.shields.io/badge/runs%20on-ns--3-informational)](https://www.nsnam.org)
-[![Built on: ns3-dev](https://img.shields.io/badge/built%20on-ns3--dev%20image-blue?logo=docker)](https://github.com/orgs/swarm-routing/packages/container/package/ns3-dev)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=swarm-routing_BeeAdHoc&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=swarm-routing_BeeAdHoc)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=swarm-routing_BeeAdHoc&metric=bugs)](https://sonarcloud.io/summary/new_code?id=swarm-routing_BeeAdHoc)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=swarm-routing_BeeAdHoc&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=swarm-routing_BeeAdHoc)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=swarm-routing_BeeAdHoc&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=swarm-routing_BeeAdHoc)
-[![codecov](https://codecov.io/gh/swarm-routing/BeeAdHoc/graph/badge.svg)](https://codecov.io/gh/swarm-routing/BeeAdHoc)
-[![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/swarm-routing/BeeAdHoc?utm_source=oss&utm_medium=github&utm_campaign=swarm-routing%2FBeeAdHoc&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)](https://coderabbit.ai)
+| Group | Badges |
+| --- | --- |
+| Build | [![Built on: ns3-dev](https://img.shields.io/badge/built%20on-ns3--dev%20image-blue?logo=docker)](https://github.com/orgs/swarm-routing/packages/container/package/ns3-dev) |
+| Quality | [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=swarm-routing_BeeAdHoc&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=swarm-routing_BeeAdHoc) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=swarm-routing_BeeAdHoc&metric=bugs)](https://sonarcloud.io/summary/new_code?id=swarm-routing_BeeAdHoc) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=swarm-routing_BeeAdHoc&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=swarm-routing_BeeAdHoc) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=swarm-routing_BeeAdHoc&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=swarm-routing_BeeAdHoc) [![codecov](https://codecov.io/gh/swarm-routing/BeeAdHoc/graph/badge.svg)](https://codecov.io/gh/swarm-routing/BeeAdHoc) [![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/swarm-routing/BeeAdHoc?utm_source=oss&utm_medium=github&utm_campaign=swarm-routing%2FBeeAdHoc&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)](https://coderabbit.ai) |
+| Release | [![Release](https://img.shields.io/github/v/release/swarm-routing/BeeAdHoc?sort=semver&cacheSeconds=1800)](https://github.com/swarm-routing/BeeAdHoc/releases) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24124821.svg)](https://doi.org/10.5281/zenodo.24124821) [![Cite](https://img.shields.io/badge/cite-CITATION.cff-blue)](CITATION.cff) [![Licence: GPL-2.0-only, core/ tools/ MIT OR GPL-2.0-only](https://img.shields.io/badge/licence-GPL--2.0--only%2C%20core%2F%20tools%2F%20MIT%20OR%20GPL--2.0--only-blue)](LICENSING.md) |
+| Trust | [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/swarm-routing/BeeAdHoc/badge)](https://scorecard.dev/viewer/?uri=github.com/swarm-routing/BeeAdHoc) |
+| Stack | [![C++23](https://img.shields.io/badge/C%2B%2B-23-blue?logo=cplusplus)](AGENTS.md) [![Runs on ns-3](https://img.shields.io/badge/runs%20on-ns--3-informational)](https://www.nsnam.org) |
+| Community & docs | [![Colony Arena: BeeAdHoc](https://img.shields.io/badge/Colony%20Arena-project%20page-orange)](https://swarm-routing.github.io/projects/BeeAdHoc/) [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow)](https://www.conventionalcommits.org) |
 <!-- org-sync:end badges -->
 
 BeeAdHoc, the honeybee-inspired routing protocol of
@@ -43,7 +35,7 @@ the rules and how to build and verify; the org conventions are in
 ## Try it
 
 `core/` alone, with no ns-3 tree (CMake and a C++20 compiler; it fetches
-swarm-core's `core/` at the pinned commit):
+swarm-core's `core/` at the release `swarm-core.lock` names):
 
 ```bash
 make core-test    # cmake -S core -B build/core && cmake --build build/core && ctest --test-dir build/core
@@ -99,7 +91,7 @@ Each release also has its own **version DOI**, listed on [its Zenodo record](htt
 Please also cite the work it builds on:
 
 - M. Farooq, H. F. Wedde, *BeeAdHoc: an efficient, secure and scalable routing framework for mobile adhoc networks*, Technische Universität Dortmund, 2006, [doi:10.17877/DE290R-14312](https://doi.org/10.17877/DE290R-14312). The version this repository implements (Project Group 460's final report, its Linux kernel module, chs. 12-13): the source of every row in docs/fidelity.md.
-- D. H. Joppi, *ns3-swarm-core*, 2026, [doi:10.5281/zenodo.24138628](https://doi.org/10.5281/zenodo.24138628). The shared primitives core/ builds on (pinned by commit: SWARM_CORE_REF) and the ns-3 base the adapter derives from (SwarmRoutingBase).
+- D. H. Joppi, *ns3-swarm-core*, 2026, [doi:10.5281/zenodo.24138628](https://doi.org/10.5281/zenodo.24138628). The shared primitives core/ builds on (pinned by release: swarm-core.lock) and the ns-3 base the adapter derives from (SwarmRoutingBase).
 
 What this implementation reproduces from its sources, and every deliberate deviation, is in [docs/fidelity.md](docs/fidelity.md).
 
