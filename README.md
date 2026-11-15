@@ -34,7 +34,7 @@ the rules and how to build and verify; the org conventions are in
 
 ## Try it
 
-`core/` alone, with no ns-3 tree (CMake and a C++20 compiler; it fetches
+`core/` alone, with no ns-3 tree (CMake and a C++23 compiler, the standard of the ns-3 release the org supports; it fetches
 swarm-core's `core/` at the release `swarm-core.lock` names):
 
 ```bash
