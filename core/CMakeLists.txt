@@ -130,6 +130,12 @@ include(GNUInstallDirs)
 target_include_directories(beeadhoc_core PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/beeadhoc-core>)
+if(BEEADHOC_CORE_SANITIZE)
+  # The objects are instrumented, so whatever links them needs the sanitizer
+  # runtime: add_link_options above reaches this directory's targets only, not
+  # a consumer's (or an installed package's) executable.
+  target_link_options(beeadhoc_core INTERFACE -fsanitize=address,undefined)
+endif()
 target_link_libraries(beeadhoc_core PUBLIC swarm::core)
 target_compile_options(beeadhoc_core PRIVATE ${BEEADHOC_WARNINGS})
 
