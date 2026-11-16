@@ -1,0 +1,685 @@
+# bee-anchor-2 campaign bee-anchor-p1000-bee-anchor-2: 4 run(s): 43750800555 (beeadhoc/bee-anchor-p1000-s1) / 43753094875 (beeadhoc/bee-anchor-p1000-s6) / 43754574418 (beeadhoc/bee-anchor-p1000-s11) / 43761882969 (beeadhoc/bee-anchor-p1000-s16); ref main; source_sha bc9cb7d9b296db01c3bd7cdb822bf3966c37e326
+##CONFIG## scenario=paper nNodes=100 time=900 runs=5 firstRun=1 areaX=3000 areaY=1000 speed=10 speedMin=0 pause=1000 range=250 propagation=tworay mobility=rwp transport=udp flows=20 cbrBps=2048 offTime=0 rateManager=constant2 protocols=aodv,dsdv,beeadhoc
+##DROPID## 1 aodv hopTx=242372 hopRx=237416 ackedHops=236677 macDrops=3416 reinjected=0 macTerminal=3416 macLost=2677 queue=0 hopLoss=4956 overlap=-2279 unackedRx=739 pqSilent=0 pqEcb=185
+# diag aodv seed=1 pdr=82.26 firstDeliveryS=26.26 ctrlTx=1159836 setupMedS=1.15 setupMaxS=29.05 flowsNoDelivery=0
+##RUN## 1 aodv 82.3 78.6 833.5 42.07 22.55 64.56 14.5 inf 12.0432
+##AIR## 1 aodv 1534.671 11320.104 10528.430 25.9813
+##ENERGY## 1 aodv 75556.025 1.468733 2.8686e-03 8.087
+##GOODPUT## 1 aodv 29.265
+##ROUTE## 1 aodv 1.1540 29.0541 0 0.09786 1.250 5032 4.0182 4.0182
+##PERF## paper aodv 1 1054.029 1054.120 789473140 -
+##DROPID## 2 aodv hopTx=307927 hopRx=306626 ackedHops=306425 macDrops=984 reinjected=0 macTerminal=984 macLost=783 queue=0 hopLoss=1301 overlap=-518 unackedRx=201 pqSilent=0 pqEcb=0
+# diag aodv seed=2 pdr=94.76 firstDeliveryS=4.44 ctrlTx=640811 setupMedS=0.97 setupMaxS=7.09 flowsNoDelivery=0
+##RUN## 2 aodv 94.8 18.7 255.5 49.10 10.67 18.36 6.5 84.5 5.6419
+##AIR## 2 aodv 992.057 6396.148 5384.286 14.1917
+##ENERGY## 2 aodv 74789.548 1.245558 2.4327e-03 2.978
+##GOODPUT## 2 aodv 34.159
+##ROUTE## 2 aodv 0.9727 7.0882 0 0.04551 3.000 2732 4.9046 4.9046
+##PERF## paper aodv 2 633.210 633.256 485807680 -
+##DROPID## 3 aodv hopTx=246033 hopRx=238412 ackedHops=237075 macDrops=4669 reinjected=0 macTerminal=4669 macLost=3332 queue=0 hopLoss=7621 overlap=-4289 unackedRx=1337 pqSilent=0 pqEcb=445
+# diag aodv seed=3 pdr=70.98 firstDeliveryS=3.74 ctrlTx=1610421 setupMedS=0.94 setupMaxS=5.73 flowsNoDelivery=0
+##RUN## 3 aodv 71.0 125.7 1226.5 38.25 34.43 88.46 76.5 inf 18.4363
+##AIR## 3 aodv 2035.171 15331.715 15274.185 36.2679
+##ENERGY## 3 aodv 76203.066 1.629176 3.1820e-03 8.304
+##GOODPUT## 3 aodv 26.609
+##ROUTE## 3 aodv 0.9390 5.7274 0 0.12688 1.250 5932 4.1336 4.1336
+##PERF## paper aodv 3 1557.573 1557.683 1043744288 -
+##DROPID## 4 aodv hopTx=278222 hopRx=272772 ackedHops=271909 macDrops=3314 reinjected=0 macTerminal=3314 macLost=2451 queue=0 hopLoss=5450 overlap=-2999 unackedRx=863 pqSilent=0 pqEcb=120
+# diag aodv seed=4 pdr=78.52 firstDeliveryS=6.65 ctrlTx=1313921 setupMedS=1.53 setupMaxS=9.31 flowsNoDelivery=0
+##RUN## 4 aodv 78.5 79.4 910.5 41.16 26.10 60.16 16.5 inf 13.9030
+##AIR## 4 aodv 1721.093 11893.407 11495.855 27.9004
+##ENERGY## 4 aodv 75676.470 1.503397 2.9363e-03 7.537
+##GOODPUT## 4 aodv 28.636
+##ROUTE## 4 aodv 1.5262 9.3062 0 0.08580 1.500 4317 4.4679 4.4679
+##PERF## paper aodv 4 1256.476 1256.553 883528619 -
+##DROPID## 5 aodv hopTx=265066 hopRx=260418 ackedHops=259541 macDrops=3817 reinjected=0 macTerminal=3817 macLost=2940 queue=0 hopLoss=4648 overlap=-1708 unackedRx=877 pqSilent=15 pqEcb=38
+# diag aodv seed=5 pdr=81.32 firstDeliveryS=5.24 ctrlTx=1310401 setupMedS=0.93 setupMaxS=2.34 flowsNoDelivery=0
+##RUN## 5 aodv 81.3 78.9 845.5 43.65 24.55 64.36 15.5 inf 13.1053
+##AIR## 5 aodv 1751.185 12737.490 12467.637 29.9515
+##ENERGY## 5 aodv 75800.439 1.420122 2.7737e-03 8.074
+##GOODPUT## 5 aodv 30.365
+##ROUTE## 5 aodv 0.9280 2.3436 0 0.10332 1.250 5513 4.0380 4.0380
+##PERF## paper aodv 5 1303.975 1304.063 895895779 -
+##DROPID## 1 dsdv hopTx=233745 hopRx=231600 ackedHops=231399 macDrops=898 reinjected=0 macTerminal=898 macLost=697 queue=0 hopLoss=2145 overlap=-1448 unackedRx=201 pqSilent=0 pqEcb=0
+# diag dsdv seed=1 pdr=96.57 firstDeliveryS=25.55 ctrlTx=600397 setupMedS=0.27 setupMaxS=4.26 flowsNoDelivery=0
+##RUN## 1 dsdv 96.6 22.6 530.5 49.38 9.94 21.08 4.5 20.5 6.8919
+##AIR## 1 dsdv 853.800 7641.728 4323.573 14.2434
+##ENERGY## 1 dsdv 74899.825 1.240289 2.4224e-03 3.831
+##GOODPUT## 1 dsdv 34.355
+##ROUTE## 1 dsdv 0.2720 4.2564 0 0.03901 4.250 2355 3.8021 3.8021
+##PERF## paper dsdv 1 604.930 604.974 321813230 -
+##DROPID## 2 dsdv hopTx=316416 hopRx=315590 ackedHops=315427 macDrops=706 reinjected=0 macTerminal=706 macLost=543 queue=0 hopLoss=826 overlap=-283 unackedRx=163 pqSilent=0 pqEcb=0
+# diag dsdv seed=2 pdr=98.70 firstDeliveryS=2.21 ctrlTx=584092 setupMedS=0.28 setupMaxS=9.05 flowsNoDelivery=0
+##RUN## 2 dsdv 98.7 17.4 421.5 51.14 9.34 15.10 5.5 11.5 6.5112
+##AIR## 2 dsdv 909.356 6800.447 3848.015 12.8420
+##ENERGY## 2 dsdv 74815.729 1.196343 2.3366e-03 2.339
+##GOODPUT## 2 dsdv 35.577
+##ROUTE## 2 dsdv 0.2789 9.0465 0 0.04096 4.000 2561 5.0248 5.0248
+##PERF## paper dsdv 2 586.224 586.266 331794768 -
+##DROPID## 3 dsdv hopTx=256761 hopRx=255276 ackedHops=255085 macDrops=891 reinjected=0 macTerminal=891 macLost=700 queue=0 hopLoss=1485 overlap=-785 unackedRx=191 pqSilent=0 pqEcb=0
+# diag dsdv seed=3 pdr=97.75 firstDeliveryS=2.74 ctrlTx=608549 setupMedS=0.29 setupMaxS=2.28 flowsNoDelivery=0
+##RUN## 3 dsdv 97.7 24.4 575.5 52.67 9.45 22.33 4.5 16.5 6.5322
+##AIR## 3 dsdv 880.662 8328.891 4915.573 15.6946
+##ENERGY## 3 dsdv 74990.086 1.164243 2.2739e-03 3.626
+##GOODPUT## 3 dsdv 36.643
+##ROUTE## 3 dsdv 0.2858 2.2774 0 0.04353 4.000 2803 3.9381 3.9381
+##PERF## paper dsdv 3 636.162 636.204 346473063 -
+##DROPID## 4 dsdv hopTx=291781 hopRx=290348 ackedHops=290187 macDrops=989 reinjected=0 macTerminal=989 macLost=828 queue=0 hopLoss=1433 overlap=-605 unackedRx=161 pqSilent=0 pqEcb=0
+# diag dsdv seed=4 pdr=97.76 firstDeliveryS=2.46 ctrlTx=594506 setupMedS=0.27 setupMaxS=1.28 flowsNoDelivery=0
+##RUN## 4 dsdv 97.8 22.3 495.5 51.25 9.49 20.24 5.5 22.5 6.5953
+##AIR## 4 dsdv 910.895 7728.810 4526.901 14.6296
+##ENERGY## 4 dsdv 74928.342 1.195582 2.3351e-03 3.671
+##GOODPUT## 4 dsdv 35.653
+##ROUTE## 4 dsdv 0.2749 1.2760 0 0.03919 3.500 2455 4.6001 4.6001
+##PERF## paper dsdv 4 647.795 647.841 352272954 -
+##DROPID## 5 dsdv hopTx=251029 hopRx=249572 ackedHops=249412 macDrops=897 reinjected=0 macTerminal=897 macLost=737 queue=0 hopLoss=1457 overlap=-720 unackedRx=160 pqSilent=0 pqEcb=0
+# diag dsdv seed=5 pdr=97.78 firstDeliveryS=5.24 ctrlTx=601899 setupMedS=0.27 setupMaxS=1.27 flowsNoDelivery=0
+##RUN## 5 dsdv 97.8 22.3 522.5 52.48 9.38 19.87 3.5 17.5 6.4989
+##AIR## 5 dsdv 874.780 7880.524 4605.046 14.8448
+##ENERGY## 5 dsdv 74935.172 1.167633 2.2805e-03 3.770
+##GOODPUT## 5 dsdv 36.510
+##ROUTE## 5 dsdv 0.2729 1.2685 0 0.03672 4.250 2356 3.8521 3.8521
+##PERF## paper dsdv 5 640.892 640.939 330165147 -
+##DROPID## 1 beeadhoc hopTx=237370 hopRx=236619 ackedHops=236420 macDrops=712 reinjected=0 macTerminal=712 macLost=513 queue=0 hopLoss=751 overlap=-238 unackedRx=199
+# diag beeadhoc seed=1 pdr=98.78 firstDeliveryS=27.13 ctrlTx=567791 setupMedS=1.31 setupMaxS=2.81 flowsNoDelivery=0
+##RUN## 1 beeadhoc 98.8 160.3 1187.5 50.52 9.19 120.17 9.5 644.5 7.4647
+##AIR## 1 beeadhoc 938.173 8779.660 4896.363 16.2380
+##ENERGY## 1 beeadhoc 75028.000 1.214537 2.3721e-03 6.160
+##GOODPUT## 1 beeadhoc 35.143
+##PERF## paper beeadhoc 1 487.789 487.822 335715944 -
+##DROPID## 2 beeadhoc hopTx=304407 hopRx=303753 ackedHops=303539 macDrops=634 reinjected=0 macTerminal=634 macLost=420 queue=0 hopLoss=654 overlap=-234 unackedRx=214
+# diag beeadhoc seed=2 pdr=98.76 firstDeliveryS=4.28 ctrlTx=703630 setupMedS=1.32 setupMaxS=2.83 flowsNoDelivery=0
+##RUN## 2 beeadhoc 98.8 387.5 4801.5 51.18 11.24 186.44 12.5 1080.5 9.7103
+##AIR## 2 beeadhoc 1197.273 9254.427 4893.089 17.0498
+##ENERGY## 2 beeadhoc 75175.135 1.201284 2.3433e-03 4.038
+##GOODPUT## 2 beeadhoc 35.645
+##PERF## paper beeadhoc 2 535.170 535.208 381513265 -
+##DROPID## 3 beeadhoc hopTx=254283 hopRx=253625 ackedHops=253398 macDrops=673 reinjected=0 macTerminal=673 macLost=446 queue=0 hopLoss=658 overlap=-212 unackedRx=227
+# diag beeadhoc seed=3 pdr=98.90 firstDeliveryS=2.76 ctrlTx=601536 setupMedS=1.30 setupMaxS=3.38 flowsNoDelivery=0
+##RUN## 3 beeadhoc 98.9 195.2 2458.5 53.29 9.23 127.92 8.5 595.5 7.4599
+##AIR## 3 beeadhoc 993.944 9791.631 5607.730 18.2148
+##ENERGY## 3 beeadhoc 75170.088 1.153464 2.2524e-03 5.626
+##GOODPUT## 3 beeadhoc 37.081
+##PERF## paper beeadhoc 3 525.866 525.907 366122408 -
+##DROPID## 4 beeadhoc hopTx=275482 hopRx=274489 ackedHops=274101 macDrops=1135 reinjected=0 macTerminal=1135 macLost=747 queue=0 hopLoss=993 overlap=-246 unackedRx=388
+# diag beeadhoc seed=4 pdr=94.56 firstDeliveryS=4.02 ctrlTx=770810 setupMedS=1.31 setupMaxS=6.81 flowsNoDelivery=0
+##RUN## 4 beeadhoc 94.6 399.7 6115.5 49.57 12.72 185.02 16.5 1707.5 10.6871
+##AIR## 4 beeadhoc 1237.247 10930.644 5991.990 20.1776
+##ENERGY## 4 beeadhoc 75392.583 1.243753 2.4152e-03 6.008
+##GOODPUT## 4 beeadhoc 34.685
+##PERF## paper beeadhoc 4 612.206 612.256 413350870 -
+##DROPID## 5 beeadhoc hopTx=246968 hopRx=246379 ackedHops=246174 macDrops=563 reinjected=0 macTerminal=563 macLost=358 queue=0 hopLoss=589 overlap=-231 unackedRx=205
+# diag beeadhoc seed=5 pdr=98.89 firstDeliveryS=5.25 ctrlTx=552340 setupMedS=1.32 setupMaxS=3.80 flowsNoDelivery=0
+##RUN## 5 beeadhoc 98.9 258.5 4108.5 53.08 8.51 131.55 7.5 825.5 7.1321
+##AIR## 5 beeadhoc 942.328 8853.137 4958.715 16.3935
+##ENERGY## 5 beeadhoc 75055.297 1.156280 2.2568e-03 5.416
+##GOODPUT## 5 beeadhoc 36.953
+##PERF## paper beeadhoc 5 475.332 475.367 332392489 -
+##MATCH## 1 aodv 51443 51443 833.5 833.5
+##MATCH## 1 dsdv 60389 51443 530.5 10.5
+##MATCH## 1 beeadhoc 61775 51443 1187.5 334.5
+##MATCH## 2 aodv 60045 60045 255.5 255.5
+##MATCH## 2 dsdv 62537 60045 421.5 18.5
+##MATCH## 2 beeadhoc 62579 60045 4801.5 1660.5
+##MATCH## 3 aodv 46774 46774 1226.5 1226.5
+##MATCH## 3 dsdv 64411 46774 575.5 6.5
+##MATCH## 3 beeadhoc 65169 46774 2458.5 47.5
+##MATCH## 4 aodv 50337 50337 910.5 910.5
+##MATCH## 4 dsdv 62671 50337 495.5 10.5
+##MATCH## 4 beeadhoc 60617 50337 6115.5 632.5
+##MATCH## 5 aodv 53376 53376 845.5 845.5
+##MATCH## 5 dsdv 64177 53376 522.5 10.5
+##MATCH## 5 beeadhoc 64911 53376 4108.5 309.5
+##COMMON## 1 aodv 51443 49272 829.0 77.6 947.5 3.994 4.557
+##COMMON## 1 dsdv 60389 49272 498.9 20.5 721.5 3.620 4.610
+##COMMON## 1 beeadhoc 61775 49272 1134.2 142.5 1557.0 3.622 4.590
+##COMMON## 2 aodv 60045 58676 255.9 18.7 249.0 4.876 6.140
+##COMMON## 2 dsdv 62537 58676 417.0 17.2 485.5 4.927 6.514
+##COMMON## 2 beeadhoc 62657 58676 4972.2 389.4 5827.1 4.734 6.238
+##COMMON## 3 aodv 46774 45336 1229.2 125.2 1209.5 4.108 4.938
+##COMMON## 3 dsdv 64411 45336 563.0 23.4 599.5 3.667 4.583
+##COMMON## 3 beeadhoc 65181 45336 1910.8 157.7 3466.9 3.603 4.512
+##COMMON## 4 aodv 50337 47314 910.2 78.2 934.7 4.307 6.993
+##COMMON## 4 dsdv 62671 47314 464.1 20.2 584.7 4.004 6.438
+##COMMON## 4 beeadhoc 60969 47314 7098.8 383.8 10260.5 4.010 6.085
+##COMMON## 5 aodv 53376 51850 844.1 78.4 886.5 3.988 5.735
+##COMMON## 5 dsdv 64177 51850 491.1 20.4 704.3 3.474 5.443
+##COMMON## 5 beeadhoc 64956 51850 3690.3 208.7 5689.6 3.402 5.281
+AntHocNet protocol comparison (mean of 5 run(s))
+  nodes=100 time=900.000s area=3000.000x1000.000m maxSpeed=10.000m/s pause=1000.000s flows=20
+
+protocol        PDR%  delay(ms)  delay99(ms) thrput(kbps)     NRL  jitter(ms)  dOff50(ms)  dOff90(ms)    nrlBytes   energy(J)       J/pkt        hops        jain   jitterEq51
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+aodv            81.6       76.3        814.3        42.85   23.66       59.18        25.9         inf      12.626     75605.1      1.4534        4.31      0.9695       169.97
+dsdv            97.7       21.8        509.1        51.39    9.52       19.72         4.7        17.7       6.606     74913.8      1.1928        4.24      0.9951        34.08
+beeadhoc        98.0      280.2       3734.3        51.53   10.18      150.22        10.9       970.7       8.491     75164.2      1.1939        4.16      0.9924       165.70
+# paths aodv divUsed=1.377 divMax=10.8 entropyBits=0.212 windowS=10.0 hopsMean=4.31 hopsMax=51.6
+# paths dsdv divUsed=1.214 divMax=4.4 entropyBits=0.133 windowS=10.0 hopsMean=4.24 hopsMax=22.6
+# paths beeadhoc divUsed=1.473 divMax=8.4 entropyBits=0.313 windowS=10.0 hopsMean=4.16 hopsMax=10.0
+# energy aodv initJ=5000.0 resMinJ=4232.7 resMeanJ=4243.9 resSdJ=6.996 firstDeathS=-1.0
+# energy dsdv initJ=5000.0 resMinJ=4244.1 resMeanJ=4250.9 resSdJ=3.447 firstDeathS=-1.0
+# energy beeadhoc initJ=5000.0 resMinJ=4238.1 resMeanJ=4248.4 resSdJ=5.450 firstDeathS=-1.0
+# drops aodv pdr=81.57 route=10.55 queue=0.25 mac=3.78 chan=3.65 ttl=0.13 sum=99.92 other=0.00 [route: setup=- reconv=- repair=-]
+# drops dsdv pdr=97.71 route=0.00 queue=0.00 mac=1.09 chan=1.20 ttl=0.00 sum=100.00 other=0.00 [route: setup=- reconv=- repair=-]
+# drops beeadhoc pdr=97.98 route=0.72 queue=0.00 mac=0.77 chan=0.36 ttl=0.00 sum=99.84 other=0.00 [route: setup=- reconv=- repair=-]
+# stddev aodv pdr=8.60 delay=38.0 delay99=351.0 nrl=8.554 nrl_bytes=4.603
+# stddev dsdv pdr=0.76 delay=2.6 delay99=56.8 nrl=0.243 nrl_bytes=0.164
+# stddev beeadhoc pdr=1.91 delay=109.4 delay99=1940.5 nrl=1.749 nrl_bytes=1.603
+# reorder aodv ratio=0.0045 ratioWorstFlow=0.0104 extentMean=1.43 extentMax=5.20 bufMax=4.20
+# reorder dsdv ratio=0.0036 ratioWorstFlow=0.0082 extentMean=2.47 extentMax=9.20 bufMax=8.60
+# reorder beeadhoc ratio=0.0151 ratioWorstFlow=0.1952 extentMean=5.72 extentMax=29.80 bufMax=27.00
+##ARGS## routing-compare --scenario=paper --runs=5 --nNodes=100 --time=900 --areaX=3000 --areaY=1000 --flows=20 --cbrBps=2048 --speed=10 --speedMin=0 --propagation=tworay --range=250 --diag --mobility=rwp --transport=udp --protocols=aodv,dsdv,beeadhoc --firstRun=1 --pause=1000
+##PROV## commit=bc9cb7d9b296db01c3bd7cdb822bf3966c37e326 ref=main run_id=43750800555 attempt=1 image=ghcr.io/swarm-routing/ns3-dev@sha256:5585a93c5cea1980592539e2d26a4e111e0ff4b0cc63b3dfd6ea5de459d80d3f profile=release harness=routing-compare base=ghcr.io/swarm-routing/ns3-dev:3.48-optimized-fb7596b@sha256:5585a93c5cea1980592539e2d26a4e111e0ff4b0cc63b3dfd6ea5de459d80d3f base_tag=ghcr.io/swarm-routing/ns3-dev:3.48-optimized-fb7596b build_profile=optimized modules=swarm-core@111a67385fbcdaecff5efa49cbdd66b20a355a09,routing-bench@3d279b83392a00288050574cee4288f30205658b,beeadhoc@bc9cb7d9b296db01c3bd7cdb822bf3966c37e326 key=cd18fbc749d7dc432006f6abbc6603911d1261081680e5b606d19d127406e370
+##CONFIG## scenario=paper nNodes=100 time=900 runs=5 firstRun=6 areaX=3000 areaY=1000 speed=10 speedMin=0 pause=1000 range=250 propagation=tworay mobility=rwp transport=udp flows=20 cbrBps=2048 offTime=0 rateManager=constant2 protocols=aodv,dsdv,beeadhoc
+##DROPID## 6 aodv hopTx=265985 hopRx=264744 ackedHops=264534 macDrops=851 reinjected=0 macTerminal=851 macLost=641 queue=0 hopLoss=1241 overlap=-600 unackedRx=210 pqSilent=0 pqEcb=0
+# diag aodv seed=6 pdr=94.76 firstDeliveryS=21.42 ctrlTx=742429 setupMedS=0.54 setupMaxS=18.34 flowsNoDelivery=0
+##RUN## 6 aodv 94.8 21.3 319.5 50.09 12.12 21.17 4.5 101.5 6.3839
+##AIR## 6 aodv 1064.099 7101.151 6336.064 16.1126
+##ENERGY## 6 aodv 74895.244 1.222660 2.3880e-03 2.607
+##GOODPUT## 6 aodv 34.848
+##ROUTE## 6 aodv 0.5446 18.3385 0 0.04512 2.500 2763 4.1131 4.1131
+##PERF## paper aodv 6 718.573 718.660 523362757 -
+##DROPID## 7 aodv hopTx=294126 hopRx=288265 ackedHops=287451 macDrops=4007 reinjected=0 macTerminal=4007 macLost=3193 queue=0 hopLoss=5861 overlap=-2668 unackedRx=814 pqSilent=0 pqEcb=0
+# diag aodv seed=7 pdr=77.53 firstDeliveryS=21.72 ctrlTx=1289544 setupMedS=0.95 setupMaxS=20.33 flowsNoDelivery=0
+##RUN## 7 aodv 77.5 84.5 925.5 41.54 25.39 66.67 24.5 inf 13.5415
+##AIR## 7 aodv 1725.535 13381.467 11966.513 30.0817
+##ENERGY## 7 aodv 75862.896 1.493452 2.9169e-03 8.122
+##GOODPUT## 7 aodv 28.898
+##ROUTE## 7 aodv 0.9498 20.3281 0 0.10475 1.500 5319 4.6903 4.6903
+##PERF## paper aodv 7 1353.762 1353.889 872599837 -
+##DROPID## 8 aodv hopTx=226963 hopRx=225362 ackedHops=225232 macDrops=848 reinjected=0 macTerminal=848 macLost=718 queue=0 hopLoss=1601 overlap=-883 unackedRx=130 pqSilent=0 pqEcb=2
+# diag aodv seed=8 pdr=95.08 firstDeliveryS=15.45 ctrlTx=538047 setupMedS=0.56 setupMaxS=15.56 flowsNoDelivery=0
+##RUN## 8 aodv 95.1 15.5 240.5 50.05 8.79 15.65 3.5 63.5 4.6449
+##AIR## 8 aodv 797.167 5354.427 4598.992 11.9451
+##ENERGY## 8 aodv 74606.551 1.218922 2.3807e-03 3.899
+##GOODPUT## 8 aodv 34.820
+##ROUTE## 8 aodv 0.5608 15.5594 0 0.03658 3.000 2238 3.4741 3.4741
+##PERF## paper aodv 8 590.276 590.329 401479338 -
+##DROPID## 9 aodv hopTx=304291 hopRx=302396 ackedHops=302103 macDrops=1146 reinjected=0 macTerminal=1146 macLost=853 queue=0 hopLoss=1895 overlap=-1042 unackedRx=293 pqSilent=0 pqEcb=0
+# diag aodv seed=9 pdr=94.11 firstDeliveryS=1.74 ctrlTx=758040 setupMedS=1.51 setupMaxS=16.22 flowsNoDelivery=0
+##RUN## 9 aodv 94.1 23.3 311.5 51.09 12.13 24.31 5.5 129.5 6.4260
+##AIR## 9 aodv 1118.685 7601.145 6689.167 17.1211
+##ENERGY## 9 aodv 74978.252 1.200151 2.3440e-03 3.778
+##GOODPUT## 9 aodv 35.541
+##ROUTE## 9 aodv 1.5129 16.2230 0 0.04949 2.750 3091 4.6334 4.6334
+##PERF## paper aodv 9 842.698 842.780 565472764 -
+##DROPID## 10 aodv hopTx=267835 hopRx=266033 ackedHops=265707 macDrops=1568 reinjected=0 macTerminal=1568 macLost=1242 queue=0 hopLoss=1802 overlap=-560 unackedRx=326 pqSilent=0 pqEcb=0
+# diag aodv seed=10 pdr=91.96 firstDeliveryS=19.16 ctrlTx=859355 setupMedS=0.56 setupMaxS=3.28 flowsNoDelivery=0
+##RUN## 10 aodv 92.0 34.2 468.5 47.17 14.90 33.13 6.5 330.5 7.8901
+##AIR## 10 aodv 1205.499 8689.978 7708.553 19.5600
+##ENERGY## 10 aodv 75136.552 1.302713 2.5444e-03 5.445
+##GOODPUT## 10 aodv 32.812
+##ROUTE## 10 aodv 0.5624 3.2843 0 0.05767 2.000 3325 4.1853 4.1853
+##PERF## paper aodv 10 931.717 931.803 605647571 -
+##DROPID## 6 dsdv hopTx=279496 hopRx=278729 ackedHops=278600 macDrops=591 reinjected=0 macTerminal=591 macLost=462 queue=0 hopLoss=767 overlap=-305 unackedRx=129 pqSilent=16 pqEcb=0
+# diag dsdv seed=6 pdr=98.79 firstDeliveryS=21.42 ctrlTx=584431 setupMedS=0.27 setupMaxS=2.30 flowsNoDelivery=0
+##RUN## 6 dsdv 98.8 16.5 384.5 52.22 9.15 14.51 3.5 12.5 6.3809
+##AIR## 6 dsdv 871.962 7006.100 3962.809 13.1565
+##ENERGY## 6 dsdv 74827.599 1.171818 2.2887e-03 2.208
+##GOODPUT## 6 dsdv 36.327
+##ROUTE## 6 dsdv 0.2749 2.3042 0 0.03214 4.250 2052 4.3457 4.3457
+##PERF## paper dsdv 6 599.618 599.674 314368268 -
+##DROPID## 7 dsdv hopTx=322160 hopRx=320845 ackedHops=320707 macDrops=898 reinjected=0 macTerminal=898 macLost=760 queue=0 hopLoss=1315 overlap=-555 unackedRx=138 pqSilent=7 pqEcb=0
+# diag dsdv seed=7 pdr=97.98 firstDeliveryS=21.72 ctrlTx=571903 setupMedS=0.28 setupMaxS=15.55 flowsNoDelivery=0
+##RUN## 7 dsdv 98.0 22.5 514.5 52.50 8.91 19.85 5.5 18.5 6.2368
+##AIR## 7 dsdv 916.904 8330.718 4861.174 15.6764
+##ENERGY## 7 dsdv 75002.900 1.168306 2.2818e-03 3.787
+##GOODPUT## 7 dsdv 36.522
+##ROUTE## 7 dsdv 0.2754 15.5484 0 0.03953 4.250 2537 4.9616 4.9616
+##PERF## paper dsdv 7 666.019 666.080 357192932 -
+##DROPID## 8 dsdv hopTx=226293 hopRx=225536 ackedHops=225419 macDrops=639 reinjected=0 macTerminal=639 macLost=522 queue=0 hopLoss=757 overlap=-235 unackedRx=117 pqSilent=0 pqEcb=0
+# diag dsdv seed=8 pdr=98.82 firstDeliveryS=15.45 ctrlTx=581353 setupMedS=0.27 setupMaxS=2.25 flowsNoDelivery=0
+##RUN## 8 dsdv 98.8 14.4 363.5 52.02 9.14 13.50 3.5 9.5 6.3787
+##AIR## 8 dsdv 811.543 6244.837 3532.757 11.7657
+##ENERGY## 8 dsdv 74718.108 1.174536 2.2940e-03 2.674
+##GOODPUT## 8 dsdv 36.190
+##ROUTE## 8 dsdv 0.2704 2.2524 0 0.02904 4.750 1847 3.5285 3.5285
+##PERF## paper dsdv 8 549.248 549.296 288167716 -
+##DROPID## 9 dsdv hopTx=314712 hopRx=313990 ackedHops=313852 macDrops=613 reinjected=0 macTerminal=613 macLost=475 queue=0 hopLoss=722 overlap=-247 unackedRx=138 pqSilent=0 pqEcb=0
+# diag dsdv seed=9 pdr=98.91 firstDeliveryS=1.52 ctrlTx=594346 setupMedS=0.28 setupMaxS=1.32 flowsNoDelivery=0
+##RUN## 9 dsdv 98.9 17.4 416.5 53.70 9.05 15.91 4.5 11.5 6.2885
+##AIR## 9 dsdv 915.894 7324.180 4181.854 13.8021
+##ENERGY## 9 dsdv 74881.236 1.140387 2.2273e-03 2.539
+##GOODPUT## 9 dsdv 37.355
+##ROUTE## 9 dsdv 0.2763 1.3155 0 0.03968 4.500 2605 4.7657 4.7657
+##PERF## paper dsdv 9 644.364 644.421 343807491 -
+##DROPID## 10 dsdv hopTx=264910 hopRx=263800 ackedHops=263645 macDrops=660 reinjected=0 macTerminal=660 macLost=505 queue=0 hopLoss=1110 overlap=-605 unackedRx=155 pqSilent=0 pqEcb=0
+# diag dsdv seed=10 pdr=98.23 firstDeliveryS=18.96 ctrlTx=581062 setupMedS=0.29 setupMaxS=1.30 flowsNoDelivery=0
+##RUN## 10 dsdv 98.2 18.3 433.5 50.38 9.43 16.01 5.5 14.5 6.5843
+##AIR## 10 dsdv 863.585 7186.659 4060.040 13.4559
+##ENERGY## 10 dsdv 74847.694 1.214863 2.3728e-03 2.971
+##GOODPUT## 10 dsdv 35.049
+##ROUTE## 10 dsdv 0.2856 1.2953 0 0.03682 4.500 2268 4.2472 4.2472
+##PERF## paper dsdv 10 609.094 609.146 318648254 -
+##DROPID## 6 beeadhoc hopTx=241614 hopRx=241318 ackedHops=241173 macDrops=353 reinjected=0 macTerminal=353 macLost=208 queue=0 hopLoss=296 overlap=-88 unackedRx=145
+# diag beeadhoc seed=6 pdr=94.94 firstDeliveryS=21.43 ctrlTx=612643 setupMedS=1.28 setupMaxS=2.85 flowsNoDelivery=0
+##RUN## 6 beeadhoc 94.9 499.2 7890.5 50.19 9.98 182.98 6.5 3390.5 8.5674
+##AIR## 6 beeadhoc 991.988 8134.251 4358.071 14.9826
+##ENERGY## 6 beeadhoc 75003.927 1.222199 2.3603e-03 3.057
+##GOODPUT## 6 beeadhoc 35.309
+##PERF## paper beeadhoc 6 491.076 491.120 316138984 -
+##DROPID## 7 beeadhoc hopTx=287166 hopRx=286266 ackedHops=285828 macDrops=1212 reinjected=0 macTerminal=1212 macLost=774 queue=0 hopLoss=900 overlap=-126 unackedRx=438
+# diag beeadhoc seed=7 pdr=93.70 firstDeliveryS=21.74 ctrlTx=767692 setupMedS=1.33 setupMaxS=3.06 flowsNoDelivery=0
+##RUN## 7 beeadhoc 93.7 623.3 7941.5 50.20 12.50 232.58 17.5 4481.5 10.6372
+##AIR## 7 beeadhoc 1265.924 12276.150 6317.764 22.0665
+##ENERGY## 7 beeadhoc 75574.967 1.231043 2.3770e-03 6.469
+##GOODPUT## 7 beeadhoc 35.326
+##PERF## paper beeadhoc 7 667.105 667.173 417603467 -
+##DROPID## 8 beeadhoc hopTx=218655 hopRx=218397 ackedHops=218305 macDrops=236 reinjected=0 macTerminal=236 macLost=144 queue=0 hopLoss=258 overlap=-114 unackedRx=92
+# diag beeadhoc seed=8 pdr=99.60 firstDeliveryS=16.45 ctrlTx=437565 setupMedS=0.80 setupMaxS=3.82 flowsNoDelivery=0
+##RUN## 8 beeadhoc 99.6 132.1 1554.5 52.43 6.82 94.02 4.5 534.5 5.7876
+##AIR## 8 beeadhoc 756.142 6127.419 3278.029 11.2907
+##ENERGY## 8 beeadhoc 74679.983 1.164800 2.2750e-03 4.210
+##GOODPUT## 8 beeadhoc 36.474
+##PERF## paper beeadhoc 8 406.417 406.454 264656725 -
+##DROPID## 9 beeadhoc hopTx=293008 hopRx=292374 ackedHops=292114 macDrops=656 reinjected=0 macTerminal=656 macLost=396 queue=0 hopLoss=634 overlap=-238 unackedRx=260
+# diag beeadhoc seed=9 pdr=97.61 firstDeliveryS=1.03 ctrlTx=690297 setupMedS=1.34 setupMaxS=2.90 flowsNoDelivery=0
+##RUN## 9 beeadhoc 97.6 419.7 7447.5 52.99 10.65 190.15 9.5 1079.5 9.0224
+##AIR## 9 beeadhoc 1152.607 9576.779 5211.545 17.7121
+##ENERGY## 9 beeadhoc 75228.731 1.160883 2.2523e-03 4.186
+##GOODPUT## 9 beeadhoc 37.112
+##PERF## paper beeadhoc 9 593.779 593.836 381885392 -
+##DROPID## 10 beeadhoc hopTx=256383 hopRx=255699 ackedHops=255448 macDrops=647 reinjected=0 macTerminal=647 macLost=396 queue=0 hopLoss=684 overlap=-288 unackedRx=251
+# diag beeadhoc seed=10 pdr=98.61 firstDeliveryS=19.94 ctrlTx=617689 setupMedS=1.29 setupMaxS=2.42 flowsNoDelivery=0
+##RUN## 10 beeadhoc 98.6 285.3 4799.5 50.58 9.99 157.92 9.5 851.5 8.3731
+##AIR## 10 beeadhoc 1025.940 8808.389 4665.444 16.1109
+##ENERGY## 10 beeadhoc 75095.372 1.214192 2.3671e-03 5.054
+##GOODPUT## 10 beeadhoc 35.249
+##PERF## paper beeadhoc 10 539.260 539.313 344993505 -
+##MATCH## 6 aodv 61256 61256 319.5 319.5
+##MATCH## 6 dsdv 63856 61256 384.5 17.5
+##MATCH## 6 beeadhoc 61368 61256 7890.5 7545.5
+##MATCH## 7 aodv 50797 50797 925.5 925.5
+##MATCH## 7 dsdv 64198 50797 514.5 11.5
+##MATCH## 7 beeadhoc 61391 50797 7941.5 859.5
+##MATCH## 8 aodv 61207 61207 240.5 240.5
+##MATCH## 8 dsdv 63615 61207 363.5 13.5
+##MATCH## 8 beeadhoc 64114 61207 1554.5 810.5
+##MATCH## 9 aodv 62474 62474 311.5 311.5
+##MATCH## 9 dsdv 65663 62474 416.5 16.5
+##MATCH## 9 beeadhoc 64803 62474 7447.5 2203.5
+##MATCH## 10 aodv 57677 57677 468.5 468.5
+##MATCH## 10 dsdv 61610 57677 433.5 15.5
+##MATCH## 10 beeadhoc 61848 57677 4799.5 959.5
+##COMMON## 6 aodv 61256 58426 303.0 20.1 630.5 3.870 9.140
+##COMMON## 6 dsdv 63856 58426 355.1 15.1 742.9 3.959 8.506
+##COMMON## 6 beeadhoc 62066 58426 10395.6 572.6 15009.0 3.692 6.866
+##COMMON## 7 aodv 50797 47803 909.7 82.0 1162.2 4.482 8.015
+##COMMON## 7 dsdv 64198 47803 479.7 19.5 631.4 4.182 7.235
+##COMMON## 7 beeadhoc 62097 47803 9529.6 581.3 13803.3 4.035 6.393
+##COMMON## 8 aodv 61207 60290 236.6 15.3 374.4 3.451 4.977
+##COMMON## 8 dsdv 63615 60290 351.5 13.9 535.8 3.423 5.438
+##COMMON## 8 beeadhoc 64114 60290 1481.6 123.8 2120.6 3.289 5.149
+##COMMON## 9 aodv 62474 60866 307.0 22.9 521.5 4.572 6.956
+##COMMON## 9 dsdv 65663 60866 397.3 16.7 538.3 4.627 6.529
+##COMMON## 9 beeadhoc 65236 60866 9004.2 463.1 12195.1 4.367 5.860
+##COMMON## 10 aodv 57677 56094 465.4 33.6 828.9 4.135 5.960
+##COMMON## 10 dsdv 61610 56094 420.6 17.5 561.7 4.067 6.079
+##COMMON## 10 beeadhoc 61961 56094 4249.9 258.8 10211.9 3.931 5.831
+AntHocNet protocol comparison (mean of 5 run(s))
+  nodes=100 time=900.000s area=3000.000x1000.000m maxSpeed=10.000m/s pause=1000.000s flows=20
+
+protocol        PDR%  delay(ms)  delay99(ms) thrput(kbps)     NRL  jitter(ms)  dOff50(ms)  dOff90(ms)    nrlBytes   energy(J)       J/pkt        hops        jain   jitterEq51
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+aodv            90.7       35.8        453.1        47.99   14.67       32.18         8.9         inf       7.777     75095.9      1.2876        4.22      0.9842        93.25
+dsdv            98.5       17.8        422.5        52.16    9.14       15.96         4.5        13.3       6.374     74855.5      1.1740        4.37      0.9960        26.73
+beeadhoc        96.9      391.9       5926.7        51.28    9.99      171.53         9.5      2067.5       8.478     75116.6      1.1986        4.09      0.9891       145.01
+# paths aodv divUsed=1.292 divMax=9.2 entropyBits=0.165 windowS=10.0 hopsMean=4.22 hopsMax=43.0
+# paths dsdv divUsed=1.199 divMax=4.4 entropyBits=0.123 windowS=10.0 hopsMean=4.37 hopsMax=31.2
+# paths beeadhoc divUsed=1.498 divMax=8.8 entropyBits=0.334 windowS=10.0 hopsMean=4.09 hopsMax=10.0
+# energy aodv initJ=5000.0 resMinJ=4240.9 resMeanJ=4249.0 resSdJ=4.770 firstDeathS=-1.0
+# energy dsdv initJ=5000.0 resMinJ=4246.2 resMeanJ=4251.4 resSdJ=2.836 firstDeathS=-1.0
+# energy beeadhoc initJ=5000.0 resMinJ=4240.5 resMeanJ=4248.8 resSdJ=4.595 firstDeathS=-1.0
+# drops aodv pdr=90.69 route=5.40 queue=0.00 mac=2.05 chan=1.77 ttl=0.08 sum=99.98 other=0.00 [route: setup=- reconv=- repair=-]
+# drops dsdv pdr=98.55 route=0.00 queue=0.01 mac=0.84 chan=0.60 ttl=0.00 sum=100.00 other=0.00 [route: setup=- reconv=- repair=-]
+# drops beeadhoc pdr=96.89 route=1.62 queue=0.00 mac=0.59 chan=0.26 ttl=0.00 sum=99.37 other=0.00 [route: setup=- reconv=- repair=-]
+# stddev aodv pdr=7.46 delay=28.0 delay99=276.8 nrl=6.372 nrl_bytes=3.421
+# stddev dsdv pdr=0.41 delay=3.0 delay99=58.2 nrl=0.191 nrl_bytes=0.133
+# stddev beeadhoc pdr=2.49 delay=190.2 delay99=2766.6 nrl=2.048 nrl_bytes=1.748
+# reorder aodv ratio=0.0018 ratioWorstFlow=0.0050 extentMean=1.43 extentMax=6.20 bufMax=5.00
+# reorder dsdv ratio=0.0027 ratioWorstFlow=0.0077 extentMean=2.27 extentMax=8.80 bufMax=8.60
+# reorder beeadhoc ratio=0.0316 ratioWorstFlow=0.2912 extentMean=8.02 extentMax=40.80 bufMax=34.80
+##ARGS## routing-compare --scenario=paper --runs=5 --nNodes=100 --time=900 --areaX=3000 --areaY=1000 --flows=20 --cbrBps=2048 --speed=10 --speedMin=0 --propagation=tworay --range=250 --diag --mobility=rwp --transport=udp --protocols=aodv,dsdv,beeadhoc --firstRun=6 --pause=1000
+##PROV## commit=bc9cb7d9b296db01c3bd7cdb822bf3966c37e326 ref=main run_id=43753094875 attempt=1 image=ghcr.io/swarm-routing/ns3-dev@sha256:5585a93c5cea1980592539e2d26a4e111e0ff4b0cc63b3dfd6ea5de459d80d3f profile=release harness=routing-compare base=ghcr.io/swarm-routing/ns3-dev:3.48-optimized-fb7596b@sha256:5585a93c5cea1980592539e2d26a4e111e0ff4b0cc63b3dfd6ea5de459d80d3f base_tag=ghcr.io/swarm-routing/ns3-dev:3.48-optimized-fb7596b build_profile=optimized modules=swarm-core@111a67385fbcdaecff5efa49cbdd66b20a355a09,routing-bench@3d279b83392a00288050574cee4288f30205658b,beeadhoc@bc9cb7d9b296db01c3bd7cdb822bf3966c37e326 key=82c301476fe70a60be8fc7e67ec0285d5903d31a1180ae705f6ea5976d2d11f7
+##CONFIG## scenario=paper nNodes=100 time=900 runs=5 firstRun=11 areaX=3000 areaY=1000 speed=10 speedMin=0 pause=1000 range=250 propagation=tworay mobility=rwp transport=udp flows=20 cbrBps=2048 offTime=0 rateManager=constant2 protocols=aodv,dsdv,beeadhoc
+##DROPID## 11 aodv hopTx=239471 hopRx=238111 ackedHops=237890 macDrops=1075 reinjected=0 macTerminal=1075 macLost=854 queue=0 hopLoss=1360 overlap=-506 unackedRx=221 pqSilent=0 pqEcb=0
+# diag aodv seed=11 pdr=94.63 firstDeliveryS=11.08 ctrlTx=734368 setupMedS=0.52 setupMaxS=32.34 flowsNoDelivery=0
+##RUN## 11 aodv 94.6 21.6 356.5 49.89 12.04 22.38 4.5 107.5 6.3563
+##AIR## 11 aodv 1037.865 7335.251 6502.802 16.5288
+##ENERGY## 11 aodv 74900.626 1.227738 2.3979e-03 3.831
+##GOODPUT## 11 aodv 34.706
+##ROUTE## 11 aodv 0.5206 32.3392 0 0.04757 2.250 2901 3.7014 3.7014
+##PERF## paper aodv 11 645.706 645.765 527738830 -
+##DROPID## 12 aodv hopTx=228534 hopRx=222560 ackedHops=221886 macDrops=3780 reinjected=0 macTerminal=3780 macLost=3106 queue=0 hopLoss=5974 overlap=-2868 unackedRx=674 pqSilent=0 pqEcb=84
+# diag aodv seed=12 pdr=81.64 firstDeliveryS=7.65 ctrlTx=1221612 setupMedS=1.31 setupMaxS=19.35 flowsNoDelivery=0
+##RUN## 12 aodv 81.6 72.0 895.5 43.91 22.75 58.16 8.5 inf 12.2103
+##AIR## 12 aodv 1570.988 13067.282 12502.866 30.1568
+##ENERGY## 12 aodv 75776.818 1.411219 2.7563e-03 9.673
+##GOODPUT## 12 aodv 30.547
+##ROUTE## 12 aodv 1.3075 19.3506 0 0.08970 1.250 4815 3.5086 3.5086
+##PERF## paper aodv 12 1210.792 1210.886 834253444 -
+##DROPID## 13 aodv hopTx=273462 hopRx=270672 ackedHops=270059 macDrops=2447 reinjected=0 macTerminal=2447 macLost=1834 queue=0 hopLoss=2790 overlap=-956 unackedRx=613 pqSilent=0 pqEcb=0
+# diag aodv seed=13 pdr=88.73 firstDeliveryS=25.35 ctrlTx=939557 setupMedS=0.68 setupMaxS=21.76 flowsNoDelivery=0
+##RUN## 13 aodv 88.7 42.5 542.5 45.88 16.75 40.63 7.5 inf 8.8989
+##AIR## 13 aodv 1329.472 9567.079 8801.088 21.8863
+##ENERGY## 13 aodv 75280.377 1.341753 2.6206e-03 5.173
+##GOODPUT## 13 aodv 31.918
+##ROUTE## 13 aodv 0.6767 21.7599 0 0.07968 1.750 4469 4.3853 4.3853
+##PERF## paper aodv 13 906.333 906.402 677697588 -
+##DROPID## 14 aodv hopTx=282210 hopRx=279815 ackedHops=279218 macDrops=1904 reinjected=0 macTerminal=1904 macLost=1307 queue=0 hopLoss=2395 overlap=-1088 unackedRx=597 pqSilent=0 pqEcb=0
+# diag aodv seed=14 pdr=89.43 firstDeliveryS=2.52 ctrlTx=997950 setupMedS=1.01 setupMaxS=2.61 flowsNoDelivery=0
+##RUN## 14 aodv 89.4 45.0 592.5 47.13 17.32 41.52 7.5 inf 9.1643
+##AIR## 14 aodv 1394.774 9946.576 9336.477 22.9754
+##ENERGY## 14 aodv 75350.115 1.307503 2.5537e-03 5.362
+##GOODPUT## 14 aodv 32.784
+##ROUTE## 14 aodv 1.0058 2.6119 0 0.07214 2.000 4156 4.4285 4.4285
+##PERF## paper aodv 14 964.970 965.047 700111432 -
+##DROPID## 15 aodv hopTx=265619 hopRx=258693 ackedHops=257467 macDrops=4335 reinjected=0 macTerminal=4335 macLost=3109 queue=0 hopLoss=6926 overlap=-3817 unackedRx=1226 pqSilent=0 pqEcb=3
+# diag aodv seed=15 pdr=74.55 firstDeliveryS=4.24 ctrlTx=1526861 setupMedS=0.95 setupMaxS=2.76 flowsNoDelivery=0
+##RUN## 15 aodv 74.6 95.0 988.5 39.07 31.96 71.87 36.5 inf 17.0629
+##AIR## 15 aodv 1962.320 13539.518 13804.579 32.5627
+##ENERGY## 15 aodv 75951.705 1.589679 3.1048e-03 7.580
+##GOODPUT## 15 aodv 27.180
+##ROUTE## 15 aodv 0.9458 2.7558 0 0.10394 1.500 4964 4.4947 4.4947
+##PERF## paper aodv 15 1420.259 1420.362 995217611 -
+##DROPID## 11 dsdv hopTx=239528 hopRx=238563 ackedHops=238431 macDrops=634 reinjected=0 macTerminal=634 macLost=502 queue=0 hopLoss=965 overlap=-463 unackedRx=132 pqSilent=0 pqEcb=0
+# diag dsdv seed=11 pdr=98.50 firstDeliveryS=3.83 ctrlTx=588052 setupMedS=0.28 setupMaxS=1.29 flowsNoDelivery=0
+##RUN## 11 dsdv 98.5 16.1 406.5 51.93 9.26 14.84 3.5 11.5 6.4485
+##AIR## 11 dsdv 836.318 6950.540 3874.926 12.9575
+##ENERGY## 11 dsdv 74810.994 1.178107 2.3010e-03 2.129
+##GOODPUT## 11 dsdv 36.125
+##ROUTE## 11 dsdv 0.2771 1.2894 0 0.03036 4.500 1927 3.7332 3.7332
+##PERF## paper dsdv 11 551.744 551.793 301967906 -
+##DROPID## 12 dsdv hopTx=236615 hopRx=235139 ackedHops=235031 macDrops=1031 reinjected=0 macTerminal=1031 macLost=923 queue=0 hopLoss=1476 overlap=-553 unackedRx=108 pqSilent=0 pqEcb=0
+# diag dsdv seed=12 pdr=97.75 firstDeliveryS=7.65 ctrlTx=591197 setupMedS=0.27 setupMaxS=1.29 flowsNoDelivery=0
+##RUN## 12 dsdv 97.7 19.0 489.5 52.58 9.20 17.93 3.5 12.5 6.3964
+##AIR## 12 dsdv 836.802 8105.581 4753.367 15.2175
+##ENERGY## 12 dsdv 74949.415 1.165784 2.2769e-03 3.972
+##GOODPUT## 12 dsdv 36.574
+##ROUTE## 12 dsdv 0.2664 1.2939 0 0.03208 4.250 2062 3.6218 3.6218
+##PERF## paper dsdv 12 582.907 582.951 325406440 -
+##DROPID## 13 dsdv hopTx=254903 hopRx=253350 ackedHops=253171 macDrops=835 reinjected=0 macTerminal=835 macLost=656 queue=0 hopLoss=1553 overlap=-897 unackedRx=179 pqSilent=0 pqEcb=0
+# diag dsdv seed=13 pdr=97.54 firstDeliveryS=10.33 ctrlTx=576806 setupMedS=0.29 setupMaxS=1.53 flowsNoDelivery=0
+##RUN## 13 dsdv 97.5 19.7 484.5 50.44 9.35 18.57 4.5 12.5 6.5376
+##AIR## 13 dsdv 844.411 7177.028 4260.622 13.6467
+##ENERGY## 13 dsdv 74841.801 1.213408 2.3699e-03 2.682
+##GOODPUT## 13 dsdv 35.088
+##ROUTE## 13 dsdv 0.2857 1.5305 0 0.03897 3.750 2403 4.0853 4.0853
+##PERF## paper dsdv 13 534.652 534.693 315373470 -
+##DROPID## 14 dsdv hopTx=276387 hopRx=275538 ackedHops=275345 macDrops=659 reinjected=0 macTerminal=659 macLost=466 queue=0 hopLoss=849 overlap=-383 unackedRx=193 pqSilent=0 pqEcb=0
+# diag dsdv seed=14 pdr=98.68 firstDeliveryS=1.85 ctrlTx=598680 setupMedS=0.28 setupMaxS=1.27 flowsNoDelivery=0
+##RUN## 14 dsdv 98.7 21.4 494.5 52.00 9.41 19.29 4.5 19.5 6.5305
+##AIR## 14 dsdv 897.130 7645.121 4493.020 14.4836
+##ENERGY## 14 dsdv 74913.257 1.178067 2.3009e-03 2.782
+##GOODPUT## 14 dsdv 36.176
+##ROUTE## 14 dsdv 0.2777 1.2710 0 0.03879 4.250 2466 4.3153 4.3153
+##PERF## paper dsdv 14 567.438 567.471 331704477 -
+##DROPID## 15 dsdv hopTx=285287 hopRx=283827 ackedHops=283656 macDrops=829 reinjected=0 macTerminal=829 macLost=658 queue=0 hopLoss=1460 overlap=-802 unackedRx=171 pqSilent=0 pqEcb=0
+# diag dsdv seed=15 pdr=97.72 firstDeliveryS=4.24 ctrlTx=598338 setupMedS=0.28 setupMaxS=1.57 flowsNoDelivery=0
+##RUN## 15 dsdv 97.7 23.4 547.5 51.21 9.55 21.15 5.5 16.5 6.6313
+##AIR## 15 dsdv 900.153 7764.538 4698.503 14.8480
+##ENERGY## 15 dsdv 74928.166 1.196439 2.3368e-03 3.332
+##GOODPUT## 15 dsdv 35.627
+##ROUTE## 15 dsdv 0.2832 1.5667 0 0.04073 3.750 2550 4.5026 4.5026
+##PERF## paper dsdv 15 589.151 589.187 347213072 -
+##DROPID## 11 beeadhoc hopTx=231551 hopRx=231201 ackedHops=231111 macDrops=248 reinjected=0 macTerminal=248 macLost=158 queue=0 hopLoss=350 overlap=-192 unackedRx=90
+# diag beeadhoc seed=11 pdr=99.28 firstDeliveryS=4.91 ctrlTx=489317 setupMedS=1.31 setupMaxS=3.26 flowsNoDelivery=0
+##RUN## 11 beeadhoc 99.3 228.9 4069.5 52.34 7.64 120.52 4.5 790.5 6.5083
+##AIR## 11 beeadhoc 836.498 7214.332 3797.304 13.1646
+##ENERGY## 11 beeadhoc 74820.972 1.168986 2.2821e-03 2.556
+##GOODPUT## 11 beeadhoc 36.428
+##PERF## paper beeadhoc 11 378.920 378.940 286973183 -
+##DROPID## 12 beeadhoc hopTx=231254 hopRx=230532 ackedHops=230394 macDrops=567 reinjected=0 macTerminal=567 macLost=429 queue=0 hopLoss=722 overlap=-293 unackedRx=138
+# diag beeadhoc seed=12 pdr=98.60 firstDeliveryS=9.65 ctrlTx=517662 setupMedS=1.32 setupMaxS=3.62 flowsNoDelivery=0
+##RUN## 12 beeadhoc 98.6 196.5 2769.5 53.03 7.98 117.39 6.5 705.5 6.6582
+##AIR## 12 beeadhoc 873.030 9001.460 4965.656 16.4891
+##ENERGY## 12 beeadhoc 75027.900 1.156963 2.2577e-03 5.182
+##GOODPUT## 12 beeadhoc 36.924
+##PERF## paper beeadhoc 12 443.466 443.492 322610907 -
+##DROPID## 13 beeadhoc hopTx=257054 hopRx=256404 ackedHops=256207 macDrops=589 reinjected=0 macTerminal=589 macLost=392 queue=0 hopLoss=650 overlap=-258 unackedRx=197
+# diag beeadhoc seed=13 pdr=98.61 firstDeliveryS=11.39 ctrlTx=574301 setupMedS=1.28 setupMaxS=1.86 flowsNoDelivery=0
+##RUN## 13 beeadhoc 98.6 264.0 4160.5 50.99 9.21 147.12 9.5 846.5 7.7961
+##AIR## 13 beeadhoc 981.863 8805.457 4881.716 16.2989
+##ENERGY## 13 beeadhoc 75067.603 1.203836 2.3475e-03 4.523
+##GOODPUT## 13 beeadhoc 35.531
+##PERF## paper beeadhoc 13 459.133 459.171 340267257 -
+##DROPID## 14 beeadhoc hopTx=276983 hopRx=276484 ackedHops=276258 macDrops=524 reinjected=0 macTerminal=524 macLost=298 queue=0 hopLoss=499 overlap=-201 unackedRx=226
+# diag beeadhoc seed=14 pdr=99.16 firstDeliveryS=3.94 ctrlTx=634253 setupMedS=1.30 setupMaxS=2.37 flowsNoDelivery=0
+##RUN## 14 beeadhoc 99.2 253.5 2903.5 52.26 9.93 143.28 9.5 855.5 8.3561
+##AIR## 14 beeadhoc 1073.158 9402.846 5272.777 17.4986
+##ENERGY## 14 beeadhoc 75170.794 1.176382 2.2975e-03 4.472
+##GOODPUT## 14 beeadhoc 36.354
+##PERF## paper beeadhoc 14 505.101 505.142 361356551 -
+##DROPID## 15 beeadhoc hopTx=287893 hopRx=286933 ackedHops=286632 macDrops=971 reinjected=0 macTerminal=971 macLost=670 queue=0 hopLoss=960 overlap=-290 unackedRx=301
+# diag beeadhoc seed=15 pdr=98.39 firstDeliveryS=4.25 ctrlTx=725711 setupMedS=1.33 setupMaxS=2.39 flowsNoDelivery=0
+##RUN## 15 beeadhoc 98.4 288.3 3176.5 51.56 11.51 158.36 13.5 1044.5 9.6467
+##AIR## 15 beeadhoc 1200.967 10718.475 6259.277 20.1986
+##ENERGY## 15 beeadhoc 75379.626 1.195515 2.3350e-03 5.455
+##GOODPUT## 15 beeadhoc 35.870
+##PERF## paper beeadhoc 15 562.669 562.707 409953738 -
+##MATCH## 11 aodv 61007 61007 356.5 356.5
+##MATCH## 11 dsdv 63501 61007 406.5 17.5
+##MATCH## 11 beeadhoc 64005 61007 4069.5 1051.5
+##MATCH## 12 aodv 53696 53696 895.5 895.5
+##MATCH## 12 dsdv 64291 53696 489.5 7.5
+##MATCH## 12 beeadhoc 64849 53696 2769.5 294.5
+##MATCH## 13 aodv 56106 56106 542.5 542.5
+##MATCH## 13 dsdv 61679 56106 484.5 10.5
+##MATCH## 13 beeadhoc 62357 56106 4160.5 798.5
+##MATCH## 14 aodv 57629 57629 592.5 592.5
+##MATCH## 14 dsdv 63590 57629 494.5 17.5
+##MATCH## 14 beeadhoc 63900 57629 2903.5 809.5
+##MATCH## 15 aodv 47778 47778 988.5 988.5
+##MATCH## 15 dsdv 62626 47778 547.5 7.5
+##MATCH## 15 beeadhoc 63052 47778 3176.5 344.5
+##COMMON## 11 aodv 61007 59769 358.4 21.6 296.0 3.667 5.360
+##COMMON## 11 dsdv 63501 59769 393.6 15.6 552.5 3.584 6.129
+##COMMON## 11 beeadhoc 64034 59769 3751.6 207.2 6737.3 3.455 5.687
+##COMMON## 12 aodv 53696 52139 876.3 69.9 1766.3 3.452 5.407
+##COMMON## 12 dsdv 64291 52139 436.5 16.6 719.0 3.220 5.345
+##COMMON## 12 beeadhoc 64906 52139 1709.5 149.8 6314.5 3.139 5.154
+##COMMON## 13 aodv 56106 54114 537.1 42.2 702.0 4.355 5.216
+##COMMON## 13 dsdv 61679 54114 466.3 18.8 608.5 3.900 5.412
+##COMMON## 13 beeadhoc 62456 54114 3980.1 255.1 6695.2 3.923 5.205
+##COMMON## 14 aodv 57629 56444 592.1 44.8 626.8 4.400 5.774
+##COMMON## 14 dsdv 63590 56444 475.8 20.4 648.5 4.104 5.986
+##COMMON## 14 beeadhoc 63903 56444 2831.9 234.4 3186.6 4.110 5.854
+##COMMON## 15 aodv 47778 46133 985.7 93.9 1097.7 4.436 6.144
+##COMMON## 15 dsdv 62626 46133 519.8 21.9 708.7 4.113 5.593
+##COMMON## 15 beeadhoc 63052 46133 2900.6 243.4 3813.5 4.131 5.616
+AntHocNet protocol comparison (mean of 5 run(s))
+  nodes=100 time=900.000s area=3000.000x1000.000m maxSpeed=10.000m/s pause=1000.000s flows=20
+
+protocol        PDR%  delay(ms)  delay99(ms) thrput(kbps)     NRL  jitter(ms)  dOff50(ms)  dOff90(ms)    nrlBytes   energy(J)       J/pkt        hops        jain   jitterEq51
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+aodv            85.8       55.2        675.1        45.18   20.16       46.91        12.9         inf      10.739     75451.9      1.3756        4.10      0.9775       134.78
+dsdv            98.0       19.9        484.5        51.63    9.36       18.35         4.3        14.5       6.509     74888.7      1.1864        4.05      0.9957        30.66
+beeadhoc        98.8      246.3       3415.9        52.04    9.25      137.33         8.7       848.5       7.793     75093.4      1.1803        4.02      0.9959       153.95
+# paths aodv divUsed=1.360 divMax=10.8 entropyBits=0.203 windowS=10.0 hopsMean=4.10 hopsMax=55.4
+# paths dsdv divUsed=1.209 divMax=5.0 entropyBits=0.128 windowS=10.0 hopsMean=4.05 hopsMax=31.0
+# paths beeadhoc divUsed=1.478 divMax=8.6 entropyBits=0.316 windowS=10.0 hopsMean=4.02 hopsMax=10.0
+# energy aodv initJ=5000.0 resMinJ=4235.8 resMeanJ=4245.5 resSdJ=6.324 firstDeathS=-1.0
+# energy dsdv initJ=5000.0 resMinJ=4244.9 resMeanJ=4251.1 resSdJ=2.979 firstDeathS=-1.0
+# energy beeadhoc initJ=5000.0 resMinJ=4240.6 resMeanJ=4249.1 resSdJ=4.438 firstDeathS=-1.0
+# drops aodv pdr=85.80 route=8.04 queue=0.03 mac=3.17 chan=2.86 ttl=0.06 sum=99.95 other=0.00 [route: setup=- reconv=- repair=-]
+# drops dsdv pdr=98.04 route=0.00 queue=0.00 mac=0.99 chan=0.96 ttl=0.00 sum=100.00 other=0.00 [route: setup=- reconv=- repair=-]
+# drops beeadhoc pdr=98.81 route=0.13 queue=0.00 mac=0.61 chan=0.38 ttl=0.00 sum=99.93 other=0.00 [route: setup=- reconv=- repair=-]
+# stddev aodv pdr=7.80 delay=28.5 delay99=261.1 nrl=7.609 nrl_bytes=4.100
+# stddev dsdv pdr=0.52 delay=2.7 delay99=50.4 nrl=0.139 nrl_bytes=0.090
+# stddev beeadhoc pdr=0.39 delay=35.0 delay99=655.6 nrl=1.561 nrl_bytes=1.293
+# reorder aodv ratio=0.0034 ratioWorstFlow=0.0108 extentMean=1.46 extentMax=6.40 bufMax=6.40
+# reorder dsdv ratio=0.0032 ratioWorstFlow=0.0073 extentMean=2.60 extentMax=10.80 bufMax=10.60
+# reorder beeadhoc ratio=0.0119 ratioWorstFlow=0.1887 extentMean=6.74 extentMax=33.60 bufMax=30.20
+##ARGS## routing-compare --scenario=paper --runs=5 --nNodes=100 --time=900 --areaX=3000 --areaY=1000 --flows=20 --cbrBps=2048 --speed=10 --speedMin=0 --propagation=tworay --range=250 --diag --mobility=rwp --transport=udp --protocols=aodv,dsdv,beeadhoc --firstRun=11 --pause=1000
+##PROV## commit=bc9cb7d9b296db01c3bd7cdb822bf3966c37e326 ref=main run_id=43754574418 attempt=1 image=ghcr.io/swarm-routing/ns3-dev@sha256:5585a93c5cea1980592539e2d26a4e111e0ff4b0cc63b3dfd6ea5de459d80d3f profile=release harness=routing-compare base=ghcr.io/swarm-routing/ns3-dev:3.48-optimized-fb7596b@sha256:5585a93c5cea1980592539e2d26a4e111e0ff4b0cc63b3dfd6ea5de459d80d3f base_tag=ghcr.io/swarm-routing/ns3-dev:3.48-optimized-fb7596b build_profile=optimized modules=swarm-core@111a67385fbcdaecff5efa49cbdd66b20a355a09,routing-bench@3d279b83392a00288050574cee4288f30205658b,beeadhoc@bc9cb7d9b296db01c3bd7cdb822bf3966c37e326 key=8fa1a0a83517bfe53861d8e92a994a92e5b34f5bdad2438da2cf8296f68d83f8
+##CONFIG## scenario=paper nNodes=100 time=900 runs=5 firstRun=16 areaX=3000 areaY=1000 speed=10 speedMin=0 pause=1000 range=250 propagation=tworay mobility=rwp transport=udp flows=20 cbrBps=2048 offTime=0 rateManager=constant2 protocols=aodv,dsdv,beeadhoc
+##DROPID## 16 aodv hopTx=276830 hopRx=273268 ackedHops=272732 macDrops=2591 reinjected=0 macTerminal=2591 macLost=2055 queue=0 hopLoss=3562 overlap=-1507 unackedRx=536 pqSilent=0 pqEcb=0
+# diag aodv seed=16 pdr=86.29 firstDeliveryS=13.61 ctrlTx=1050907 setupMedS=1.50 setupMaxS=25.38 flowsNoDelivery=0
+##RUN## 16 aodv 86.3 54.0 680.5 45.20 19.01 47.21 6.5 inf 10.1205
+##AIR## 16 aodv 1428.554 10573.905 9845.764 24.2758
+##ENERGY## 16 aodv 75426.802 1.364722 2.6655e-03 7.128
+##GOODPUT## 16 aodv 31.442
+##ROUTE## 16 aodv 1.4983 25.3806 0 0.07591 1.500 4194 4.4537 4.4537
+##PERF## paper aodv 16 974.316 974.395 753877627 -
+##DROPID## 17 aodv hopTx=295083 hopRx=291380 ackedHops=290727 macDrops=2899 reinjected=0 macTerminal=2899 macLost=2246 queue=0 hopLoss=3703 overlap=-1457 unackedRx=653 pqSilent=0 pqEcb=0
+# diag aodv seed=17 pdr=84.76 firstDeliveryS=5.28 ctrlTx=1229906 setupMedS=0.94 setupMaxS=22.13 flowsNoDelivery=0
+##RUN## 17 aodv 84.8 59.4 734.5 45.42 22.15 51.67 9.5 inf 11.7717
+##AIR## 17 aodv 1676.029 11560.473 11468.549 27.4501
+##ENERGY## 17 aodv 75622.142 1.361629 2.6594e-03 7.069
+##GOODPUT## 17 aodv 31.595
+##ROUTE## 17 aodv 0.9404 22.1270 0 0.08309 1.500 4613 4.5714 4.5714
+##PERF## paper aodv 17 1188.056 1188.156 871552276 -
+##DROPID## 18 aodv hopTx=258051 hopRx=246243 ackedHops=244532 macDrops=6848 reinjected=0 macTerminal=6848 macLost=5137 queue=0 hopLoss=11808 overlap=-6671 unackedRx=1711 pqSilent=0 pqEcb=192
+# diag aodv seed=18 pdr=53.03 firstDeliveryS=16.52 ctrlTx=1993627 setupMedS=0.95 setupMaxS=35.51 flowsNoDelivery=0
+##RUN## 18 aodv 53.0 196.1 1640.5 28.06 58.09 122.97 792.5 inf 31.2057
+##AIR## 18 aodv 2429.712 16648.453 16224.625 39.2253
+##ENERGY## 18 aodv 76485.604 2.228731 4.3530e-03 10.714
+##GOODPUT## 18 aodv 19.523
+##ROUTE## 18 aodv 0.9461 35.5058 0 0.16902 1.500 5797 4.4086 4.4086
+##PERF## paper aodv 18 1723.902 1724.013 1177388369 -
+##DROPID## 19 aodv hopTx=231667 hopRx=229129 ackedHops=228675 macDrops=1830 reinjected=0 macTerminal=1830 macLost=1376 queue=0 hopLoss=2538 overlap=-1162 unackedRx=454 pqSilent=0 pqEcb=0
+# diag aodv seed=19 pdr=91.43 firstDeliveryS=2.82 ctrlTx=840767 setupMedS=0.55 setupMaxS=11.79 flowsNoDelivery=0
+##RUN## 19 aodv 91.4 36.8 506.5 48.21 14.26 36.39 5.5 438.5 7.5622
+##AIR## 19 aodv 1167.029 8904.088 8161.324 20.2583
+##ENERGY## 19 aodv 75152.612 1.274832 2.4899e-03 6.992
+##GOODPUT## 19 aodv 33.537
+##ROUTE## 19 aodv 0.5485 11.7875 0 0.06735 1.500 3969 3.6950 3.6950
+##PERF## paper aodv 19 809.456 809.511 596367917 -
+##DROPID## 20 aodv hopTx=250104 hopRx=246992 ackedHops=246252 macDrops=2537 reinjected=0 macTerminal=2537 macLost=1797 queue=0 hopLoss=3112 overlap=-1315 unackedRx=740 pqSilent=0 pqEcb=75
+# diag aodv seed=20 pdr=86.47 firstDeliveryS=13.21 ctrlTx=1100500 setupMedS=0.57 setupMaxS=3.05 flowsNoDelivery=0
+##RUN## 20 aodv 86.5 70.0 811.5 44.76 20.11 56.45 8.5 inf 10.7441
+##AIR## 20 aodv 1480.766 11206.615 10591.432 25.8653
+##ENERGY## 20 aodv 75525.782 1.379895 2.6951e-03 6.920
+##GOODPUT## 20 aodv 31.137
+##ROUTE## 20 aodv 0.5689 3.0486 0 0.08188 1.500 4480 4.1072 4.1072
+##PERF## paper aodv 20 1092.554 1092.629 775564357 -
+##DROPID## 16 dsdv hopTx=271719 hopRx=270515 ackedHops=270345 macDrops=964 reinjected=0 macTerminal=964 macLost=794 queue=0 hopLoss=1204 overlap=-410 unackedRx=170 pqSilent=0 pqEcb=0
+# diag dsdv seed=16 pdr=98.12 firstDeliveryS=13.60 ctrlTx=598218 setupMedS=0.28 setupMaxS=3.31 flowsNoDelivery=0
+##RUN## 16 dsdv 98.1 19.3 491.5 51.40 9.52 17.77 4.5 11.5 6.6068
+##AIR## 16 dsdv 878.042 7703.890 4453.961 14.4843
+##ENERGY## 16 dsdv 74915.234 1.192007 2.3281e-03 3.118
+##GOODPUT## 16 dsdv 35.754
+##ROUTE## 16 dsdv 0.2754 3.3067 0 0.03868 4.500 2430 4.2781 4.2781
+##PERF## paper dsdv 16 637.532 637.592 341349623 -
+##DROPID## 17 dsdv hopTx=293716 hopRx=292676 ackedHops=292521 macDrops=765 reinjected=0 macTerminal=765 macLost=610 queue=0 hopLoss=1040 overlap=-430 unackedRx=155 pqSilent=12 pqEcb=0
+# diag dsdv seed=17 pdr=98.38 firstDeliveryS=6.19 ctrlTx=598511 setupMedS=0.29 setupMaxS=2.46 flowsNoDelivery=0
+##RUN## 17 dsdv 98.4 21.3 500.5 52.72 9.28 19.13 4.5 15.5 6.4418
+##AIR## 17 dsdv 908.994 7788.593 4604.535 14.7801
+##ENERGY## 17 dsdv 74934.487 1.162424 2.2704e-03 3.339
+##GOODPUT## 17 dsdv 36.673
+##ROUTE## 17 dsdv 0.2857 2.4552 0 0.03848 3.750 2480 4.5054 4.5054
+##PERF## paper dsdv 17 642.368 642.427 350017957 -
+##DROPID## 18 dsdv hopTx=321687 hopRx=319880 ackedHops=319707 macDrops=998 reinjected=0 macTerminal=998 macLost=825 queue=0 hopLoss=1807 overlap=-982 unackedRx=173 pqSilent=0 pqEcb=0
+# diag dsdv seed=18 pdr=97.21 firstDeliveryS=9.84 ctrlTx=577581 setupMedS=0.29 setupMaxS=2.29 flowsNoDelivery=0
+##RUN## 18 dsdv 97.2 23.0 520.5 51.44 9.18 20.13 5.5 17.5 6.4166
+##AIR## 18 dsdv 921.426 7895.604 4676.020 14.9923
+##ENERGY## 18 dsdv 74950.944 1.191494 2.3271e-03 3.812
+##GOODPUT## 18 dsdv 35.786
+##ROUTE## 18 dsdv 0.2917 2.2947 0 0.04271 4.000 2686 5.0458 5.0458
+##PERF## paper dsdv 18 604.439 604.484 357782624 -
+##DROPID## 19 dsdv hopTx=227745 hopRx=226546 ackedHops=226449 macDrops=596 reinjected=0 macTerminal=596 macLost=499 queue=0 hopLoss=1199 overlap=-700 unackedRx=97 pqSilent=0 pqEcb=0
+# diag dsdv seed=19 pdr=98.14 firstDeliveryS=2.55 ctrlTx=582534 setupMedS=0.27 setupMaxS=1.66 flowsNoDelivery=0
+##RUN## 19 dsdv 98.1 18.1 470.5 51.75 9.21 17.27 2.5 13.5 6.4237
+##AIR## 19 dsdv 818.788 7072.239 4009.061 13.2223
+##ENERGY## 19 dsdv 74819.398 1.182429 2.3094e-03 3.028
+##GOODPUT## 19 dsdv 35.997
+##ROUTE## 19 dsdv 0.2685 1.6553 0 0.03230 5.250 2043 3.5601 3.5601
+##PERF## paper dsdv 19 535.582 535.619 296465249 -
+##DROPID## 20 dsdv hopTx=240228 hopRx=238859 ackedHops=238678 macDrops=877 reinjected=0 macTerminal=877 macLost=696 queue=0 hopLoss=1369 overlap=-673 unackedRx=181 pqSilent=0 pqEcb=0
+# diag dsdv seed=20 pdr=97.84 firstDeliveryS=11.91 ctrlTx=611901 setupMedS=0.27 setupMaxS=1.28 flowsNoDelivery=0
+##RUN## 20 dsdv 97.8 20.7 513.5 50.64 9.88 19.20 4.5 11.5 6.8284
+##AIR## 20 dsdv 860.154 7699.628 4554.671 14.5716
+##ENERGY## 20 dsdv 74908.353 1.209663 2.3626e-03 3.711
+##GOODPUT## 20 dsdv 35.228
+##ROUTE## 20 dsdv 0.2729 1.2772 0 0.03987 4.000 2468 3.8386 3.8386
+##PERF## paper dsdv 20 614.343 614.395 331775263 -
+##DROPID## 16 beeadhoc hopTx=274975 hopRx=274259 ackedHops=274063 macDrops=604 reinjected=0 macTerminal=604 macLost=408 queue=0 hopLoss=716 overlap=-308 unackedRx=196
+# diag beeadhoc seed=16 pdr=98.83 firstDeliveryS=14.65 ctrlTx=614878 setupMedS=1.30 setupMaxS=3.32 flowsNoDelivery=0
+##RUN## 16 beeadhoc 98.8 208.9 1762.5 51.77 9.71 138.45 9.5 819.5 8.2092
+##AIR## 16 beeadhoc 1047.403 9545.219 5263.650 17.6181
+##ENERGY## 16 beeadhoc 75155.975 1.187204 2.3188e-03 4.880
+##GOODPUT## 16 beeadhoc 36.014
+##PERF## paper beeadhoc 16 538.048 538.096 372811106 -
+##DROPID## 17 beeadhoc hopTx=284726 hopRx=283966 ackedHops=283733 macDrops=692 reinjected=0 macTerminal=692 macLost=459 queue=0 hopLoss=760 overlap=-301 unackedRx=233
+# diag beeadhoc seed=17 pdr=98.04 firstDeliveryS=5.29 ctrlTx=654142 setupMedS=1.33 setupMaxS=4.31 flowsNoDelivery=0
+##RUN## 17 beeadhoc 98.0 336.6 5161.5 52.54 10.18 167.23 9.5 1063.5 8.7304
+##AIR## 17 beeadhoc 1113.702 9936.526 5584.300 18.4828
+##ENERGY## 17 beeadhoc 75252.082 1.171348 2.2827e-03 5.191
+##GOODPUT## 17 beeadhoc 36.628
+##PERF## paper beeadhoc 17 538.552 538.597 382360257 -
+##DROPID## 18 beeadhoc hopTx=263007 hopRx=262080 ackedHops=261728 macDrops=1003 reinjected=0 macTerminal=1003 macLost=651 queue=0 hopLoss=927 overlap=-276 unackedRx=352
+# diag beeadhoc seed=18 pdr=90.23 firstDeliveryS=10.90 ctrlTx=780537 setupMedS=1.33 setupMaxS=3.39 flowsNoDelivery=0
+##RUN## 18 beeadhoc 90.2 303.4 3445.5 47.75 13.37 171.44 22.5 5699.5 11.0971
+##AIR## 18 beeadhoc 1228.269 11065.116 5982.041 20.3060
+##ENERGY## 18 beeadhoc 75430.283 1.291814 2.5230e-03 6.418
+##GOODPUT## 18 beeadhoc 33.219
+##PERF## paper beeadhoc 18 575.275 575.326 403590143 -
+##DROPID## 19 beeadhoc hopTx=228992 hopRx=228524 ackedHops=228450 macDrops=291 reinjected=0 macTerminal=291 macLost=217 queue=0 hopLoss=468 overlap=-251 unackedRx=74
+# diag beeadhoc seed=19 pdr=99.26 firstDeliveryS=3.08 ctrlTx=500250 setupMedS=1.28 setupMaxS=3.37 flowsNoDelivery=0
+##RUN## 19 beeadhoc 99.3 146.5 1552.5 52.34 7.82 105.07 6.5 556.5 6.4309
+##AIR## 19 beeadhoc 837.883 7786.773 4292.195 14.3521
+##ENERGY## 19 beeadhoc 74908.438 1.170499 2.2861e-03 4.912
+##GOODPUT## 19 beeadhoc 36.407
+##PERF## paper beeadhoc 19 407.473 407.508 295279065 -
+##DROPID## 20 beeadhoc hopTx=238917 hopRx=238410 ackedHops=238216 macDrops=530 reinjected=0 macTerminal=530 macLost=336 queue=0 hopLoss=507 overlap=-171 unackedRx=194
+# diag beeadhoc seed=20 pdr=99.20 firstDeliveryS=13.02 ctrlTx=549299 setupMedS=0.82 setupMaxS=1.87 flowsNoDelivery=0
+##RUN## 20 beeadhoc 99.2 143.0 1141.5 51.35 8.75 116.70 7.5 558.5 7.0684
+##AIR## 20 beeadhoc 911.354 8630.060 4882.681 16.0268
+##ENERGY## 20 beeadhoc 74993.029 1.194404 2.3328e-03 5.869
+##GOODPUT## 20 beeadhoc 35.719
+##PERF## paper beeadhoc 20 482.501 482.542 338594514 -
+##MATCH## 16 aodv 55269 55269 680.5 680.5
+##MATCH## 16 dsdv 62848 55269 491.5 8.5
+##MATCH## 16 beeadhoc 63305 55269 1762.5 579.5
+##MATCH## 17 aodv 55538 55538 734.5 734.5
+##MATCH## 17 dsdv 64464 55538 500.5 11.5
+##MATCH## 17 beeadhoc 64244 55538 5161.5 797.5
+##MATCH## 18 aodv 34318 34318 1640.5 1640.5
+##MATCH## 18 dsdv 62905 34318 520.5 5.5
+##MATCH## 18 beeadhoc 58391 34318 3445.5 29.5
+##MATCH## 19 aodv 58951 58951 506.5 506.5
+##MATCH## 19 dsdv 63276 58951 470.5 14.5
+##MATCH## 19 beeadhoc 63997 58951 1552.5 564.5
+##MATCH## 20 aodv 54733 54733 811.5 811.5
+##MATCH## 20 dsdv 61925 54733 513.5 8.5
+##MATCH## 20 beeadhoc 62787 54733 1141.5 462.5
+##COMMON## 16 aodv 55269 53743 680.8 53.7 680.7 4.424 5.492
+##COMMON## 16 dsdv 62848 53743 471.5 18.3 595.0 4.128 5.167
+##COMMON## 16 beeadhoc 63305 53743 1657.1 195.0 2337.7 4.159 5.195
+##COMMON## 17 aodv 55538 53961 732.9 58.8 794.5 4.504 6.864
+##COMMON## 17 dsdv 64464 53961 475.6 19.9 612.7 4.121 6.481
+##COMMON## 17 beeadhoc 64386 53961 4933.8 303.4 9292.1 4.030 6.254
+##COMMON## 18 aodv 34318 31634 1546.6 186.1 3421.4 4.010 9.107
+##COMMON## 18 dsdv 62905 31634 439.6 18.1 592.5 3.592 6.516
+##COMMON## 18 beeadhoc 58393 31634 2468.8 199.1 4178.3 3.574 5.518
+##COMMON## 19 aodv 58951 57525 506.6 36.6 510.3 3.675 4.496
+##COMMON## 19 dsdv 63276 57525 443.2 17.0 777.3 3.506 4.104
+##COMMON## 19 beeadhoc 63997 57525 1546.4 142.2 1626.6 3.500 4.131
+##COMMON## 20 aodv 54733 53141 810.6 69.8 953.0 4.089 4.728
+##COMMON## 20 dsdv 61925 53141 498.9 19.7 603.0 3.712 4.607
+##COMMON## 20 beeadhoc 62787 53141 1124.6 134.4 1343.5 3.669 4.441
+AntHocNet protocol comparison (mean of 5 run(s))
+  nodes=100 time=900.000s area=3000.000x1000.000m maxSpeed=10.000m/s pause=1000.000s flows=20
+
+protocol        PDR%  delay(ms)  delay99(ms) thrput(kbps)     NRL  jitter(ms)  dOff50(ms)  dOff90(ms)    nrlBytes   energy(J)       J/pkt        hops        jain   jitterEq51
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+aodv            80.4       83.3        874.7        42.33   26.72       62.94       164.5         inf      14.281     75642.6      1.5220        4.25      0.9494       195.20
+dsdv            97.9       20.5        499.3        51.59    9.41       18.70         4.3        13.9       6.543     74905.7      1.1876        4.25      0.9949        31.53
+beeadhoc        97.1      227.7       2612.7        51.15    9.97      139.78        11.1      1739.5       8.307     75148.0      1.2031        4.10      0.9816       171.95
+# paths aodv divUsed=1.382 divMax=11.6 entropyBits=0.214 windowS=10.0 hopsMean=4.25 hopsMax=56.2
+# paths dsdv divUsed=1.210 divMax=4.4 entropyBits=0.129 windowS=10.0 hopsMean=4.25 hopsMax=19.2
+# paths beeadhoc divUsed=1.465 divMax=9.0 entropyBits=0.309 windowS=10.0 hopsMean=4.10 hopsMax=10.0
+# energy aodv initJ=5000.0 resMinJ=4232.5 resMeanJ=4243.6 resSdJ=7.764 firstDeathS=-1.0
+# energy dsdv initJ=5000.0 resMinJ=4244.5 resMeanJ=4250.9 resSdJ=3.401 firstDeathS=-1.0
+# energy beeadhoc initJ=5000.0 resMinJ=4239.2 resMeanJ=4248.5 resSdJ=5.454 firstDeathS=-1.0
+# drops aodv pdr=80.40 route=11.73 queue=0.08 mac=3.91 chan=3.75 ttl=0.08 sum=99.95 other=0.00 [route: setup=- reconv=- repair=-]
+# drops dsdv pdr=97.94 route=0.00 queue=0.00 mac=1.06 chan=0.99 ttl=0.00 sum=100.00 other=0.00 [route: setup=- reconv=- repair=-]
+# drops beeadhoc pdr=97.11 route=1.78 queue=0.00 mac=0.64 chan=0.41 ttl=0.00 sum=99.94 other=0.00 [route: setup=- reconv=- repair=-]
+# stddev aodv pdr=15.50 delay=64.2 delay99=442.5 nrl=17.773 nrl_bytes=9.588
+# stddev dsdv pdr=0.45 delay=1.9 delay99=19.6 nrl=0.293 nrl_bytes=0.177
+# stddev beeadhoc pdr=3.88 delay=89.0 delay99=1673.4 nrl=2.108 nrl_bytes=1.805
+# reorder aodv ratio=0.0049 ratioWorstFlow=0.0118 extentMean=1.65 extentMax=8.40 bufMax=6.20
+# reorder dsdv ratio=0.0035 ratioWorstFlow=0.0087 extentMean=2.65 extentMax=14.60 bufMax=13.80
+# reorder beeadhoc ratio=0.0087 ratioWorstFlow=0.1348 extentMean=4.58 extentMax=21.40 bufMax=19.00
+##ARGS## routing-compare --scenario=paper --runs=5 --nNodes=100 --time=900 --areaX=3000 --areaY=1000 --flows=20 --cbrBps=2048 --speed=10 --speedMin=0 --propagation=tworay --range=250 --diag --mobility=rwp --transport=udp --protocols=aodv,dsdv,beeadhoc --firstRun=16 --pause=1000
+##PROV## commit=bc9cb7d9b296db01c3bd7cdb822bf3966c37e326 ref=main run_id=43761882969 attempt=1 image=ghcr.io/swarm-routing/ns3-dev@sha256:5585a93c5cea1980592539e2d26a4e111e0ff4b0cc63b3dfd6ea5de459d80d3f profile=release harness=routing-compare base=ghcr.io/swarm-routing/ns3-dev:3.48-optimized-fb7596b@sha256:5585a93c5cea1980592539e2d26a4e111e0ff4b0cc63b3dfd6ea5de459d80d3f base_tag=ghcr.io/swarm-routing/ns3-dev:3.48-optimized-fb7596b build_profile=optimized modules=swarm-core@111a67385fbcdaecff5efa49cbdd66b20a355a09,routing-bench@3d279b83392a00288050574cee4288f30205658b,beeadhoc@bc9cb7d9b296db01c3bd7cdb822bf3966c37e326 key=6d5efb40dcbd4da80792778ecf99e5805a858eae6cfef193880f873380bd85b0

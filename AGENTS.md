@@ -42,7 +42,8 @@ docs/       fidelity.md: the fidelity sheet (#13), every row against PG 460's Li
 .github/workflows/ns3.yml    ns3/ in ns3-dev latest debug + sanitized (reusable-ns3-ci.yml; checks `ci / ns-latest debug`, `ci / ns-latest sanitized`, `ci / format`)
 .github/workflows/swarm-core-pin.yml   the swarm-core pin is one SHA and current (reusable-swarm-core-pin.yml; check `swarm-core / pin`)
 .github/workflows/benchmark-cell.yml   one benchmark cell at a pinned source_sha (reusable-benchmark-cell.yml, build mode); dispatched by ns3-campaign
-tools/bench/campaigns/   campaign plans: smoke.yaml (the change-test smoke against the base)
+tools/bench/campaigns/   campaign plans: smoke.yaml (the change-test smoke against the base), anchor.yaml (the anchor, generation bee-anchor-2)
+results/cells/<gen>/     the collected cells of each campaign that gates a release (bee-anchor-2: the v0.2.0 anchor; verdict in docs/benchmarks/v0.2.0-anchor.md)
 ```
 
 ## Build & verify
