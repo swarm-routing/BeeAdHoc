@@ -31,19 +31,21 @@ stability promise**.
 ```mermaid
 flowchart LR
     V01["<b>v0.1.0</b><br/>core/ and docs/<br/>ungated"]
-    V02["<b>v0.2.0</b><br/>gated:<br/>module + pipeline + anchor"]
+    V02["<b>v0.2.0</b><br/>gated:<br/>module + pipeline + anchor<br/>shipped 2026-11-16"]
+    V021["<b>v0.2.1</b><br/>on the frozen<br/>swarm-core v1.0.0"]
     V03["<b>v0.3.0</b><br/>reviewed"]
     V10["<b>v1.0.0</b><br/>wire and core/ API<br/>frozen"]
 
-    V01 --> V02 --> V03 --> V10
+    V01 --> V02 --> V021 --> V03 --> V10
 
     style V01 fill:#e2f0ed,stroke:#0f7f70,stroke-width:2px
-    style V02 fill:#fff8e6,stroke:#c48f00,stroke-dasharray:4 3
+    style V02 fill:#e2f0ed,stroke:#0f7f70,stroke-width:2px
+    style V021 fill:#fff8e6,stroke:#c48f00,stroke-dasharray:4 3
     style V03 fill:#fff8e6,stroke:#c48f00,stroke-dasharray:4 3
     style V10 fill:#f6dede,stroke:#c0392b,stroke-width:2px
 ```
 
-Green is shipped (v0.1.0, 2026-11-11); amber is planned. v0.1.0 came before the
+Green is shipped (v0.1.0, 2026-11-11; v0.2.0, 2026-11-16, with the anchor's written infeasibility verdict); amber is planned. v0.1.0 came before the
 comparator gates by maintainer decision 2026-11-10, so no number from it counts
 as a benchmark result.
 
@@ -99,6 +101,7 @@ after its v0.3.0 review; they need a `reusable-release.yml` `increment` input
 |---|---|
 | **v0.1.0** | `core/` and `docs/` released, ungated. **Shipped 2026-11-11** ([release v0.1.0](https://github.com/swarm-routing/BeeAdHoc/releases/tag/v0.1.0)). It has not cleared the comparator gates (org golden rule 6), so no number from it counts. |
 | **v0.2.0** | **Gated.** The ns-3 module `beeadhoc` is green on swarm-core; the router observer is adopted; the protocol has its own benchmark pipeline; the anchor has a verdict (PASS, or a written infeasibility verdict); **the anchor missed (`bee-anchor-2`, 3 of 5 pause times, 2026-11-16), and v0.2.0 ships with its written infeasibility verdict ([`benchmarks/v0.2.0-anchor.md`](benchmarks/v0.2.0-anchor.md))**; the rows of `docs/fidelity.md` that read `unknown: unresolved` (no issue owns them, such as the link-failure row) are each settled by a recorded reading or repo choice. The rows that wait on the papers (`unknown: open #5`, re-checked by [#5](https://github.com/swarm-routing/BeeAdHoc/issues/5) and [#27](https://github.com/swarm-routing/BeeAdHoc/issues/27)) are not a v0.2.0 prerequisite; they belong to v0.3.0.<br/>Scope: [#36](https://github.com/swarm-routing/BeeAdHoc/issues/36) the simulator-agnostic core (data path, swarms, link failure); [#47](https://github.com/swarm-routing/BeeAdHoc/issues/47) the `beeadhoc` contrib module; [#41](https://github.com/swarm-routing/BeeAdHoc/issues/41) the pipeline of paired smoke and anchor campaigns. The decision on the two Listing 13.15 interpretations, [#4](https://github.com/swarm-routing/BeeAdHoc/issues/4), is already closed (2026-11-10), so the anchor runs against the recorded reading. |
+| **v0.2.1** | **On the frozen swarm-core.** A patch release built on swarm-core v1.0.0, whose API is frozen (swarm-routing/ns3-swarm-core#83): `swarm-core.lock` locks v1.0.0 (org-bot's pin bump, #161) and CI is green on it, with no API change on either side and no protocol change. Forced to a patch (`increment: PATCH`) by the maintainer's decision of 2026-11-16 (swarm-routing/ns3-swarm-core#83); the comparator gates are v0.2.0's, unchanged. |
 | **v0.3.0** | **Reviewed.** Paper-review issues and perf follow-ups are closed, and any new mechanism is default-off with its A/B.<br/>Scope: [#5](https://github.com/swarm-routing/BeeAdHoc/issues/5) the anchor reviewed against GECCO 2005; [#27](https://github.com/swarm-routing/BeeAdHoc/issues/27) the fidelity sheet reviewed against GECCO 2005 and SIS 2005 (needs the GECCO paper); [#55](https://github.com/swarm-routing/BeeAdHoc/issues/55) forager take without copies, span-based route tag. |
 | **v1.0.0** | **Stability promise.** The wire format and the `core/` API are frozen; the protocol is paper-faithful with every deviation documented; the three comparator gates are passed; CI is green on the ns-3 release the org supports; a released run is recorded in the `benchmarks` global suite. |
 
