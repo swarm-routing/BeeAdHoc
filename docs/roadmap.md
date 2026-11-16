@@ -132,5 +132,6 @@ None is open here today; add rows as such issues appear.
 Every published release with its Zenodo version DOI, read from Zenodo by swarm-routing/.github `tools/zenodo/zenodo.py shipped` (org-bot's `release-aftercare` task); never edit the block by hand.
 
 <!-- releases:shipped:begin (zenodo.py shipped --write; never edit by hand) -->
+- **v0.2.0** shipped 2026-11-16 ([release](https://github.com/swarm-routing/BeeAdHoc/releases/tag/v0.2.0), Zenodo version DOI [10.5281/zenodo.24267890](https://doi.org/10.5281/zenodo.24267890))
 - **v0.1.0** shipped 2026-11-11 ([release](https://github.com/swarm-routing/BeeAdHoc/releases/tag/v0.1.0), Zenodo version DOI [10.5281/zenodo.24124822](https://doi.org/10.5281/zenodo.24124822))
 <!-- releases:shipped:end -->
