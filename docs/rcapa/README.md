@@ -19,17 +19,19 @@ consumer pins a registry baseline, which names a BeeAdHoc release). A
 regression in that port's version against an earlier one is an RCAPA here.
 The ns-3 module, the GitHub releases and their Zenodo DOIs are not consumed
 at a version by another project, so a defect there is an ordinary `bug`
-issue, as is any defect fixed before the next release.
+issue, as is any defect that never reached a published port version. A
+defect in the port recipe itself (its portfile or version metadata) is a
+`VCP-NNN` in swarm-routing/vcpkg-registry.
 
 | | |
 |---|---|
 | Published as | `core/` through the `beeadhoc-core` vcpkg port (a BeeAdHoc release at a registry baseline) |
 | ID prefix | `BAH-NNN` |
 | Ticket | an issue in swarm-routing/BeeAdHoc, form *Regression in a release (RCAPA)*, title `[rcapa] BAH-NNN <short description>`, labels `rcapa` and `bug`, opened from the consumer's finding |
-| Verified by | the consumer's failing build or test against the `beeadhoc-core` version that broke and the one before it; then `make core-test` (`core.yml`: ctest, strict warnings, ASan + UBSan) |
+| Verified by | the consumer's failing build or test against the `beeadhoc-core` version that broke and the one before it; then `make core-test` (ctest with strict warnings) locally, and the `core` check (`core.yml`), which also builds and runs the tests under ASan + UBSan |
 | Corrective action | the fix PR with a core test in `core/test/` that fails without it; a wire-format change bumps the version byte (golden rule 3); then a release and the port bump org-bot opens in swarm-routing/vcpkg-registry |
 | Preventive action | the core test or fuzz case that would have caught it, and a consumer case in swarm-routing/vcpkg-registry `test/consumer/` if only a consumer showed it |
-| Closes when | a release carries the fix **and** the `beeadhoc-core` port is bumped to it, with the consumer green on the new baseline |
+| Closes when | a release carries the fix **and** the `beeadhoc-core` port is bumped to it in the registry, with the consumer that found it green on the new baseline |
 
 ```mermaid
 sequenceDiagram
@@ -58,9 +60,7 @@ sequenceDiagram
 2. Copy [`_template.md`](_template.md) to `rcapa-<short-description>.md`
    (lowercase, hyphens: what breaks, not where it was found), and add its row
    to the index in the same pull request.
-3. The ticket stays open until the corrective action is merged, a release
-   carries the fix, and the consumer that found it runs green on that
-   release; record the release in the index.
+3. The ticket stays open until a release carries the fix, the `beeadhoc-core` port is bumped to it in swarm-routing/vcpkg-registry, and the consumer that found it runs green on the new baseline; record the release and the baseline in the index.
 
 ## What an RCAPA answers
 
