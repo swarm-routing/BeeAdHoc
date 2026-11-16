@@ -155,7 +155,7 @@ version (ch. 3 or ch. 6) ch. 7 ran. See *Anchor candidate*.
 |---|---|---|---|---|
 | BeeAdHoc sends the fewest control packets, flat over pause time | ns-2, 100 nodes, 3000 × 1000 m, 900 s, 20 CBR flows of four 512-byte packets/s, random waypoint 0–10 m/s, pause 1, 30, 100, 500, 1000 s (AntHocNet's scalability setup); results in figures only | Control packets sent (§7.2.5 counts packets, not NRL) | AODV, DSR, DSDV ("left out in some cases due to errors", §7.1.4). The org has no DSR arm | [PG460] §7.1.4, §7.2.5, Fig. 7.3, Fig. 7.14 |
 
-Status: **open: #5**. The citation of record is [W05], which has not been read;
+Status: **open: #5**; the v0.2.0 run (`bee-anchor-2`) missed, see *Anchor history*. The citation of record is [W05], which has not been read;
 #5 re-reads this anchor against it once it has been. Two
 cautions stand until then: ch. 7 measured an ns-2 BeeAdHoc, not the kernel
 module this sheet follows (*Which version*), and its DSDV comparison may be
@@ -195,6 +195,22 @@ thin by the report's own account.
   to the arm, so under that rule `v270a` is not this repository's anchor: a
   new anchor is pre-registered under a new id once `core/` exists, and a
   re-run of `v270a` stays a historical replication.
+- **Pre-registration (`bee-anchor-1`, 2026-11-13; `bee-anchor-2`, 2026-11-15).**
+  `v270a`'s scenario and gate re-registered on this repository's `core/`, seeds
+  1–20, ns3-dev 3.48-optimized by digest ([#5](https://github.com/swarm-routing/BeeAdHoc/issues/5#issuecomment-6841625121)).
+  `bee-anchor-1` was never dispatched, because no cell could build the
+  swarm-core commit it named. `bee-anchor-2` changes only the commits
+  ([#5](https://github.com/swarm-routing/BeeAdHoc/issues/5#issuecomment-6889731223)):
+  BeeAdHoc `bc9cb7d`, swarm-core v0.4.0 (`111a673`), routing-bench `3d279b8`.
+  Plan file: `tools/bench/campaigns/anchor.yaml`.
+- **Verdict (2026-11-16): MISS, 3 of 5 pause times**
+  ([#5](https://github.com/swarm-routing/BeeAdHoc/issues/5#issuecomment-6903847269);
+  [`benchmarks/v0.2.0-anchor.md`](benchmarks/v0.2.0-anchor.md)). BeeAdHoc's
+  NRL is flat over pause time and below AODV's at every pause time. It is
+  below DSDV's at 1, 30 and 100 s. At 500 and 1000 s the two are level
+  (+0.33 [−0.30, +0.97], +0.49 [−0.36, +1.34]), the same pause times
+  `v270a` missed. Under the comparator rule, v0.2.0 ships with this written
+  infeasibility verdict. #5 re-reads the trend against [W05] in v0.3.0.
 
 ## Shared plumbing (from the arm)
 
