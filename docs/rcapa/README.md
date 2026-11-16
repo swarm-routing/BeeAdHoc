@@ -16,9 +16,11 @@ A **published release** of BeeAdHoc is a `v*` tag of this repository: its
 GitHub release, archived on Zenodo (concept DOI
 [10.5281/zenodo.24124821](https://doi.org/10.5281/zenodo.24124821)), the `beeadhoc-core` vcpkg port (swarm-routing/vcpkg-registry, bumped by org-bot after each release). A
 regression is something that worked in one of those releases and broke
-after a change. A defect caught on `main` before the next tag needs no RCAPA:
-an ordinary `bug` issue is enough. Whether a commit reached a release is read
-from `git tag --contains <commit>`.
+after a change, whenever it is found, also on `main` before the next tag.
+A defect introduced after the last tag and fixed before the next one never
+reached a release: it needs no RCAPA, an ordinary `bug` issue is enough.
+Whether a commit reached a release is read from
+`git tag --contains <commit>`.
 
 | | |
 |---|---|
@@ -26,7 +28,7 @@ from `git tag --contains <commit>`.
 | ID prefix | `BAH-NNN` |
 | Ticket | an issue in swarm-routing/BeeAdHoc, form *Regression in a release (RCAPA)*, title `[rcapa] BAH-NNN <short description>`, labels `rcapa` and `bug` |
 | Verified by | the reproducer against the failing tag and the last good one: `make core-test` (`core.yml`: ctest, strict warnings, ASan + UBSan), the ns-3 suite and the `routing-compare` delivery smoke of `ns3.yml` (reusable-ns3-ci), and its determinism program; a changed number: `benchmark-cell.yml` |
-| Corrective action | the fix PR with a core test in `core/test/` that fails without it; a wire-format change bumps the version byte (golden rule 3); then a release bump |
+| Corrective action | the fix PR with a test, in the layer that shows the defect, that fails without it: a core test in `core/test/` for core behaviour, an ns-3 suite case in `ns3/test/` for the adapter; a wire-format change bumps the version byte (golden rule 3); then a release bump |
 | Preventive action | the test or check that would have caught it before the tag (a core test, a fuzz case, an ns-3 suite case, the delivery smoke); a fidelity row in `docs/fidelity.md` corrected if the reading was wrong |
 | Closes when | the fix is merged **and** a `v*` release carries it (tag and version DOI read from Zenodo, and the `beeadhoc-core` port bumped) |
 
