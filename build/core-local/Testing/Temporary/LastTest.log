@@ -1,0 +1,49 @@
+Start testing: Nov 17 04:55 UTC
+----------------------------------------------------------
+1/1 Testing: beeadhoc-core
+1/1 Test: beeadhoc-core
+Command: "/tmp/claude-0/-home-user/844ef203-bb92-5474-822f-3dad885c668a/scratchpad/w578/BeeAdHoc/build/core-local/beeadhoc_core_tests"
+Directory: /tmp/claude-0/-home-user/844ef203-bb92-5474-822f-3dad885c668a/scratchpad/w578/BeeAdHoc/build/core-local
+"beeadhoc-core" start time: Nov 17 04:55 UTC
+Output:
+----------------------------------------------------------
+ok   scout: wire roundtrip
+ok   scout: the decoder fails closed
+ok   scout: seeded fuzz (fails or round-trips to itself)
+ok   battery level bins
+ok   rating (Listing 13.15, #4)
+ok   forager arrays: bounded, per type
+ok   forager choice (Listing 13.17)
+ok   forager store: MAXAGE collection, destination cap
+ok   discovery: scout out, back, foragers home
+ok   discovery: the destination's level is the L-th value
+ok   discovery: expanding ring and give-up
+ok   discovery: seen list, hop and search caps
+ok   discovery: a returned scout with a repeated node is refused
+ok   discovery: a late scout with no search out
+ok   router: fixed seed, fixed trace
+ok   trailer: wire roundtrip
+ok   trailer: the decoder fails closed
+ok   trailer: seeded fuzz (fails or round-trips to itself)
+ok   data: FORWARD-chain levels, INPUT-chain foreign forager (#4)
+ok   data: one foreign forager piggybacked home (§13.7.1)
+ok   data: a packet from the destination ends its search
+ok   swarm: wire roundtrip
+ok   swarm: the decoder fails closed
+ok   swarm: seeded fuzz (fails or round-trips to itself)
+ok   swarm: Listing 13.30's trigger, reversed routes home (§13.7.3)
+ok   swarm: unpacked at home, relayed only on its route
+ok   link failure: the foragers over the failed link go
+ok   observer: every callback, kinds, bytes, footprint
+ok   observer: decisions and trace identical with and without
+ok   observer: store removals (array cap, LRU, MAXAGE, use)
+0 failed
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"beeadhoc-core" end time: Nov 17 04:55 UTC
+"beeadhoc-core" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 17 04:55 UTC

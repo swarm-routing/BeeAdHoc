@@ -1,0 +1,2 @@
+/usr/bin/ar qc libbeeadhoc_core.a "CMakeFiles/beeadhoc_core.dir/beeadhoc-forager.cc.o" "CMakeFiles/beeadhoc_core.dir/beeadhoc-router.cc.o" "CMakeFiles/beeadhoc_core.dir/beeadhoc-scout.cc.o" "CMakeFiles/beeadhoc_core.dir/beeadhoc-swarm.cc.o" "CMakeFiles/beeadhoc_core.dir/beeadhoc-trailer.cc.o"
+/usr/bin/ranlib libbeeadhoc_core.a
