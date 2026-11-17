@@ -1,2 +1,0 @@
-/usr/bin/ar qc libswarm_core.a "CMakeFiles/swarm_core.dir/swarm-dedup-history.cc.o" "CMakeFiles/swarm_core.dir/swarm-observer.cc.o" "CMakeFiles/swarm_core.dir/swarm-pheromone-table.cc.o" "CMakeFiles/swarm_core.dir/swarm-selection.cc.o"
-/usr/bin/ranlib libswarm_core.a
