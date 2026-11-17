@@ -1,2 +1,4 @@
 /dist/
 /.campaign/
+# make core-test's CMake trees (build/core, build/core-local with SWARM_CORE_DIR)
+/build/
