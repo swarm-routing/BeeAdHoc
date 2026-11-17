@@ -34,11 +34,12 @@ the rules and how to build and verify; the org conventions are in
 
 ## Try it
 
-`core/` alone, with no ns-3 tree (CMake and a C++23 compiler, the standard of the ns-3 release the org supports; it fetches
-swarm-core's `core/` at the release `swarm-core.lock` names):
+`core/` alone, with no ns-3 tree (CMake and a C++23 compiler, the standard of the ns-3 release the org supports, and a
+vcpkg checkout: swarm-core's `core/` comes from its vcpkg port, at the release
+`swarm-core.lock` names):
 
 ```bash
-make core-test    # cmake -S core -B build/core && cmake --build build/core && ctest --test-dir build/core
+make core-test VCPKG_ROOT=/path/to/vcpkg   # cmake -S core -B build/core -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake, build, ctest
 ```
 
 The ns-3 module, in the org's `ns3-dev` image (docker), with

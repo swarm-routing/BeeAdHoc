@@ -5,9 +5,12 @@ name: Core
 # BeeAdHoc's simulator-free core/ on its own (plain CMake + ctest, no ns-3
 # tree), with the org's quality gates for C++: strict warnings as errors (in
 # core/CMakeLists.txt), the tests under ASan + UBSan, and clang-format with the
-# org .clang-format. swarm-core's primitives come from the commit
-# core/CMakeLists.txt pins. Once ns3/ exists, reusable-ns3-ci.yml builds the
-# same sources inside ns-3 as well. The check name is `core`.
+# org .clang-format. swarm-core's primitives come from its vcpkg port
+# (swarm-routing/.github#489): vcpkg.json pins the version swarm-core.lock
+# names, vcpkg-configuration.json the swarm-routing/vcpkg-registry baseline,
+# and swarm-routing/.github's setup-vcpkg action gives the tool (its binary
+# cache on GitHub Packages is off here, see the step). ns3.yml builds the same
+# sources inside ns-3 on the lock's tag. The check name is `core`.
 on:
   push:
     branches: [main]
@@ -22,6 +25,8 @@ jobs:
     name: core
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
       - name: Harden the runner (audit egress)
         uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
@@ -38,29 +43,46 @@ jobs:
           sparse-checkout: .clang-format
           sparse-checkout-cone-mode: false
           persist-credentials: false
-      - name: Build and test (debug, strict warnings)
+      - name: vcpkg (swarm-routing/.github#489)
+        id: vcpkg
+        uses: swarm-routing/.github/.github/actions/setup-vcpkg@main
+        timeout-minutes: 8
+        with:
+          # The NuGet cache needs mono on the runner (28-50 s to install); the
+          # three ports it would restore build in about 5 s, so here it costs
+          # more than it saves (measured on swarm-routing/ARA#176,
+          # swarm-routing/.github#489). Turn it on when the ports grow.
+          binary-cache: 'off'
+      # one vcpkg_installed for every configure below: the port is installed once
+      - name: Build and test (debug, strict warnings; swarm-core from its vcpkg port)
+        env:
+          TOOLCHAIN: ${{ steps.vcpkg.outputs.toolchain }}
         run: |
-          cmake -S core -B build/debug -DCMAKE_BUILD_TYPE=Debug
+          cmake -S core -B build/debug -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" -DVCPKG_INSTALLED_DIR="$PWD/build/vcpkg_installed"
           cmake --build build/debug -j "$(nproc)"
           ctest --test-dir build/debug --output-on-failure
-      - name: Build and test (ASan + UBSan)
+      - name: Build and test (ASan + UBSan; BeeAdHoc instrumented, swarm-core the port as published)
+        env:
+          TOOLCHAIN: ${{ steps.vcpkg.outputs.toolchain }}
         run: |
           cmake -S core -B build/sanitized -DCMAKE_BUILD_TYPE=Debug -DBEEADHOC_CORE_SANITIZE=ON \
-            -DSWARM_CORE_DIR="$PWD/build/debug/_deps/swarm_core_src-src/core"
+            -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" -DVCPKG_INSTALLED_DIR="$PWD/build/vcpkg_installed"
           cmake --build build/sanitized -j "$(nproc)"
           ctest --test-dir build/sanitized --output-on-failure
-      - name: The CMake package beeadhoc-core (find_package, swarm-core from its package; swarm-routing/.github#436)
+      - name: The CMake package beeadhoc-core (find_package, on the swarm-core port; swarm-routing/.github#436)
+        env:
+          TOOLCHAIN: ${{ steps.vcpkg.outputs.toolchain }}
         run: |
           prefix="$PWD/build/prefix"
-          cmake -S build/debug/_deps/swarm_core_src-src/core -B build/swarm-core-pkg -DCMAKE_BUILD_TYPE=Release -DSWARM_CORE_TESTS=OFF
-          cmake --build build/swarm-core-pkg -j "$(nproc)" && cmake --install build/swarm-core-pkg --prefix "$prefix"
-          cmake -S core -B build/pkg -DCMAKE_BUILD_TYPE=Release -DBEEADHOC_CORE_SWARM_CORE_FROM_PACKAGE=ON \
-            -DBEEADHOC_CORE_INSTALL=ON -DBEEADHOC_CORE_TESTS=OFF -DCMAKE_PREFIX_PATH="$prefix"
+          installed="$PWD/build/vcpkg_installed"
+          cmake -S core -B build/pkg -DCMAKE_BUILD_TYPE=Release -DBEEADHOC_CORE_INSTALL=ON -DBEEADHOC_CORE_TESTS=OFF \
+            -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" -DVCPKG_INSTALLED_DIR="$installed"
           cmake --build build/pkg -j "$(nproc)" && cmake --install build/pkg --prefix "$prefix"
           for f in lib/libbeeadhoc_core.a lib/cmake/beeadhoc-core/beeadhoc-coreConfig.cmake lib/cmake/beeadhoc-core/beeadhoc-coreConfigVersion.cmake lib/cmake/beeadhoc-core/beeadhoc-coreTargets.cmake; do
             test -f "$prefix/$f" || { echo "::error::the install has no $f"; exit 1; }
           done
-          cmake -S core/test/consumer-package -B build/consumer -DCMAKE_PREFIX_PATH="$prefix"
+          cmake -S core/test/consumer-package -B build/consumer -DCMAKE_PREFIX_PATH="$prefix;$installed/x64-linux"
           cmake --build build/consumer && build/consumer/consumer
       - name: Format (org .clang-format)
         run: git ls-files 'core/*.h' 'core/*.cc' | xargs clang-format-18 --style=file:.org/.clang-format --dry-run --Werror

@@ -1,15 +1,15 @@
 // Copyright (c) 2026 Daniel Joppi (https://github.com/swarm-routing)
 // SPDX-License-Identifier: MIT OR GPL-2.0-only
 //
-// Test support for BeeAdHoc's core tests, on swarm-core's Checker and
-// SeededRng (its core/test/swarm-core-check.h): a discrete-event clock and
+// Test support for BeeAdHoc's core tests, on the Checker and SeededRng of
+// beeadhoc-check.h (swarm-core's, copied): a discrete-event clock and
 // scheduler behind swarm-core's ports, a fixed energy port, and a static
 // network that carries scouts between routers through the wire codec.
 #ifndef BEEADHOC_CORE_TEST_SUPPORT_H
 #define BEEADHOC_CORE_TEST_SUPPORT_H
 
 #include "../beeadhoc-router.h"
-#include "test/swarm-core-check.h"
+#include "beeadhoc-check.h"
 
 #include <cstdint>
 #include <functional>
@@ -24,9 +24,6 @@
 #include <vector>
 
 namespace beeadhoc::core::test {
-
-using swarm::core::test::Checker;
-using swarm::core::test::SeededRng;
 
 /// The clock and timer ports as one discrete-event queue: events run in
 /// (time, scheduling order), so a run is fully deterministic.
