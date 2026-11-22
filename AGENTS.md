@@ -38,7 +38,7 @@ ns3/        contrib module `beeadhoc` (GPL-2.0-only), compiling core/ on swarm-c
   examples/beeadhoc-example.cc       a small RWP MANET; CI's determinism program
   test/beeadhoc-test-suite.cc        test.py -s beeadhoc: the core tests, codec roundtrip + fuzz, chain delivery, the battery port, determinism
 docs/       fidelity.md: the fidelity sheet (#13), every row against PG 460's Linux module (chs. 12–13); GECCO 2005 once in hand (#5); PG 439 and Farooq's thesis do not specify BeeAdHoc
-.github/workflows/core.yml   core/ alone: strict warnings, tests, ASan + UBSan, clang-format (check `core`)
+.github/workflows/core.yml   core/ alone: strict warnings, tests, ASan + UBSan, clang-tidy (org .clang-tidy, findings as errors), clang-format (check `core`)
 .github/workflows/ns3.yml    ns3/ in ns3-dev latest debug + sanitized (reusable-ns3-ci.yml; checks `ci / ns-latest debug`, `ci / ns-latest sanitized`, `ci / format`)
 .github/workflows/swarm-core-pin.yml   the swarm-core pin is one SHA and current (reusable-swarm-core-pin.yml; check `swarm-core / pin`)
 .github/workflows/benchmark-cell.yml   one benchmark cell at a pinned source_sha (reusable-benchmark-cell.yml, build mode); dispatched by ns3-campaign
