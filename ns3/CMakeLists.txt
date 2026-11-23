@@ -14,14 +14,21 @@
 get_filename_component(beeadhoc_ns3_dir "${CMAKE_CURRENT_SOURCE_DIR}" REALPATH)  # CMake < 3.19 too
 get_filename_component(beeadhoc_core_dir "${beeadhoc_ns3_dir}/../core" ABSOLUTE)
 # core/ includes swarm-core's primitives without the ns3/ prefix (they are the
-# same files as ns3/swarm-*.h), so it builds alone as well.
-set(beeadhoc_swarm_core_dir "${PROJECT_SOURCE_DIR}/contrib/swarm-core/core")
-foreach(d "${beeadhoc_core_dir}" "${beeadhoc_swarm_core_dir}")
+# same files as ns3/swarm-*.h), so it builds alone as well. Their directory
+# comes with ${libswarm-core}: the adapter links swarm-core's swarm::core
+# PUBLIC (swarm-routing/swarm-adapter-ns3#258), so linking it below is enough.
+# Adapter v1.0.0 has no such link and carries them in its own core/ instead,
+# which is added to the include path where it exists.
+foreach(d "${beeadhoc_core_dir}" "${PROJECT_SOURCE_DIR}/contrib/swarm-core")
   if(NOT EXISTS "${d}")
     message(FATAL_ERROR "beeadhoc: ${d} not found (install swarm-core as contrib/swarm-core)")
   endif()
 endforeach()
-include_directories("${beeadhoc_core_dir}" "${beeadhoc_swarm_core_dir}")
+include_directories("${beeadhoc_core_dir}")
+set(beeadhoc_swarm_core_dir "${PROJECT_SOURCE_DIR}/contrib/swarm-core/core")
+if(EXISTS "${beeadhoc_swarm_core_dir}/swarm-ports.h")
+  include_directories("${beeadhoc_swarm_core_dir}")
+endif()
 
 # The harness arm, only where swarm-routing/ns3-tools' routing-bench is
 # installed and enabled. Its library is named through a variable: ns-3 scans
