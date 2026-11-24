@@ -101,7 +101,7 @@ else()
   find_package(swarm-core CONFIG REQUIRED)
 endif()
 
-# The strict warnings the org CI applies (ns3-containers' swarm-quality.cmake),
+# The strict warnings the org CI applies (sim-containers' swarm-quality.cmake),
 # on BeeAdHoc's own sources only.
 # A swarm-core deprecation ([[deprecated]], its docs/api-policy.md
 # "Deprecation") stays a warning: it shows in every build, never fails one.

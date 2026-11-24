@@ -24,9 +24,13 @@
 #define BEEADHOC_CORE_TRAILER_H
 
 #include "beeadhoc-config.h"
+#include "beeadhoc-scout.h"
+#include "swarm-wire.h"
 
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <optional>
 #include <span>
 #include <vector>
@@ -60,6 +64,32 @@ struct RouteTrailer {
 
     bool operator==(const RouteTrailer&) const = default;
 };
+
+/// Writes the trailer through any swarm-core wire writer (WireWriter,
+/// FixedWireWriter, the ns-3 BufferWireWriter): the bytes encodeTrailer(t)
+/// returns, with no allocation of its own (#97). Writes nothing and returns
+/// false when a route is longer than the u16 count can say.
+template <typename Writer>
+    requires std::derived_from<Writer, swarm::core::WireFields<Writer>>
+bool encodeTrailer(const RouteTrailer& t, Writer& w) {
+    constexpr std::size_t kMaxCount = std::numeric_limits<std::uint16_t>::max();
+    if (t.route.size() > kMaxCount || (t.piggyback && t.piggyback->route.size() > kMaxCount))
+        return false;
+    auto writeRoute = [&w](const std::vector<NodeAddress>& route) {
+        w.u16(static_cast<std::uint16_t>(route.size()));
+        for (NodeAddress a : route)
+            w.i32(a);
+    };
+    w.version(RouteTrailer::kWireVersion);
+    w.u32(t.info & kInfoMask);
+    writeRoute(t.route);
+    w.boolean(t.piggyback.has_value());
+    if (t.piggyback) {
+        w.u32(t.piggyback->info & kInfoMask);
+        writeRoute(t.piggyback->route);
+    }
+    return true;
+}
 
 /// The encoded trailer; empty (a frame no decoder accepts) when a route is
 /// longer than the u16 count can say. The router never builds one: its routes

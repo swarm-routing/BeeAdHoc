@@ -18,9 +18,11 @@
 
 #include "beeadhoc-config.h"
 #include "swarm-observer.h"
+#include "swarm-wire.h"
 
 #include <cstddef>
 #include <array>
+#include <concepts>
 #include <cstdint>
 #include <optional>
 #include <span>
@@ -78,6 +80,24 @@ inline constexpr std::array<swarm::core::KindName, 3> kKindNames{{
     {static_cast<std::uint8_t>(ScoutMode::Backward), "BACKWARD_SCOUT"},
     {kSwarmKind, "SWARM"},
 }};
+
+/// Writes the header through any swarm-core wire writer (WireWriter,
+/// FixedWireWriter, the ns-3 BufferWireWriter): the bytes encodeScout(s)
+/// returns, with no allocation of its own (#97).
+template <typename Writer>
+    requires std::derived_from<Writer, swarm::core::WireFields<Writer>>
+void encodeScout(const Scout& s, Writer& w) {
+    w.version(Scout::kWireVersion);
+    w.u8(static_cast<std::uint8_t>(s.mode));
+    w.i32(s.source);
+    w.i32(s.destination);
+    w.u32(s.id);
+    w.u8(s.ttl);
+    w.u32(s.info & kInfoMask);
+    w.u16(static_cast<std::uint16_t>(s.route.size()));
+    for (NodeAddress a : s.route)
+        w.i32(a);
+}
 
 /// The encoded header.
 std::vector<std::uint8_t> encodeScout(const Scout& s);

@@ -26,18 +26,31 @@ namespace {
 constexpr uint8_t kUdpProtocol = 17;
 using swarm::core::RouteAction;
 
-/// True when `dst` is the subnet-directed broadcast address of one of the
-/// node's interfaces (Ipv4Address::IsBroadcast knows 255.255.255.255 only).
-bool SubnetBroadcast(Ptr<Ipv4> ipv4, Ipv4Address dst) {
-    for (uint32_t i = 0; i < ipv4->GetNInterfaces(); ++i) {
-        for (uint32_t j = 0; j < ipv4->GetNAddresses(i); ++j) {
-            if (ipv4->GetAddress(i, j).GetBroadcast() == dst) return true;
+}  // namespace
+
+bool RoutingProtocol::SubnetBroadcast(Ptr<Ipv4> ipv4, Ipv4Address dst) {
+    if (m_broadcastsStale) {
+        m_broadcasts.clear();
+        for (uint32_t i = 0; i < ipv4->GetNInterfaces(); ++i) {
+            for (uint32_t j = 0; j < ipv4->GetNAddresses(i); ++j) {
+                m_broadcasts.push_back(ipv4->GetAddress(i, j).GetBroadcast());
+            }
         }
+        std::sort(m_broadcasts.begin(), m_broadcasts.end());
+        m_broadcastsStale = false;
     }
-    return false;
+    return std::binary_search(m_broadcasts.begin(), m_broadcasts.end(), dst);
 }
 
-}  // namespace
+void RoutingProtocol::NotifyAddAddress(uint32_t interface, Ipv4InterfaceAddress address) {
+    m_broadcastsStale = true;
+    SwarmRoutingBase::NotifyAddAddress(interface, address);
+}
+
+void RoutingProtocol::NotifyRemoveAddress(uint32_t interface, Ipv4InterfaceAddress address) {
+    m_broadcastsStale = true;
+    SwarmRoutingBase::NotifyRemoveAddress(interface, address);
+}
 
 TypeId RoutingProtocol::GetTypeId() {
     static TypeId tid =
@@ -203,13 +216,15 @@ bool RoutingProtocol::RouteInput(Ptr<const Packet> p, const Ipv4Header& header,
         return true;
     }
     // From a neighbour: the payload carries the trailer.
-    const auto at = ReadRouteTrailer(p, header.GetProtocol());
+    auto at = ReadRouteTrailer(p, header.GetProtocol());
     if (!at) {
         NS_LOG_DEBUG("no valid BeeAdHoc route trailer on a data packet for " << dst);
         DropData(p, header, ecb);
         return true;
     }
-    core::RouteTrailer trailer = at->trailer;
+    // The decoded trailer itself, not a copy of its routes: forwardData
+    // writes this node's level into it in place.
+    core::RouteTrailer& trailer = at->trailer;
     Ptr<Packet> payload = StripRouteTrailer(p, header.GetProtocol(), at->size);
     if (local) {
         // INPUT chain: the core keeps its foragers, then the packet goes up.
