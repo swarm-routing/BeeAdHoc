@@ -11,10 +11,11 @@ namespace beeadhoc::core::test {
 
 namespace {
 
-constexpr std::array<NamedTest, 30> kTests{{
+constexpr std::array<NamedTest, 31> kTests{{
     {"scout: wire roundtrip", TestScoutRoundtrip},
     {"scout: the decoder fails closed", TestScoutFailsClosed},
     {"scout: seeded fuzz (fails or round-trips to itself)", TestScoutFuzz},
+    {"wire: the writer path gives the vector encoders' bytes (#97)", TestWriterPath},
     {"battery level bins", TestBatteryLevel},
     {"rating (Listing 13.15, #4)", TestRating},
     {"forager arrays: bounded, per type", TestForagerArrays},

@@ -16,16 +16,7 @@ std::vector<std::uint8_t> encodeScout(const Scout& s) {
     std::vector<std::uint8_t> out;
     out.reserve(s.wireSize());
     WireWriter w(out);
-    w.version(Scout::kWireVersion);
-    w.u8(static_cast<std::uint8_t>(s.mode));
-    w.i32(s.source);
-    w.i32(s.destination);
-    w.u32(s.id);
-    w.u8(s.ttl);
-    w.u32(s.info & kInfoMask);
-    w.u16(static_cast<std::uint16_t>(s.route.size()));
-    for (NodeAddress a : s.route)
-        w.i32(a);
+    encodeScout(s, w);
     return out;
 }
 

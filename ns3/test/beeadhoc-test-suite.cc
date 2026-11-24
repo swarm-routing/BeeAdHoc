@@ -40,6 +40,7 @@
 #include "ns3/wifi-helper.h"
 #include "ns3/yans-wifi-helper.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <sstream>
 #include <string>
@@ -186,6 +187,98 @@ private:
         NS_TEST_EXPECT_MSG_EQ((swBack.has_value() && *swBack == sw), true, "the same swarm");
         NS_TEST_EXPECT_MSG_EQ(ns3::beeadhoc::DecodeScoutPacket(sp).has_value(), false,
                               "not a scout");
+    }
+};
+
+/// The header path (#97): ScoutHeader and RouteTrailerHeader write through
+/// BufferWireWriter and read through ReadWireBytes into stack buffers, the
+/// swarm payload through a FixedWireWriter; the bytes are core/'s vector
+/// encoders', at every size up to the caps and past them.
+class HeaderWriterPathTestCase : public TestCase {
+public:
+    HeaderWriterPathTestCase()
+        : TestCase("header: the writer path gives the vector encoders' bytes (#97)") {}
+
+private:
+    void DoRun() override {
+        namespace core = ::beeadhoc::core;
+        const std::size_t cap = ns3::beeadhoc::MaxScoutRouteNodes();
+        auto route = [](std::size_t n) {
+            std::vector<core::NodeAddress> r;
+            for (std::size_t i = 0; i < n; ++i)
+                r.push_back(static_cast<core::NodeAddress>(0x0A010001 + i));
+            return r;
+        };
+
+        for (std::size_t n : {std::size_t{0}, std::size_t{1}, std::size_t{4}, cap}) {
+            Scout s = SampleScout();
+            s.route = route(n);
+            const std::vector<uint8_t> want = core::encodeScout(s);
+            NS_TEST_EXPECT_MSG_EQ((Bytes(ns3::beeadhoc::MakeScoutPacket(s)) == want), true,
+                                  "scout: Serialize writes encodeScout's bytes");
+            ns3::beeadhoc::ScoutHeader h;
+            Ptr<Packet> p = FromBytes(want);
+            p->AddAtEnd(Create<Packet>(5));  // a payload after it is not read
+            NS_TEST_EXPECT_MSG_EQ(p->RemoveHeader(h), want.size(), "scout: its bytes consumed");
+            NS_TEST_EXPECT_MSG_EQ((h.IsValid() && h.Get() == s), true, "scout: read back");
+            const auto d = ns3::beeadhoc::DecodeScoutPacket(FromBytes(want));
+            NS_TEST_EXPECT_MSG_EQ((d.has_value() && *d == s), true, "scout: decoded");
+        }
+        {
+            // One node past the cap: the count's bytes are consumed, invalid.
+            Scout s = SampleScout();
+            s.route = route(cap + 1);
+            const std::vector<uint8_t> over = core::encodeScout(s);
+            ns3::beeadhoc::ScoutHeader h;
+            NS_TEST_EXPECT_MSG_EQ(FromBytes(over)->RemoveHeader(h), over.size(),
+                                  "over the cap: the announced bytes consumed");
+            NS_TEST_EXPECT_MSG_EQ(h.IsValid(), false, "over the cap: invalid");
+            NS_TEST_EXPECT_MSG_EQ(ns3::beeadhoc::DecodeScoutPacket(FromBytes(over)).has_value(),
+                                  false, "over the cap: no scout");
+        }
+
+        for (std::size_t n : {std::size_t{2}, cap}) {
+            for (bool piggyback : {false, true}) {
+                core::RouteTrailer t;
+                t.route = route(n);
+                t.info = 0x2A;
+                if (piggyback) t.piggyback = core::RouteTrailer::Piggyback{route(n), 0x1FF};
+                const std::vector<uint8_t> want = core::encodeTrailer(t);
+                Ptr<Packet> datagram = Create<Packet>(16);
+                datagram->AddHeader(UdpHeader());
+                const std::vector<uint8_t> b =
+                    Bytes(ns3::beeadhoc::AddRouteTrailer(datagram, 17, t));
+                NS_TEST_EXPECT_MSG_EQ((b.size() == 8 + want.size() + 16 &&
+                                       std::equal(want.begin(), want.end(), b.begin() + 8)),
+                                      true, "trailer: Serialize writes encodeTrailer's bytes");
+                Ptr<Packet> raw = FromBytes(want);
+                raw->AddAtEnd(Create<Packet>(16));
+                const auto read = ns3::beeadhoc::ReadRouteTrailer(raw, 6);
+                NS_TEST_EXPECT_MSG_EQ(
+                    (read.has_value() && read->trailer == t && read->size == want.size()), true,
+                    "trailer: read at the front of a non-UDP payload");
+                ns3::beeadhoc::RouteTrailerHeader h;
+                NS_TEST_EXPECT_MSG_EQ(raw->RemoveHeader(h), want.size(), "trailer: consumed");
+                NS_TEST_EXPECT_MSG_EQ((h.IsValid() && h.Get() == t), true, "trailer: read back");
+            }
+        }
+        NS_TEST_EXPECT_MSG_EQ(ns3::beeadhoc::ReadRouteTrailer(Create<Packet>(7), 17).has_value(),
+                              false, "a UDP payload shorter than a UDP header has no trailer");
+
+        const std::size_t swarmSize = core::Config{}.swarmSize;
+        for (std::size_t k : {std::size_t{0}, std::size_t{1}, swarmSize, swarmSize + 1}) {
+            core::Swarm sw;
+            sw.source = 4;
+            sw.destination = 1;
+            sw.route = route(cap);
+            sw.foragers.assign(k, core::Swarm::Cargo{route(cap), 0x1FF});
+            const std::vector<uint8_t> want = core::encodeSwarm(sw);
+            NS_TEST_EXPECT_MSG_EQ((Bytes(ns3::beeadhoc::MakeSwarmPacket(sw)) == want), true,
+                                  "swarm: encodeSwarm's bytes, past the decoders' cap too");
+            const auto d = ns3::beeadhoc::DecodeSwarmPacket(FromBytes(want));
+            NS_TEST_EXPECT_MSG_EQ((d.has_value() && *d == sw), k <= swarmSize,
+                                  "swarm: decoded up to SWARMSIZE foragers, refused past it");
+        }
     }
 };
 
@@ -649,6 +742,7 @@ public:
             AddTestCase(new BeeAdHocCoreTestCase(t), TestCase::Duration::QUICK);
         }
         AddTestCase(new HeaderRoundtripTestCase, TestCase::Duration::QUICK);
+        AddTestCase(new HeaderWriterPathTestCase, TestCase::Duration::QUICK);
         AddTestCase(new HeaderFuzzTestCase, TestCase::Duration::QUICK);
         AddTestCase(new ChainDeliveryTestCase, TestCase::Duration::QUICK);
         AddTestCase(new SwarmTestCase, TestCase::Duration::QUICK);
