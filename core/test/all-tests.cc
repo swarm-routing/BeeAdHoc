@@ -22,6 +22,7 @@ constexpr std::array<NamedTest, 31> kTests{{
     {"forager choice (Listing 13.17)", TestForagerChoice},
     {"forager store: MAXAGE collection, destination cap", TestForagerCollection},
     {"discovery: scout out, back, foragers home", TestDiscovery},
+    {"discovery: an ended search cancels its resend timer (#97)", TestResendCancelled},
     {"discovery: the destination's level is the L-th value", TestDestinationLevel},
     {"discovery: expanding ring and give-up", TestExpandingRing},
     {"discovery: seen list, hop and search caps", TestScoutBounds},

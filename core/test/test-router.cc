@@ -38,6 +38,45 @@ void TestDiscovery(Checker& c) {
     c.check(net.at(0).foragers().size(3, ForagerType::Energy) == 1, "a rated forager dances");
 }
 
+void TestResendCancelled(Checker& c) {
+    Config config;
+    config.initialScoutTtl = 4;
+    {
+        Network net(4, config, 1);
+        net.chain();
+        net.at(0).routeOutput(3, ForagerType::Energy);
+        c.check(net.clock().pendingCancellable() == 1, "the scout's resend timer is pending");
+        net.clock().runUntil(config.scoutResendInterval - 0.01);
+        c.check(!net.at(0).searching(3) && net.clock().cancelled() == 1 &&
+                    net.clock().pendingCancellable() == 0,
+                "the returned scout ends the search and cancels its resend (#97)");
+        net.clock().runUntil(10.0);
+        c.check(net.broadcasts(0) == 1 && net.ready.size() == 1,
+                "the cancelled resend never runs: no second scout, one RouteReady");
+    }
+    {
+        Network net(3, config, 13);
+        net.chain();
+        net.at(2).routeOutput(0, ForagerType::Energy);
+        net.clock().runUntil(1.0);  // 2 knows 0
+        net.at(0).routeOutput(2, ForagerType::Energy);
+        const std::size_t before = net.clock().cancelled();
+        const auto d = net.at(2).routeOutput(0, ForagerType::Energy);
+        c.check(net.carry(d.trailer, ForagerType::Energy).has_value(), "2 -> 0 delivered");
+        c.check(!net.at(0).searching(2) && net.clock().cancelled() == before + 1,
+                "a data packet from the destination ends the search and cancels its resend");
+    }
+    {
+        Network net(3, config, 3);
+        net.link(0, 1);  // node 2 is unreachable
+        net.at(0).routeOutput(2, ForagerType::Energy);
+        net.clock().runUntil(10.0);
+        c.check(net.discards.size() == 1 && net.clock().pendingCancellable() == 0 &&
+                    net.clock().cancelled() == 0,
+                "a search that gives up leaves no timer and cancels none");
+    }
+}
+
 void TestDestinationLevel(Checker& c) {
     Config config;
     config.initialScoutTtl = 4;
