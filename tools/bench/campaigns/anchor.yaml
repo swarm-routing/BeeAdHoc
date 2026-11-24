@@ -55,7 +55,7 @@ source_sha: bc9cb7d9b296db01c3bd7cdb822bf3966c37e326
 workflow: benchmark-cell.yml
 program: routing-compare
 # ns3-dev 3.48-optimized (fb7596b), the image the smoke pins: AODV stays on
-# 3.48 while ns-3.49's AODV livelocks (swarm-routing/ns3-containers#35).
+# 3.48 while ns-3.49's AODV livelocks (swarm-routing/sim-containers#35).
 image: ghcr.io/swarm-routing/ns3-dev@sha256:5585a93c5cea1980592539e2d26a4e111e0ff4b0cc63b3dfd6ea5de459d80d3f
 cap: 4
 control: beeadhoc
