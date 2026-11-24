@@ -155,11 +155,11 @@ version (ch. 3 or ch. 6) ch. 7 ran. See *Anchor candidate*.
 |---|---|---|---|---|
 | BeeAdHoc sends the fewest control packets, flat over pause time | ns-2, 100 nodes, 3000 × 1000 m, 900 s, 20 CBR flows of four 512-byte packets/s, random waypoint 0–10 m/s, pause 1, 30, 100, 500, 1000 s (AntHocNet's scalability setup); results in figures only | Control packets sent (§7.2.5 counts packets, not NRL) | AODV, DSR, DSDV ("left out in some cases due to errors", §7.1.4). The org has no DSR arm | [PG460] §7.1.4, §7.2.5, Fig. 7.3, Fig. 7.14 |
 
-Status: **open: #5**; the v0.2.0 run (`bee-anchor-2`) missed, see *Anchor history*. The citation of record is [W05], which has not been read;
-#5 re-reads this anchor against it once it has been. Two
-cautions stand until then: ch. 7 measured an ns-2 BeeAdHoc, not the kernel
-module this sheet follows (*Which version*), and its DSDV comparison may be
-thin by the report's own account.
+Status: **reviewed against [W05] and [WF05] (2026-11-24, #5): the trend is
+confirmed where the papers measure it, and unchanged.** The v0.2.0 run
+(`bee-anchor-2`) missed; see *Anchor history*. Two cautions stand: ch. 7
+measured an ns-2 BeeAdHoc, not the kernel module this sheet follows (*Which
+version*), and its DSDV comparison may be thin by the report's own account.
 
 ## Anchor history
 
@@ -211,6 +211,22 @@ thin by the report's own account.
   (+0.33 [−0.30, +0.97], +0.49 [−0.36, +1.34]), the same pause times
   `v270a` missed. Under the comparator rule, v0.2.0 ships with this written
   infeasibility verdict. #5 re-reads the trend against [W05] in v0.3.0.
+- **Re-read against [W05] and [WF05] (2026-11-24, [#5](https://github.com/swarm-routing/BeeAdHoc/issues/5)).**
+  Both papers evaluate the ns-2 BeeAdHoc in ns-2, in a scenario derived from
+  Broch et al. (1998): 50 nodes, 2400 × 800 m, random waypoint 1–20 m/s,
+  every node a CBR source of 512-bit packets, 1000 s, five runs, against
+  ns-2's DSR, AODV and DSDV ([W05] §4; [WF05] §4). The transport is not
+  stated. Both report BeeAdHoc sending the fewest control packets in every
+  setting they show: [W05] Table 2 (pause 60 s, total control packets at four
+  speed ranges, 0.50× DSDV's at 1–5 m/s down to 0.41× at 1–20 m/s) and [WF05] Fig. 2–4. So the
+  trend `bee-anchor-2` tests is **confirmed**, and the scenario, gate and id
+  are unchanged. But [W05] §4.4 varies pause time over 1, 30 and 60 s only,
+  "because [...] any increase in pause time after 60 seconds just improves
+  the performance of the algorithms". The two pause times `bee-anchor-2`
+  missed, 500 and 1000 s, lie outside anything either paper measured, and
+  "flat over pause time" up to 1000 s rests on [PG460] §7.2.5 alone. The
+  three pause times it passed (1, 30, 100 s) lie in or next to the papers'
+  range. The MISS verdict stands; this reading qualifies it.
 
 ## Shared plumbing (from the arm)
 
