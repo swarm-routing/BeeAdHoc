@@ -11,7 +11,7 @@ namespace beeadhoc::core::test {
 
 namespace {
 
-constexpr std::array<NamedTest, 31> kTests{{
+constexpr std::array<NamedTest, 32> kTests{{
     {"scout: wire roundtrip", TestScoutRoundtrip},
     {"scout: the decoder fails closed", TestScoutFailsClosed},
     {"scout: seeded fuzz (fails or round-trips to itself)", TestScoutFuzz},
