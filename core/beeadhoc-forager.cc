@@ -116,13 +116,13 @@ std::optional<Forager> ForagerStore::take(NodeAddress dest, ForagerType type, Ti
     while (!array.empty()) {
         const bool own =
             std::any_of(array.begin(), array.end(), [](const Forager& f) { return f.own; });
-        std::vector<std::size_t> candidates;
+        candidates_.clear();
         for (std::size_t i = 0; i < array.size(); ++i) {
-            if (array[i].own == own) candidates.push_back(i);
+            if (array[i].own == own) candidates_.push_back(i);
         }
-        const int pick = rng.uniformInt(static_cast<int>(candidates.size()));
+        const int pick = rng.uniformInt(static_cast<int>(candidates_.size()));
         const auto at = array.begin() +
-                        static_cast<std::ptrdiff_t>(candidates.at(static_cast<std::size_t>(pick)));
+                        static_cast<std::ptrdiff_t>(candidates_.at(static_cast<std::size_t>(pick)));
         const Time age = now - at->created;
         if (at->dances > 0 && age < config_.foragerDanceTime) {
             --at->dances;
