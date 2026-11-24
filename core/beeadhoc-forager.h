@@ -124,6 +124,9 @@ private:
     Footprint reported_;
     bool reportedAny_ = false;
     std::map<NodeAddress, Entry> entries_;  // ordered: iteration is deterministic
+    // take()'s candidate indices, kept between calls so a draw allocates
+    // nothing once it has grown to ARRAYSIZE (#55); bounded by the array.
+    std::vector<std::size_t> candidates_;
 };
 
 }  // namespace beeadhoc::core

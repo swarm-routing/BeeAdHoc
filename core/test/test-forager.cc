@@ -26,6 +26,22 @@ Forager forager(NodeAddress first, int dances, Time created, bool own = true) {
     return Forager{{first, 50}, 0, dances, created, own};
 }
 
+// Returns the scripted picks in turn and records each n it was asked for.
+class ScriptedRng : public swarm::core::IRng {
+public:
+    explicit ScriptedRng(std::vector<int> picks) : picks_(std::move(picks)) {}
+    double uniform() override { return 0.0; }
+    int uniformInt(int n) override {
+        asked.push_back(n);
+        return picks_.at(next_++);
+    }
+    std::vector<int> asked;
+
+private:
+    std::vector<int> picks_;
+    std::size_t next_ = 0;
+};
+
 }  // namespace
 
 void TestBatteryLevel(Checker& c) {
@@ -112,6 +128,43 @@ void TestForagerChoice(Checker& c) {
         store.put(1, ForagerType::Energy, forager(6, 0, 2.5), 2.5, rng);
         auto a = store.take(1, ForagerType::Energy, 3.0, rng);
         c.check(a && a->route[0] == 6, "an expired forager is discarded while others remain");
+    }
+    {
+        // Selection order (#55): the draw indexes the own foragers in array
+        // (arrival) order, one uniformInt(own count) per draw, foreign ones
+        // skipped; then the foreign ones, in the same order.
+        ForagerStore store(config);
+        SeededRng put(5);
+        store.put(1, ForagerType::Energy, forager(10, 0, 0.0, true), 0.0, put);
+        store.put(1, ForagerType::Energy, forager(20, 0, 0.0, false), 0.0, put);
+        store.put(1, ForagerType::Energy, forager(30, 0, 0.0, true), 0.0, put);
+        store.put(1, ForagerType::Energy, forager(40, 0, 0.0, true), 0.0, put);
+        store.put(1, ForagerType::Energy, forager(50, 0, 0.0, false), 0.0, put);
+        ScriptedRng picks({1, 1, 0, 1, 0});
+        std::vector<NodeAddress> order;
+        while (auto f = store.take(1, ForagerType::Energy, 0.1, picks))
+            order.push_back(f->route[0]);
+        c.check(order == std::vector<NodeAddress>{30, 40, 10, 50, 20},
+                "own in arrival order first, then foreign");
+        c.check(picks.asked == std::vector<int>{3, 2, 1, 2, 1},
+                "one draw over the candidate count each time");
+    }
+    {
+        // Bounds (golden rule 7): a full array of ARRAYSIZE is drawn over
+        // whole, and nothing is taken past it.
+        Config small = config;
+        small.foragerArraySize = 4;
+        ForagerStore store(small);
+        SeededRng put(6);
+        for (int i = 0; i < 6; ++i)
+            store.put(1, ForagerType::Energy, forager(i, 0, 0.0), 0.0, put);
+        ScriptedRng picks({3, 0, 1, 0});
+        std::vector<NodeAddress> order;
+        while (auto f = store.take(1, ForagerType::Energy, 0.1, picks))
+            order.push_back(f->route[0]);
+        c.check(picks.asked == std::vector<int>{4, 3, 2, 1} &&
+                    order == std::vector<NodeAddress>{5, 2, 4, 3},
+                "the draw spans exactly ARRAYSIZE, then empties");
     }
 }
 
