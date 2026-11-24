@@ -138,6 +138,9 @@ private:
         std::uint32_t id = 0;  ///< of the latest scout
         std::uint8_t ttl = 0;
         int roundsAtMax = 0;  ///< scouts sent at maxScoutTtl
+        /// The latest scout's resend timer, cancelled when the search ends
+        /// before it fires (#97).
+        swarm::core::TimerHandle resend = swarm::core::kNoTimer;
     };
 
     DataDecision decide(NodeAddress dest, DataDecision d);
@@ -153,6 +156,9 @@ private:
     void emitSwarm(const SwarmDecision& d);
     /// Ends a search for `dest` now that foragers for it exist.
     void routeFound(NodeAddress dest);
+    /// Erases the search for `dest`, cancelling its pending resend; false
+    /// when none is out.
+    bool endSearch(NodeAddress dest);
     std::size_t maxRouteNodes() const;
 
     NodeAddress self_;

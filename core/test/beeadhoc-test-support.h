@@ -26,12 +26,23 @@
 namespace beeadhoc::core::test {
 
 /// The clock and timer ports as one discrete-event queue: events run in
-/// (time, scheduling order), so a run is fully deterministic.
+/// (time, scheduling order), so a run is fully deterministic. It implements
+/// scheduleCancellable and cancel (#97): a cancelled event never runs.
 class EventQueue : public swarm::core::IClock, public swarm::core::ITimerScheduler {
 public:
     Time now() const override { return now_; }
     void schedule(Time delay, std::function<void()> callback) override {
-        events_.push(Event{now_ + (delay > 0.0 ? delay : 0.0), next_++, std::move(callback)});
+        push(delay, std::move(callback), swarm::core::kNoTimer);
+    }
+    swarm::core::TimerHandle scheduleCancellable(Time delay,
+                                                 std::function<void()> callback) override {
+        const swarm::core::TimerHandle handle = ++lastHandle_;
+        pending_.insert(handle);
+        push(delay, std::move(callback), handle);
+        return handle;
+    }
+    void cancel(swarm::core::TimerHandle timer) override {
+        if (pending_.erase(timer) != 0) ++cancelled_;
     }
     /// Runs every event due at or before `until`, then sets the clock to it.
     void runUntil(Time until) {
@@ -39,20 +50,34 @@ public:
             Event e = events_.top();
             events_.pop();
             now_ = e.at;
+            if (e.handle != swarm::core::kNoTimer && pending_.erase(e.handle) == 0)
+                continue;  // cancelled
             e.run();
         }
         now_ = until;
     }
+    /// Cancellable timers scheduled and not yet run or cancelled.
+    std::size_t pendingCancellable() const { return pending_.size(); }
+    /// Timers cancelled before they ran.
+    std::size_t cancelled() const { return cancelled_; }
 
 private:
     struct Event {
         Time at;
         std::uint64_t order;
         std::function<void()> run;
+        swarm::core::TimerHandle handle;
         bool operator>(const Event& o) const { return at != o.at ? at > o.at : order > o.order; }
     };
+    void push(Time delay, std::function<void()> callback, swarm::core::TimerHandle handle) {
+        events_.push(
+            Event{now_ + (delay > 0.0 ? delay : 0.0), next_++, std::move(callback), handle});
+    }
     Time now_ = 0.0;
     std::uint64_t next_ = 0;
+    swarm::core::TimerHandle lastHandle_ = swarm::core::kNoTimer;
+    std::set<swarm::core::TimerHandle> pending_;
+    std::size_t cancelled_ = 0;
     std::priority_queue<Event, std::vector<Event>, std::greater<>> events_;
 };
 

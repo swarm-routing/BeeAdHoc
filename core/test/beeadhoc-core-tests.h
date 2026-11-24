@@ -21,6 +21,7 @@ void TestForagerArrays(Checker& c);
 void TestForagerChoice(Checker& c);
 void TestForagerCollection(Checker& c);
 void TestDiscovery(Checker& c);
+void TestResendCancelled(Checker& c);
 void TestDestinationLevel(Checker& c);
 void TestExpandingRing(Checker& c);
 void TestScoutBounds(Checker& c);

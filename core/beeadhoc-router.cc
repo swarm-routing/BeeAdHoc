@@ -224,8 +224,16 @@ std::size_t Router::onLinkFailure(NodeAddress neighbor) {
 void Router::routeFound(NodeAddress dest) {
     // Any route to `dest` ends its search, an earlier ring's scout included,
     // and the held packets go.
-    if (searches_.erase(dest) == 0) return;
+    if (!endSearch(dest)) return;
     routeReady_(dest);
+}
+
+bool Router::endSearch(NodeAddress dest) {
+    const auto it = searches_.find(dest);
+    if (it == searches_.end()) return false;
+    timers_.cancel(it->second.resend);
+    searches_.erase(it);
+    return true;
 }
 
 void Router::sendScout(NodeAddress dest, Search& search) {
@@ -241,12 +249,14 @@ void Router::sendScout(NodeAddress dest, Search& search) {
     seen_.record(self_, s.id);  // its own scout echoed back is a repeat
     emit(ScoutDecision::broadcast(std::move(s)));
     const std::uint32_t id = search.id;
-    timers_.schedule(config_.scoutResendInterval, [this, dest, id] { onResendTimer(dest, id); });
+    search.resend = timers_.scheduleCancellable(config_.scoutResendInterval,
+                                                [this, dest, id] { onResendTimer(dest, id); });
 }
 
 void Router::onResendTimer(NodeAddress dest, std::uint32_t id) {
     auto it = searches_.find(dest);
-    if (it == searches_.end() || it->second.id != id) return;  // answered or superseded
+    // Answered or superseded: a scheduler without cancel still runs it.
+    if (it == searches_.end() || it->second.id != id) return;
     Search& search = it->second;
     if (search.ttl >= std::max<std::uint8_t>(config_.maxScoutTtl, 1) &&
         search.roundsAtMax >= config_.maxRoundsAtMaxTtl) {
@@ -336,7 +346,7 @@ void Router::onBackwardScout(const Scout& scout) {
     // unlike deliverData and onSwarm, this does not go through routeFound.
     // Kept as it was (#104), so a well-formed run is unchanged: foragers did
     // arrive, and releasing no held packet does nothing.
-    searches_.erase(scout.destination);
+    endSearch(scout.destination);
     routeReady_(scout.destination);
 }
 
