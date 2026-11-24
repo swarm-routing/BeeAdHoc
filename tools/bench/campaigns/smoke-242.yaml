@@ -1,0 +1,27 @@
+# The change-test smoke for #242 (the destination answers every copy of a
+# scout): a copy of smoke.yaml (see it for the procedure and the cells), with
+# its own generation and the PR's pins. Base: main at dc46b88 (#243); head:
+# 1f737b8, the fix (core/beeadhoc-router.cc), its core test and fidelity row.
+# A class-B behaviour change: the verdicts go in the PR.
+generation: smoke-242-1f737b8
+ref: main
+repo: swarm-routing/BeeAdHoc
+workflow: benchmark-cell.yml
+program: routing-compare
+cap: 4
+control: base
+image: ghcr.io/swarm-routing/ns3-dev@sha256:2fb198aa6761595b09716e347d1690f8fe6061dc88acd3e6b0f8cb47e4d70c96
+pins:
+  base: {source_sha: dc46b88ea3b4ae935a929a6436e4b0cb4f75691a}
+  head: {source_sha: 1f737b86317a5fccd8c836bcaebc658142d8d5c3}
+
+arms:
+  base: ""
+  head: ""
+
+cells:
+  grid-rwp: {workflow: benchmark-cell.yml, inputs: {harness: routing-compare, args: "--scenario=paper --nNodes=50 --time=300 --areaX=1500 --areaY=300 --speed=20 --pause=30 --range=300 --propagation=range --mobility=rwp --transport=udp --diag --firstRun=1 --runs=20 --protocols=beeadhoc"}}
+  static-mesh: {workflow: benchmark-cell.yml, inputs: {harness: routing-compare, args: "--scenario=paper --nNodes=50 --time=300 --areaX=1500 --areaY=300 --speed=20 --pause=300 --range=300 --propagation=range --mobility=rwp --transport=udp --diag --firstRun=1 --runs=20 --protocols=beeadhoc"}}
+
+jobs:
+  - {arms: [base, head], cells: "*"}
