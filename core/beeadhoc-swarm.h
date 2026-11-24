@@ -24,9 +24,12 @@
 #include "beeadhoc-config.h"
 #include "beeadhoc-forager.h"
 #include "beeadhoc-scout.h"
+#include "swarm-wire.h"
 
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <optional>
 #include <span>
 #include <vector>
@@ -66,6 +69,36 @@ struct Swarm {
 
     bool operator==(const Swarm&) const = default;
 };
+
+/// Writes the swarm through any swarm-core wire writer (WireWriter,
+/// FixedWireWriter, the ns-3 BufferWireWriter): the bytes encodeSwarm(s)
+/// returns, with no allocation of its own (#97). Writes nothing and returns
+/// false when a route or the cargo is longer than its u16 count can say.
+template <typename Writer>
+    requires std::derived_from<Writer, swarm::core::WireFields<Writer>>
+bool encodeSwarm(const Swarm& s, Writer& w) {
+    constexpr std::size_t kMaxCount = std::numeric_limits<std::uint16_t>::max();
+    if (s.route.size() > kMaxCount || s.foragers.size() > kMaxCount) return false;
+    for (const Swarm::Cargo& c : s.foragers)
+        if (c.route.size() > kMaxCount) return false;
+    auto writeRoute = [&w](const std::vector<NodeAddress>& route) {
+        w.u16(static_cast<std::uint16_t>(route.size()));
+        for (NodeAddress a : route)
+            w.i32(a);
+    };
+    w.version(Swarm::kWireVersion);
+    w.u8(Swarm::kKind);
+    w.i32(s.source);
+    w.i32(s.destination);
+    w.u8(static_cast<std::uint8_t>(s.type));
+    writeRoute(s.route);
+    w.u16(static_cast<std::uint16_t>(s.foragers.size()));
+    for (const Swarm::Cargo& c : s.foragers) {
+        w.u32(c.info & kInfoMask);
+        writeRoute(c.route);
+    }
+    return true;
+}
 
 /// The encoded swarm; empty (a frame no decoder accepts) when a route or the
 /// cargo is longer than its u16 count can say. The router never builds one:

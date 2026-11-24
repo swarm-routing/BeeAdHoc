@@ -16,12 +16,6 @@ using swarm::core::WireWriter;
 
 namespace {
 
-void writeRoute(WireWriter& w, const std::vector<NodeAddress>& route) {
-    w.u16(static_cast<std::uint16_t>(route.size()));
-    for (NodeAddress a : route)
-        w.i32(a);
-}
-
 std::vector<NodeAddress> readRoute(WireReader& r, std::size_t maxRouteNodes) {
     const auto cap = static_cast<std::uint16_t>(
         std::min<std::size_t>(maxRouteNodes, std::numeric_limits<std::uint16_t>::max()));
@@ -36,20 +30,10 @@ std::vector<NodeAddress> readRoute(WireReader& r, std::size_t maxRouteNodes) {
 }  // namespace
 
 std::vector<std::uint8_t> encodeTrailer(const RouteTrailer& t) {
-    constexpr std::size_t kMaxCount = std::numeric_limits<std::uint16_t>::max();
-    if (t.route.size() > kMaxCount || (t.piggyback && t.piggyback->route.size() > kMaxCount))
-        return {};
     std::vector<std::uint8_t> out;
     out.reserve(t.wireSize());
     WireWriter w(out);
-    w.version(RouteTrailer::kWireVersion);
-    w.u32(t.info & kInfoMask);
-    writeRoute(w, t.route);
-    w.boolean(t.piggyback.has_value());
-    if (t.piggyback) {
-        w.u32(t.piggyback->info & kInfoMask);
-        writeRoute(w, t.piggyback->route);
-    }
+    if (!encodeTrailer(t, w)) return {};
     return out;
 }
 

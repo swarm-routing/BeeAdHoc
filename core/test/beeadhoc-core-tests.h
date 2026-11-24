@@ -15,6 +15,7 @@ namespace beeadhoc::core::test {
 void TestScoutRoundtrip(Checker& c);
 void TestScoutFailsClosed(Checker& c);
 void TestScoutFuzz(Checker& c);
+void TestWriterPath(Checker& c);
 void TestBatteryLevel(Checker& c);
 void TestRating(Checker& c);
 void TestForagerArrays(Checker& c);

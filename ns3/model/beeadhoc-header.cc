@@ -2,9 +2,11 @@
 // SPDX-License-Identifier: GPL-2.0-only
 #include "beeadhoc-header.h"
 
+#include "ns3/swarm-wire-buffer.h"
 #include "ns3/udp-header.h"
 
 #include <algorithm>
+#include <array>
 #include <cstdint>
 #include <span>
 #include <vector>
@@ -12,8 +14,27 @@
 namespace ns3 {
 namespace beeadhoc {
 
+namespace {
+
+/// MaxScoutRouteNodes(), at compile time: it sizes the stack buffers below.
+constexpr std::size_t kMaxRouteNodes =
+    static_cast<std::size_t>(std::max(core::Config{}.maxHops, 1)) + 1;
+/// The longest scout a decoder accepts.
+constexpr std::size_t kMaxScoutSize = core::Scout::kFixedWireSize + 4 * kMaxRouteNodes;
+/// The longest swarm a decoder accepts: SWARMSIZE carried foragers, every
+/// route at the cap.
+constexpr std::size_t kMaxSwarmSize =
+    core::Swarm::kFixedWireSize + 4 * kMaxRouteNodes +
+    core::Config{}.swarmSize * (core::Swarm::kCargoFixedWireSize + 4 * kMaxRouteNodes);
+/// The most bytes a trailer can take: both routes at the cap.
+constexpr std::size_t kMaxTrailerSize = core::RouteTrailer::kFixedWireSize +
+                                        core::RouteTrailer::kPiggybackFixedWireSize +
+                                        8 * kMaxRouteNodes;
+
+}  // namespace
+
 std::size_t MaxScoutRouteNodes() {
-    return static_cast<std::size_t>(std::max(core::Config{}.maxHops, 1)) + 1;
+    return kMaxRouteNodes;
 }
 
 NS_OBJECT_ENSURE_REGISTERED(ScoutHeader);
@@ -35,22 +56,30 @@ uint32_t ScoutHeader::GetSerializedSize() const {
 }
 
 void ScoutHeader::Serialize(Buffer::Iterator start) const {
-    const std::vector<uint8_t> bytes = core::encodeScout(m_scout);
-    start.Write(bytes.data(), static_cast<uint32_t>(bytes.size()));
+    BufferWireWriter w(start);
+    core::encodeScout(m_scout, w);
 }
 
 uint32_t ScoutHeader::Deserialize(Buffer::Iterator start) {
     constexpr auto kFixed = static_cast<uint32_t>(core::Scout::kFixedWireSize);
-    uint32_t n = std::min(start.GetRemainingSize(), kFixed);
-    std::vector<uint8_t> bytes(n);
-    if (n > 0) start.Read(bytes.data(), n);  // data() may be null when empty
+    std::array<uint8_t, kMaxScoutSize> scratch;
+    std::span<const uint8_t> bytes = ReadWireBytes(start, scratch, kFixed);
+    auto n = static_cast<uint32_t>(bytes.size());
     if (n == kFixed) {
         // The route count is the fixed part's last two bytes, little endian.
         const uint32_t count = bytes[kFixed - 2] | (uint32_t{bytes[kFixed - 1]} << 8);
         const uint32_t more = std::min(start.GetRemainingSize(), 4 * count);
-        bytes.resize(n + more);
-        if (more > 0) start.Read(bytes.data() + n, more);
-        n += more;
+        if (n + more > scratch.size()) {
+            // More nodes than the cap: decodeScout refuses it. Consume what
+            // the count announces, as for any scout.
+            start.Next(more);
+            m_valid = false;
+            m_scout = core::Scout{};
+            return n + more;
+        }
+        n +=
+            static_cast<uint32_t>(ReadWireBytes(start, std::span(scratch).subspan(n), more).size());
+        bytes = std::span<const uint8_t>(scratch).first(n);
     }
     const auto scout = core::decodeScout(bytes, MaxScoutRouteNodes());
     m_valid = scout.has_value();
@@ -75,57 +104,43 @@ Ptr<Packet> MakeScoutPacket(const core::Scout& scout) {
 }
 
 std::optional<core::Scout> DecodeScoutPacket(Ptr<const Packet> p) {
-    if (!p || p->GetSize() == 0) return std::nullopt;
-    std::vector<uint8_t> bytes(p->GetSize());
-    p->CopyData(bytes.data(), static_cast<uint32_t>(bytes.size()));
-    return core::decodeScout(bytes, MaxScoutRouteNodes());
+    // A longer payload is no scout decodeScout accepts: not copied.
+    if (!p || p->GetSize() == 0 || p->GetSize() > kMaxScoutSize) return std::nullopt;
+    std::array<uint8_t, kMaxScoutSize> scratch;
+    const uint32_t n = p->CopyData(scratch.data(), p->GetSize());
+    return core::decodeScout(std::span(scratch).first(n), MaxScoutRouteNodes());
 }
 
 Ptr<Packet> MakeSwarmPacket(const core::Swarm& swarm) {
+    swarm::core::FixedWireWriter<kMaxSwarmSize> w;
+    if (core::encodeSwarm(swarm, w) && w.ok())
+        return Create<Packet>(w.bytes().data(), static_cast<uint32_t>(w.size()));
+    // Longer than any swarm the router builds (SWARMSIZE foragers, routes at
+    // the cap): the vector encoder, so the bytes stay the same.
     const std::vector<uint8_t> bytes = core::encodeSwarm(swarm);
     if (bytes.empty()) return Create<Packet>();  // data() may be null
     return Create<Packet>(bytes.data(), static_cast<uint32_t>(bytes.size()));
 }
 
 std::optional<core::Swarm> DecodeSwarmPacket(Ptr<const Packet> p) {
-    if (!p || p->GetSize() == 0) return std::nullopt;
-    std::vector<uint8_t> bytes(p->GetSize());
-    p->CopyData(bytes.data(), static_cast<uint32_t>(bytes.size()));
-    return core::decodeSwarm(bytes, MaxScoutRouteNodes(), core::Config{}.swarmSize);
+    // A longer payload is no swarm decodeSwarm accepts: not copied.
+    if (!p || p->GetSize() == 0 || p->GetSize() > kMaxSwarmSize) return std::nullopt;
+    std::array<uint8_t, kMaxSwarmSize> scratch;
+    const uint32_t n = p->CopyData(scratch.data(), p->GetSize());
+    return core::decodeSwarm(std::span(scratch).first(n), MaxScoutRouteNodes(),
+                             core::Config{}.swarmSize);
 }
 
 namespace {
 
 constexpr uint8_t kUdp = 17;
-
-/// A copy of `p` from where the trailer sits: after the UDP header for UDP,
-/// all of it otherwise. Null when a UDP payload is shorter than a UDP header.
-Ptr<Packet> AtTrailer(Ptr<const Packet> p, uint8_t protocol) {
-    Ptr<Packet> q = p->Copy();
-    if (protocol == kUdp) {
-        UdpHeader udp;
-        if (q->GetSize() < udp.GetSerializedSize()) return nullptr;
-        q->RemoveHeader(udp);
-    }
-    return q;
-}
-
-}  // namespace
-
-namespace {
-
-/// The most bytes a trailer can take: both routes at the cap.
-uint32_t MaxTrailerSize() {
-    const auto cap = static_cast<uint32_t>(MaxScoutRouteNodes());
-    return static_cast<uint32_t>(core::RouteTrailer::kFixedWireSize +
-                                 core::RouteTrailer::kPiggybackFixedWireSize) +
-           8 * cap;
-}
+/// A UDP header's 8 bytes (UdpHeader::GetSerializedSize), before the trailer.
+constexpr uint32_t kUdpHeaderSize = 8;
 
 /// The trailer at the start of `bytes`: walks the layout
 /// (core/beeadhoc-trailer.h) to its end, each count bounded first, then
 /// decodes exactly those bytes.
-std::optional<RouteTrailerAt> TrailerIn(const std::vector<uint8_t>& bytes) {
+std::optional<RouteTrailerAt> TrailerIn(std::span<const uint8_t> bytes) {
     const std::size_t cap = MaxScoutRouteNodes();
     auto count = [&bytes](std::size_t at) -> std::optional<std::size_t> {
         if (bytes.size() < at + 2) return std::nullopt;
@@ -145,7 +160,7 @@ std::optional<RouteTrailerAt> TrailerIn(const std::vector<uint8_t>& bytes) {
         size += 2 + 4 * *m;
     }
     if (bytes.size() < size) return std::nullopt;
-    const auto t = core::decodeTrailer(std::span(bytes).first(size), cap);
+    const auto t = core::decodeTrailer(bytes.first(size), cap);
     if (!t) return std::nullopt;
     return RouteTrailerAt{*t, static_cast<uint32_t>(size)};
 }
@@ -171,13 +186,13 @@ uint32_t RouteTrailerHeader::GetSerializedSize() const {
 }
 
 void RouteTrailerHeader::Serialize(Buffer::Iterator start) const {
-    const std::vector<uint8_t> bytes = core::encodeTrailer(m_trailer);
-    if (!bytes.empty()) start.Write(bytes.data(), static_cast<uint32_t>(bytes.size()));
+    BufferWireWriter w(start);
+    core::encodeTrailer(m_trailer, w);  // writes nothing when it cannot be said
 }
 
 uint32_t RouteTrailerHeader::Deserialize(Buffer::Iterator start) {
-    std::vector<uint8_t> bytes(std::min(start.GetRemainingSize(), MaxTrailerSize()));
-    if (!bytes.empty()) start.Read(bytes.data(), static_cast<uint32_t>(bytes.size()));
+    std::array<uint8_t, kMaxTrailerSize> scratch;
+    const auto bytes = ReadWireBytes(start, scratch, kMaxTrailerSize);
     const auto t = TrailerIn(bytes);
     m_valid = t.has_value();
     m_trailer = t ? t->trailer : core::RouteTrailer{};
@@ -196,11 +211,14 @@ void RouteTrailerHeader::Print(std::ostream& os) const {
 
 std::optional<RouteTrailerAt> ReadRouteTrailer(Ptr<const Packet> p, uint8_t protocol) {
     if (!p) return std::nullopt;
-    Ptr<Packet> q = AtTrailer(p, protocol);
-    if (!q) return std::nullopt;
-    std::vector<uint8_t> bytes(std::min(q->GetSize(), MaxTrailerSize()));
-    if (!bytes.empty()) q->CopyData(bytes.data(), static_cast<uint32_t>(bytes.size()));
-    return TrailerIn(bytes);
+    // The trailer sits after the UDP header for UDP, at the front otherwise;
+    // a UDP payload shorter than a UDP header has none.
+    const uint32_t at = protocol == kUdp ? kUdpHeaderSize : 0;
+    if (p->GetSize() < at) return std::nullopt;
+    std::array<uint8_t, kUdpHeaderSize + kMaxTrailerSize> scratch;
+    const uint32_t n = p->CopyData(
+        scratch.data(), std::min(p->GetSize(), at + static_cast<uint32_t>(kMaxTrailerSize)));
+    return TrailerIn(std::span<const uint8_t>(scratch).subspan(at, n - at));
 }
 
 Ptr<Packet> AddRouteTrailer(Ptr<const Packet> payload, uint8_t protocol,
