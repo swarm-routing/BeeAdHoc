@@ -84,6 +84,9 @@ public:
     bool RouteInput(Ptr<const Packet> p, const Ipv4Header& header, Ptr<const NetDevice> idev,
                     const UnicastForwardCallback& ucb, const MulticastForwardCallback& mcb,
                     const LocalDeliverCallback& lcb, const ErrorCallback& ecb) override;
+    // The node's addresses changed: the cached broadcast addresses are stale.
+    void NotifyAddAddress(uint32_t interface, Ipv4InterfaceAddress address) override;
+    void NotifyRemoveAddress(uint32_t interface, Ipv4InterfaceAddress address) override;
 
 protected:
     void DoInitialize() override;
@@ -117,12 +120,20 @@ private:
                   const UnicastForwardCallback& ucb);
     static void DropData(Ptr<const Packet> payload, const Ipv4Header& header,
                          const ErrorCallback& ecb);
+    /// True when `dst` is the subnet-directed broadcast address of one of the
+    /// node's interfaces (Ipv4Address::IsBroadcast knows 255.255.255.255
+    /// only). Reads m_broadcasts, rebuilt from `ipv4` when stale.
+    bool SubnetBroadcast(Ptr<Ipv4> ipv4, Ipv4Address dst);
 
     /// The core's clock port. Clock() is const and the router takes a
     /// mutable reference; SwarmClock is stateless, so this one reads the same.
     SwarmClock m_clock;
     EnergyPort m_energy{*this};
     std::unique_ptr<core::Router> m_router;
+    /// Every interface address's broadcast address, sorted (#55): read per
+    /// data packet, rebuilt only after the node's addresses change.
+    std::vector<Ipv4Address> m_broadcasts;
+    bool m_broadcastsStale = true;
     TracedCallback<uint8_t, bool, uint32_t> m_scoutTx;
     TracedCallback<uint32_t> m_swarmTx;
 };
