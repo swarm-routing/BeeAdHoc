@@ -7,13 +7,13 @@ name: ns-3
 # supports), on the swarm-core release swarm-core.lock names (its `main` in
 # the canary leg), with every org quality gate swarm-core runs: strict warnings,
 # coverage (report-only, to Codecov), SonarQube Cloud, determinism, clang-format
-# and licence headers. routing-bench (swarm-routing/ns3-tools) is built beside
+# and licence headers. routing-bench (swarm-routing/sim-tools) is built beside
 # it so the harness arm (ns3/helper/beeadhoc-bench-arms.cc) compiles and runs.
 #
 # core/ also builds alone against the same swarm-core release, from its vcpkg
 # port (core.yml; swarm-routing/.github#489). This module builds on the same release (the tag in `dependencies`,
 # and in core-deps below); `canary-dependencies` builds on swarm-core and
-# ns3-tools main in one non-blocking leg on push, schedule and dispatch, never on
+# sim-tools main in one non-blocking leg on push, schedule and dispatch, never on
 # a PR (swarm-routing/.github#411). The `swarm-core / pin` check keeps every tag
 # on the lock's (swarm-routing/ns3-swarm-core#134).
 on:
@@ -56,12 +56,16 @@ jobs:
       # non-blocking canary leg, outside PRs (swarm-routing/.github#411)
       dependencies: |
         swarm-core=swarm-routing/swarm-adapter-ns3@v2.0.0
-        routing-bench=swarm-routing/ns3-tools@v1.0.0:ns3/routing-bench
+        routing-bench=swarm-routing/sim-tools@v1.1.4:ns3/routing-bench
       canary-dependencies: |
         swarm-core=swarm-routing/swarm-adapter-ns3@main
-        routing-bench=swarm-routing/ns3-tools@main:ns3/routing-bench
+        routing-bench=swarm-routing/sim-tools@main:ns3/routing-bench
       ns3-versions: ${{ inputs.ns3-versions || '["latest"]' }}
       profiles: ${{ inputs.ns3-versions != '' && inputs.profiles || '["debug", "sanitized"]' }}
+      # Automatic legs build in ns3-protocol-dev: swarm-core and routing-bench
+      # prebuilt at the releases above, so only this module compiles
+      # (swarm-routing/sim-containers#256); on-demand older releases keep ns3-dev.
+      protocol-image: ${{ inputs.ns3-versions == '' }}
       # Older images may predate these options: automatic `latest` legs only.
       strict-warnings: ${{ inputs.ns3-versions == '' }}
       coverage: ${{ inputs.ns3-versions == '' }}
