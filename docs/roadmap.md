@@ -33,7 +33,7 @@ flowchart LR
     V01["<b>v0.1.0</b><br/>core/ and docs/<br/>ungated"]
     V02["<b>v0.2.0</b><br/>gated:<br/>module + pipeline + anchor<br/>shipped 2026-11-16"]
     V021["<b>v0.2.1</b><br/>on the frozen<br/>swarm-core v1.0.0<br/>shipped 2026-11-16"]
-    V03["<b>v0.3.0</b><br/>reviewed"]
+    V03["<b>v0.3.0</b><br/>reviewed<br/>shipped 2026-11-25"]
     V10["<b>v1.0.0</b><br/>wire and core/ API<br/>frozen"]
 
     V01 --> V02 --> V021 --> V03 --> V10
@@ -41,11 +41,11 @@ flowchart LR
     style V01 fill:#e2f0ed,stroke:#0f7f70,stroke-width:2px
     style V02 fill:#e2f0ed,stroke:#0f7f70,stroke-width:2px
     style V021 fill:#e2f0ed,stroke:#0f7f70,stroke-width:2px
-    style V03 fill:#fff8e6,stroke:#c48f00,stroke-dasharray:4 3
+    style V03 fill:#e2f0ed,stroke:#0f7f70,stroke-width:2px
     style V10 fill:#f6dede,stroke:#c0392b,stroke-width:2px
 ```
 
-Green is shipped (v0.1.0, 2026-11-11; v0.2.0, 2026-11-16, with the anchor's written infeasibility verdict; v0.2.1, 2026-11-16, on swarm-core v1.0.0); amber is planned. v0.1.0 came before the
+Green is shipped (v0.1.0, 2026-11-11; v0.2.0, 2026-11-16, with the anchor's written infeasibility verdict; v0.2.1, 2026-11-16, on swarm-core v1.0.0; v0.3.0, 2026-11-25, reviewed against the papers); amber is planned. v0.1.0 came before the
 comparator gates by maintainer decision 2026-11-10, so no number from it counts
 as a benchmark result.
 
@@ -64,6 +64,7 @@ flowchart TB
         I27["#27 fidelity sheet review"]
         I55["#55 perf: forager take"]
         I97["#97 perf: swarm-core header<br/>path, cancellable timers"]
+        I242["#242 destination answers<br/>every scout copy"]
     end
     SC["swarm-core v0.1.0<br/>ns3-swarm-core#38 (closed)"]
     SC2["swarm-core v0.2.0<br/>adapter complete"]
@@ -78,14 +79,15 @@ flowchart TB
     I41 --> V02(["BeeAdHoc v0.2.0"])
     SC2 -->|"adopt the adapter additions"| V02
     V02 --> I5 & I27 & I55 & I97
-    I5 & I27 & I55 & I97 --> V03(["BeeAdHoc v0.3.0"])
+    I27 --> I242
+    I5 & I27 & I55 & I97 & I242 --> V03(["BeeAdHoc v0.3.0"])
     T3 -.->|"contract v2 readers"| V03
     V03 --> RUN["recorded released run<br/>(benchmarks global suite)"]
     BM --> RUN
     RUN --> V10(["BeeAdHoc v1.0.0"])
 
     style V02 fill:#e2f0ed,stroke:#0f7f70,stroke-width:2px
-    style V03 fill:#fff8e6,stroke:#c48f00,stroke-dasharray:4 3
+    style V03 fill:#e2f0ed,stroke:#0f7f70,stroke-width:2px
     style V10 fill:#f6dede,stroke:#c0392b,stroke-width:2px
 ```
 
@@ -103,7 +105,7 @@ after its v0.3.0 review; they need a `reusable-release.yml` `increment` input
 | **v0.1.0** | `core/` and `docs/` released, ungated. **Shipped 2026-11-11** ([release v0.1.0](https://github.com/swarm-routing/BeeAdHoc/releases/tag/v0.1.0)). It has not cleared the comparator gates (org golden rule 6), so no number from it counts. |
 | **v0.2.0** | **Gated.** The ns-3 module `beeadhoc` is green on swarm-core; the router observer is adopted; the protocol has its own benchmark pipeline; the anchor has a verdict (PASS, or a written infeasibility verdict); **the anchor missed (`bee-anchor-2`, 3 of 5 pause times, 2026-11-16), and v0.2.0 ships with its written infeasibility verdict ([`benchmarks/v0.2.0-anchor.md`](benchmarks/v0.2.0-anchor.md))**; the rows of `docs/fidelity.md` that read `unknown: unresolved` (no issue owns them, such as the link-failure row) are each settled by a recorded reading or repo choice. The rows that wait on the papers (`unknown: open #5`, re-checked by [#5](https://github.com/swarm-routing/BeeAdHoc/issues/5) and [#27](https://github.com/swarm-routing/BeeAdHoc/issues/27)) are not a v0.2.0 prerequisite; they belong to v0.3.0.<br/>Scope: [#36](https://github.com/swarm-routing/BeeAdHoc/issues/36) the simulator-agnostic core (data path, swarms, link failure); [#47](https://github.com/swarm-routing/BeeAdHoc/issues/47) the `beeadhoc` contrib module; [#41](https://github.com/swarm-routing/BeeAdHoc/issues/41) the pipeline of paired smoke and anchor campaigns. The decision on the two Listing 13.15 interpretations, [#4](https://github.com/swarm-routing/BeeAdHoc/issues/4), is already closed (2026-11-10), so the anchor runs against the recorded reading. |
 | **v0.2.1** | **On the frozen swarm-core.** **Shipped 2026-11-16** ([release v0.2.1](https://github.com/swarm-routing/BeeAdHoc/releases/tag/v0.2.1), Zenodo version DOI [10.5281/zenodo.24269446](https://doi.org/10.5281/zenodo.24269446)). A patch release built on swarm-core v1.0.0, whose API is frozen (swarm-routing/ns3-swarm-core#83): `swarm-core.lock` locks v1.0.0 (org-bot's pin bump, #161) and CI is green on it, with no API change on either side and no protocol change. Forced to a patch (`increment: PATCH`) by the maintainer's decision of 2026-11-16 (swarm-routing/ns3-swarm-core#83); the comparator gates are v0.2.0's, unchanged. |
-| **v0.3.0** | **Reviewed.** Every `release:v0.3.0` issue is closed, and each meets its own acceptance criteria:<br/>1. **The fidelity sheet is re-verified against the papers** ([#27](https://github.com/swarm-routing/BeeAdHoc/issues/27)): every row #27 lists that GECCO 2005 or SIS 2005 touches has a reading of the paper recorded on #27 (agrees, adds a value, or contradicts, with locators: section, page, figure); each changed value or reading is its own PR naming #27; and `fidelity.py verify` passes on every row that then cites [W05] or [WF05].<br/>2. **The anchor is re-read against GECCO 2005** ([#5](https://github.com/swarm-routing/BeeAdHoc/issues/5)): the trend `bee-anchor-2` tests ([PG460] §7.2.5) is confirmed or contradicted by the paper's own evaluation, with the open conditions on #27 (transport, runs, overhead count) and the BeeSec/BeeAIS evaluations noted on #5 checked, and the result is written into `docs/fidelity.md` *Anchor history*. A changed trend, scenario or gate is pre-registered under a new id on #5. *Proposed 2026-11-24, pending the maintainer's confirmation on [#209](https://github.com/swarm-routing/BeeAdHoc/issues/209):* running that new id is not a v0.3.0 prerequisite, and `bee-anchor-2`'s verdict stands until it runs.<br/>3. **The perf follow-ups are closed, class A** ([#55](https://github.com/swarm-routing/BeeAdHoc/issues/55) forager take without copies and the span-based route read; [#97](https://github.com/swarm-routing/BeeAdHoc/issues/97) swarm-core's non-allocating header path and cancellable timers, which is #55's scope item 3): same-seed output byte-identical before and after, and the determinism gate passes.<br/>4. **Any new mechanism is default-off** with its A/B on ≥ 20 paired seeds (org rules 5 and 6); none is planned.<br/>5. `release_check.py ready` passes.<br/>Not in scope (they land whenever they land): [#104](https://github.com/swarm-routing/BeeAdHoc/issues/104), [#106](https://github.com/swarm-routing/BeeAdHoc/issues/106), [#107](https://github.com/swarm-routing/BeeAdHoc/issues/107), [#99](https://github.com/swarm-routing/BeeAdHoc/issues/99), [#128](https://github.com/swarm-routing/BeeAdHoc/issues/128), and the secure-arm work [#219](https://github.com/swarm-routing/BeeAdHoc/issues/219)–[#221](https://github.com/swarm-routing/BeeAdHoc/issues/221). |
+| **v0.3.0** | **Reviewed.** **Shipped 2026-11-25** ([release v0.3.0](https://github.com/swarm-routing/BeeAdHoc/releases/tag/v0.3.0), Zenodo version DOI [10.5281/zenodo.24519542](https://doi.org/10.5281/zenodo.24519542)). Every `release:v0.3.0` issue is closed, and each meets its own acceptance criteria:<br/>1. **The fidelity sheet is re-verified against the papers** ([#27](https://github.com/swarm-routing/BeeAdHoc/issues/27)): every row #27 lists that GECCO 2005 or SIS 2005 touches has a reading of the paper recorded on #27 (agrees, adds a value, or contradicts, with locators: section, page, figure); each changed value or reading is its own PR naming #27; and `fidelity.py verify` passes on every row that then cites [W05] or [WF05].<br/>2. **The anchor is re-read against GECCO 2005** ([#5](https://github.com/swarm-routing/BeeAdHoc/issues/5)): the trend `bee-anchor-2` tests ([PG460] §7.2.5) is confirmed or contradicted by the paper's own evaluation, with the open conditions on #27 (transport, runs, overhead count) and the BeeSec/BeeAIS evaluations noted on #5 checked, and the result is written into `docs/fidelity.md` *Anchor history*. A changed trend, scenario or gate is pre-registered under a new id on #5; running that new id is not a v0.3.0 prerequisite, and `bee-anchor-2`'s verdict stands until it runs (maintainer decision 2026-11-24, [#209](https://github.com/swarm-routing/BeeAdHoc/issues/209)).<br/>#5 and #27 stay in v0.3.0: the papers are read by the maintainer, or from their text supplied in a session (maintainer decision 2026-11-24, #209).<br/>3. **The perf follow-ups are closed, class A** ([#55](https://github.com/swarm-routing/BeeAdHoc/issues/55) forager take without copies and the span-based route read; [#97](https://github.com/swarm-routing/BeeAdHoc/issues/97) swarm-core's non-allocating header path and cancellable timers, which is #55's scope item 3): same-seed output byte-identical before and after, and the determinism gate passes.<br/>3a. **The deviation the paper review found is fixed** ([#242](https://github.com/swarm-routing/BeeAdHoc/issues/242), added 2026-11-24 by maintainer decision): the destination answers every copy of a scout ([PG460] §13.5; [W05] §2.2), with its paired smoke A/B in #250.<br/>4. **Any new mechanism is default-off** with its A/B on ≥ 20 paired seeds (org rules 5 and 6); none is planned.<br/>5. `release_check.py ready` passes.<br/>Not in scope (they land whenever they land): [#104](https://github.com/swarm-routing/BeeAdHoc/issues/104), [#106](https://github.com/swarm-routing/BeeAdHoc/issues/106), [#107](https://github.com/swarm-routing/BeeAdHoc/issues/107), [#99](https://github.com/swarm-routing/BeeAdHoc/issues/99), [#128](https://github.com/swarm-routing/BeeAdHoc/issues/128), and the secure-arm work [#219](https://github.com/swarm-routing/BeeAdHoc/issues/219)–[#221](https://github.com/swarm-routing/BeeAdHoc/issues/221). |
 | **v1.0.0** | **Stability promise.** The wire format and the `core/` API are frozen; the protocol is paper-faithful with every deviation documented; the three comparator gates are passed; CI is green on the ns-3 release the org supports; a released run is recorded in the `benchmarks` global suite. |
 
 [#3](https://github.com/swarm-routing/BeeAdHoc/issues/3), the standalone-protocol epic, stays open until v0.2.0 ships.

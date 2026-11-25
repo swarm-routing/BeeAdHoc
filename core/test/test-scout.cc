@@ -2,10 +2,14 @@
 // SPDX-License-Identifier: MIT OR GPL-2.0-only
 //
 // The scout's wire header (golden rule 3): roundtrip, fail-closed decoding,
-// and a seeded fuzz.
+// and a seeded fuzz. The codecs' writer path (#97): any swarm-core wire writer
+// gives the vector encoders' bytes.
 #include "../beeadhoc-scout.h"
+#include "../beeadhoc-swarm.h"
+#include "../beeadhoc-trailer.h"
 #include "beeadhoc-core-tests.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <vector>
 
@@ -90,6 +94,58 @@ void TestScoutFuzz(Checker& c) {
         }
     }
     c.check(decoded > 0, "some mutations still decode");
+}
+
+void TestWriterPath(Checker& c) {
+    using swarm::core::FixedWireWriter;
+    auto same = [](const auto& w, const std::vector<std::uint8_t>& v) {
+        return w.ok() && std::ranges::equal(w.bytes(), v);
+    };
+    Scout empty;
+    empty.route.clear();
+    for (const Scout& s : {sample(), empty, Scout{}}) {
+        FixedWireWriter<Scout::kFixedWireSize + 4 * 11> w;
+        encodeScout(s, w);
+        c.check(same(w, encodeScout(s)), "scout: the writer path gives encodeScout's bytes");
+    }
+
+    RouteTrailer t;
+    t.route = {0, 1, -7, 3};
+    t.info = pushInfo(pushInfo(0, 4), 6);
+    for (const RouteTrailer& x : {t, RouteTrailer{}}) {
+        FixedWireWriter<128> w;
+        c.check(encodeTrailer(x, w) && same(w, encodeTrailer(x)), "trailer: the same bytes");
+    }
+    t.piggyback = RouteTrailer::Piggyback{{3, -7, 0}, 0x1FFu};
+    {
+        FixedWireWriter<128> w;
+        c.check(encodeTrailer(t, w) && same(w, encodeTrailer(t)), "piggybacked: the same bytes");
+    }
+    RouteTrailer tooLong;
+    tooLong.route.resize(70000);
+    {
+        FixedWireWriter<8> w;
+        c.check(!encodeTrailer(tooLong, w) && w.size() == 0 && encodeTrailer(tooLong).empty(),
+                "an unsayable trailer: nothing written, as the vector encoder's empty frame");
+    }
+
+    Swarm sw;
+    sw.source = 9;
+    sw.destination = -2;
+    sw.type = ForagerType::Throughput;
+    sw.route = {9, 4, -2};
+    sw.foragers = {{{-2, 4, 9}, pushInfo(0, 7)}, {{-2, 9}, 0x123456u}};
+    for (const Swarm& x : {sw, Swarm{}}) {
+        FixedWireWriter<256> w;
+        c.check(encodeSwarm(x, w) && same(w, encodeSwarm(x)), "swarm: the same bytes");
+    }
+    Swarm tooMany;
+    tooMany.foragers.resize(70000);
+    {
+        FixedWireWriter<8> w;
+        c.check(!encodeSwarm(tooMany, w) && w.size() == 0 && encodeSwarm(tooMany).empty(),
+                "an unsayable swarm: nothing written, as the vector encoder's empty frame");
+    }
 }
 
 }  // namespace beeadhoc::core::test

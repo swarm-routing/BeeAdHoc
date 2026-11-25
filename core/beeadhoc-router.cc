@@ -224,8 +224,16 @@ std::size_t Router::onLinkFailure(NodeAddress neighbor) {
 void Router::routeFound(NodeAddress dest) {
     // Any route to `dest` ends its search, an earlier ring's scout included,
     // and the held packets go.
-    if (searches_.erase(dest) == 0) return;
+    if (!endSearch(dest)) return;
     routeReady_(dest);
+}
+
+bool Router::endSearch(NodeAddress dest) {
+    const auto it = searches_.find(dest);
+    if (it == searches_.end()) return false;
+    timers_.cancel(it->second.resend);
+    searches_.erase(it);
+    return true;
 }
 
 void Router::sendScout(NodeAddress dest, Search& search) {
@@ -241,12 +249,14 @@ void Router::sendScout(NodeAddress dest, Search& search) {
     seen_.record(self_, s.id);  // its own scout echoed back is a repeat
     emit(ScoutDecision::broadcast(std::move(s)));
     const std::uint32_t id = search.id;
-    timers_.schedule(config_.scoutResendInterval, [this, dest, id] { onResendTimer(dest, id); });
+    search.resend = timers_.scheduleCancellable(config_.scoutResendInterval,
+                                                [this, dest, id] { onResendTimer(dest, id); });
 }
 
 void Router::onResendTimer(NodeAddress dest, std::uint32_t id) {
     auto it = searches_.find(dest);
-    if (it == searches_.end() || it->second.id != id) return;  // answered or superseded
+    // Answered or superseded: a scheduler without cancel still runs it.
+    if (it == searches_.end() || it->second.id != id) return;
     Search& search = it->second;
     if (search.ttl >= std::max<std::uint8_t>(config_.maxScoutTtl, 1) &&
         search.roundsAtMax >= config_.maxRoundsAtMaxTtl) {
@@ -276,10 +286,14 @@ void Router::onScout(const Scout& scout, NodeAddress /*from*/) {
 }
 
 void Router::onForwardScout(const Scout& scout) {
-    if (scout.source == self_ || !seen_.record(scout.source, scout.id)) return;
+    if (scout.source == self_) return;
     if (std::find(scout.route.begin(), scout.route.end(), self_) != scout.route.end()) return;
     const auto maxNodes = static_cast<std::size_t>(std::max(config_.maxHops, 1)) + 1;
 
+    // The destination test comes before the seen list, and the destination
+    // records nothing: it turns back every copy, each over its own path
+    // ([PG460] §13.5, prose after Listing 13.26; [W05] §2.2; #242). Relays
+    // keep the seen list.
     if (scout.destination == self_) {
         // Turn it back (mode 1 -> 2, Listing 13.26) with this node's own level
         // as the route's L-th value (maintainer decision 2026-11-10, #4).
@@ -293,6 +307,7 @@ void Router::onForwardScout(const Scout& scout) {
         return;
     }
 
+    if (!seen_.record(scout.source, scout.id)) return;
     // Relay: TTL left, and room for this node and the destination after it.
     if (scout.ttl <= 1 || scout.route.size() + 2 > maxNodes) return;
     Scout relay = scout;
@@ -336,7 +351,7 @@ void Router::onBackwardScout(const Scout& scout) {
     // unlike deliverData and onSwarm, this does not go through routeFound.
     // Kept as it was (#104), so a well-formed run is unchanged: foragers did
     // arrive, and releasing no held packet does nothing.
-    searches_.erase(scout.destination);
+    endSearch(scout.destination);
     routeReady_(scout.destination);
 }
 

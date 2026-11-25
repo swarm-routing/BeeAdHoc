@@ -11,19 +11,22 @@ namespace beeadhoc::core::test {
 
 namespace {
 
-constexpr std::array<NamedTest, 30> kTests{{
+constexpr std::array<NamedTest, 33> kTests{{
     {"scout: wire roundtrip", TestScoutRoundtrip},
     {"scout: the decoder fails closed", TestScoutFailsClosed},
     {"scout: seeded fuzz (fails or round-trips to itself)", TestScoutFuzz},
+    {"wire: the writer path gives the vector encoders' bytes (#97)", TestWriterPath},
     {"battery level bins", TestBatteryLevel},
     {"rating (Listing 13.15, #4)", TestRating},
     {"forager arrays: bounded, per type", TestForagerArrays},
     {"forager choice (Listing 13.17)", TestForagerChoice},
     {"forager store: MAXAGE collection, destination cap", TestForagerCollection},
     {"discovery: scout out, back, foragers home", TestDiscovery},
+    {"discovery: an ended search cancels its resend timer (#97)", TestResendCancelled},
     {"discovery: the destination's level is the L-th value", TestDestinationLevel},
     {"discovery: expanding ring and give-up", TestExpandingRing},
     {"discovery: seen list, hop and search caps", TestScoutBounds},
+    {"discovery: the destination answers every copy (#242)", TestDestinationAnswersEveryCopy},
     {"discovery: a returned scout with a repeated node is refused", TestScoutRouteRepeats},
     {"discovery: a late scout with no search out", TestLateScout},
     {"router: fixed seed, fixed trace", TestRouterDeterminism},

@@ -6,6 +6,7 @@
 // caps (golden rule 7) and a fixed-seed trace (org rule 5).
 #include "beeadhoc-core-tests.h"
 
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -36,6 +37,45 @@ void TestDiscovery(Checker& c) {
             "the forager's route, destination last");
     // 3 links at level 7 rate 8: the forager dances and stays.
     c.check(net.at(0).foragers().size(3, ForagerType::Energy) == 1, "a rated forager dances");
+}
+
+void TestResendCancelled(Checker& c) {
+    Config config;
+    config.initialScoutTtl = 4;
+    {
+        Network net(4, config, 1);
+        net.chain();
+        net.at(0).routeOutput(3, ForagerType::Energy);
+        c.check(net.clock().pendingCancellable() == 1, "the scout's resend timer is pending");
+        net.clock().runUntil(config.scoutResendInterval - 0.01);
+        c.check(!net.at(0).searching(3) && net.clock().cancelled() == 1 &&
+                    net.clock().pendingCancellable() == 0,
+                "the returned scout ends the search and cancels its resend (#97)");
+        net.clock().runUntil(10.0);
+        c.check(net.broadcasts(0) == 1 && net.ready.size() == 1,
+                "the cancelled resend never runs: no second scout, one RouteReady");
+    }
+    {
+        Network net(3, config, 13);
+        net.chain();
+        net.at(2).routeOutput(0, ForagerType::Energy);
+        net.clock().runUntil(1.0);  // 2 knows 0
+        net.at(0).routeOutput(2, ForagerType::Energy);
+        const std::size_t before = net.clock().cancelled();
+        const auto d = net.at(2).routeOutput(0, ForagerType::Energy);
+        c.check(net.carry(d.trailer, ForagerType::Energy).has_value(), "2 -> 0 delivered");
+        c.check(!net.at(0).searching(2) && net.clock().cancelled() == before + 1,
+                "a data packet from the destination ends the search and cancels its resend");
+    }
+    {
+        Network net(3, config, 3);
+        net.link(0, 1);  // node 2 is unreachable
+        net.at(0).routeOutput(2, ForagerType::Energy);
+        net.clock().runUntil(10.0);
+        c.check(net.discards.size() == 1 && net.clock().pendingCancellable() == 0 &&
+                    net.clock().cancelled() == 0,
+                "a search that gives up leaves no timer and cancels none");
+    }
 }
 
 void TestDestinationLevel(Checker& c) {
@@ -127,6 +167,33 @@ void TestScoutBounds(Checker& c) {
                     net.at(0).routeOutput(3, ForagerType::Energy).action == RouteAction::Drop,
                 "RXMTLISTLENGTH: no search past the cap");
     }
+}
+
+void TestDestinationAnswersEveryCopy(Checker& c) {
+    // A diamond 0 - {1, 2} - 3: two copies of one scout reach the destination
+    // over disjoint paths. The destination turns back each copy ([PG460]
+    // §13.5, [W05] §2.2; #242), so the source stores a forager per route.
+    Config config;
+    config.initialScoutTtl = 4;
+    Network net(4, config, 9);
+    net.link(0, 1);
+    net.link(0, 2);
+    net.link(1, 3);
+    net.link(2, 3);
+    net.at(0).routeOutput(3, ForagerType::Energy);
+    net.clock().runUntil(1.0);
+    int answers = 0;
+    for (const auto& line : net.log)
+        if (line.find(" 3>") != std::string::npos) ++answers;
+    c.check(answers == 2, "the destination turns back both copies");
+    c.check(net.at(0).foragers().size(3, ForagerType::Energy) == 2,
+            "two own foragers per type at the source");
+    // Draw until the array is used up: each forager is drawn at least once.
+    std::set<std::vector<NodeAddress>> routes;
+    for (int i = 0; i < 100 && net.at(0).foragers().size(3, ForagerType::Energy) > 0; ++i)
+        routes.insert(net.at(0).routeOutput(3, ForagerType::Energy).route);
+    c.check(routes == std::set<std::vector<NodeAddress>>{{1, 3}, {2, 3}},
+            "one forager over each path");
 }
 
 void TestScoutRouteRepeats(Checker& c) {
