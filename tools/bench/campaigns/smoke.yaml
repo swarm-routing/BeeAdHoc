@@ -5,10 +5,15 @@
 # The cells are swarm-routing/ns3-tools' two-arm smoke cells
 # (campaigns/anthocnet-aodv-smoke.toml: the paper grid under random waypoint,
 # and the near-static mesh at pause 300 s), with beeadhoc alone in the harness and
-# 20 seeds (1-20) in one job. Both arms run on ns3-dev 3.49-optimized
-# (e0719a5) by digest: ns-3's release profile on the release ns-3 supports
-# (swarm-routing/sim-containers#254). The anchors stay on 3.48-optimized
-# (fb7596b), the image their published numbers were measured on.
+# 20 seeds (1-20) in one job. Both arms run on ns3-dev `latest-optimized`
+# (ns-3's release profile on the release ns-3 supports), a rolling tag
+# (`rolling_image: true`, ns3-campaign v1.1.4+, swarm-routing/sim-tools#330):
+# the first `dispatch` resolves it to a digest and records it in the
+# campaign's state, every cell runs on that digest, and `verdicts` prints it
+# first, so a PR's verdict lines name the image. A new generation picks up the
+# next ns-3 release with no edit here (swarm-routing/sim-containers#254). The
+# anchors stay pinned by digest to 3.48-optimized (fb7596b), the image their
+# published numbers were measured on.
 #
 # For a PR: copy this plan, set `generation` to a new id and `pins` to the
 # PR's base and head commits, then (ns3-tools checked out next to this repo):
@@ -30,14 +35,15 @@
 # both cells, #41). The pins below are #108's merge commit (062d3cc: the core's
 # trailer, foreign foragers, piggybacks and swarms in the adapter, expected to
 # change every beeadhoc row) against its parent (7570629, #109: CI only).
-generation: smoke-062d3cc
+generation: smoke-062d3cc-rolling
 ref: main
 repo: swarm-routing/BeeAdHoc
 workflow: benchmark-cell.yml
 program: routing-compare
 cap: 4
 control: base
-image: ghcr.io/swarm-routing/ns3-dev@sha256:2fb198aa6761595b09716e347d1690f8fe6061dc88acd3e6b0f8cb47e4d70c96
+rolling_image: true
+image: ghcr.io/swarm-routing/ns3-dev:latest-optimized
 pins:
   base: {source_sha: 757062940b21980de112292339d4978919fc0b57}
   head: {source_sha: 062d3cc81404bd5cb4b6b3605f4523830938dcbc}
