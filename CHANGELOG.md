@@ -1,5 +1,7 @@
 ## v0.3.0 (2026-11-25)
 
+The "reviewed" release. The fidelity sheet is reviewed against the citation of record, GECCO 2005, and against SIS 2005 (#27). The one deviation that review found is fixed: the destination now answers every copy of a scout, as [PG460] §13.5 and GECCO 2005 §2.2 specify (#242, #250). That fix is a protocol behaviour change: its paired smoke A/B (20 seeds, in #250) shows higher control overhead (NRL +1.64 and +3.83 in the two smoke cells), and under mobility a lower 99th-percentile delay. The anchor `bee-anchor-2` is re-read against the papers (#5). Its MISS verdict stands, qualified: the papers measure pause times up to 60 s only. A second anchor in GECCO 2005's own scenario, `bee-anchor-w05`, is pre-registered and runs toward v1.0.0 (#251). The forager draw, the trailer forwarding, the header path and the scout-resend timer no longer allocate or run needlessly; each change keeps same-seed output byte-identical (#55, #97). The comparator gates have not been passed, so no number from this release counts as a benchmark result (org golden rule 6).
+
 ### Feat
 
 - **core**: take swarm-core from its vcpkg port (manifest mode) (#179)
