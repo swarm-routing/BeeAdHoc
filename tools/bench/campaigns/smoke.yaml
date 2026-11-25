@@ -35,7 +35,7 @@
 # both cells, #41). The pins below are #108's merge commit (062d3cc: the core's
 # trailer, foreign foragers, piggybacks and swarms in the adapter, expected to
 # change every beeadhoc row) against its parent (7570629, #109: CI only).
-generation: smoke-062d3cc
+generation: smoke-062d3cc-rolling
 ref: main
 repo: swarm-routing/BeeAdHoc
 workflow: benchmark-cell.yml
