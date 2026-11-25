@@ -49,7 +49,7 @@ concurrency:
 
 jobs:
   ci:
-    uses: swarm-routing/.github/.github/workflows/reusable-ns3-ci.yml@b833d62a6ba87bc9813d643a94e7ae252e305a44 # main@2026-11-24
+    uses: swarm-routing/.github/.github/workflows/reusable-ns3-ci.yml@a178f47d84bab60f932bde93a03fb1b031073d8b # main@2026-11-24
     with:
       modules: beeadhoc=ns3
       # released versions (swarm-routing/ns3-swarm-core#134); the moving refs in the
@@ -86,5 +86,5 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    uses: swarm-routing/.github/.github/workflows/reusable-codecov.yml@b833d62a6ba87bc9813d643a94e7ae252e305a44 # main@2026-11-24
+    uses: swarm-routing/.github/.github/workflows/reusable-codecov.yml@a178f47d84bab60f932bde93a03fb1b031073d8b # main@2026-11-24
 
