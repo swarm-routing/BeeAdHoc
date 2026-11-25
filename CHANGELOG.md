@@ -1,3 +1,21 @@
+## v0.3.0 (2026-11-25)
+
+### Feat
+
+- **core**: take swarm-core from its vcpkg port (manifest mode) (#179)
+
+### Fix
+
+- **core**: the destination answers every copy of a scout (#250)
+- **make**: the vcpkg branch of core-test clears a cached SWARM_CORE_DIR (#181)
+
+### Perf
+
+- **ns3**: serialize headers without a vector (#247)
+- **ns3**: forward the decoded trailer without copying its routes (#246)
+- **core**: cancel a scout's resend timer once its search ends (#245)
+- **core**: reuse the forager draw's candidate buffer (#237)
+
 ## v0.2.1 (2026-11-16)
 
 A patch release built on the frozen swarm-core v1.0.0 (swarm-routing/ns3-swarm-core#83): `swarm-core.lock` now locks swarm-core v1.0.0 (#161), whose API is frozen at `kSwarmCoreApiVersion` 2. BeeAdHoc itself is unchanged since v0.2.0: no protocol, wire-format or API change, and the comparator gates are v0.2.0's (the anchor's written infeasibility verdict, `docs/benchmarks/v0.2.0-anchor.md`). The release workflow gained an `increment` input (#162), used here to force the patch.
