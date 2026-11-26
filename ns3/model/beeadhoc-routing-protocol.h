@@ -32,8 +32,9 @@
 //  - link failure: core::Router::onLinkFailure removes the foragers over the
 //    failed link (fidelity row "A failed next link"); the packet under it is
 //    lost, as the row says.
-//  - the battery: the node's EnergyMetricHook through the base's Energy()
-//    port; with none, the core reads "no battery data", level 7 (§13.1.2).
+//  - the battery: the node's EnergyMetricHook through the base's
+//    EnergyProvider() port (swarm-core's IEnergyProvider); with none, the
+//    source is Unknown and the core reads "no battery data", level 7 (§13.1.2).
 // Every data packet is the energy type: the kernel module measures only
 // energy (§13.2.2), and the base hands the adapter no IP header to read a TOS
 // from (accepted by the maintainer on 2026-11-11,
@@ -100,12 +101,12 @@ protected:
     void OnLinkFailure(Ipv4Address neighbor) override;
 
 private:
-    /// The core's energy port: the base's Energy() read on every call, so an
-    /// EnergyMetricHook installed after the protocol is still seen.
-    class EnergyPort : public swarm::core::IEnergy {
+    /// The core's energy port: the base's EnergyProvider() read on every
+    /// call, so an EnergyMetricHook installed after the protocol is still seen.
+    class EnergyPort : public swarm::core::IEnergyProvider {
     public:
         explicit EnergyPort(const RoutingProtocol& owner) : m_owner(owner) {}
-        double residualEnergyFraction() const override;
+        swarm::core::EnergySnapshot snapshot() const override;
 
     private:
         const RoutingProtocol& m_owner;

@@ -11,6 +11,7 @@
 #include "../beeadhoc-router.h"
 #include "beeadhoc-check.h"
 
+#include <cmath>
 #include <cstdint>
 #include <functional>
 #include <limits>
@@ -81,11 +82,15 @@ private:
     std::priority_queue<Event, std::vector<Event>, std::greater<>> events_;
 };
 
-/// A battery that reports a fixed residual fraction (NaN: no battery data).
-class FixedEnergy : public swarm::core::IEnergy {
+/// A battery that reports a fixed residual fraction (NaN: no battery data,
+/// an Unknown source, as the adapter's SwarmEnergyProvider gives).
+class FixedEnergy : public swarm::core::IEnergyProvider {
 public:
     double fraction = std::numeric_limits<double>::quiet_NaN();
-    double residualEnergyFraction() const override { return fraction; }
+    swarm::core::EnergySnapshot snapshot() const override {
+        if (std::isnan(fraction)) return {};
+        return {swarm::core::PowerSource::Battery, fraction};
+    }
 };
 
 /// Routers on a fixed graph. Every scout a router sends is encoded, then

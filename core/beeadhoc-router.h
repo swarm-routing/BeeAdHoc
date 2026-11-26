@@ -79,7 +79,7 @@ public:
     /// `rng`, so a fixed seed behaves the same with and without one.
     Router(NodeAddress self, const Config& config, swarm::core::IClock& clock,
            swarm::core::IRng& rng, swarm::core::ITimerScheduler& timers,
-           swarm::core::IEnergy& energy, Sink sink, RouteReady routeReady,
+           const swarm::core::IEnergyProvider& energy, Sink sink, RouteReady routeReady,
            swarm::core::IRouterObserver* observer = nullptr);
 
     Router(const Router&) = delete;
@@ -166,7 +166,7 @@ private:
     swarm::core::IClock& clock_;
     swarm::core::IRng& rng_;
     swarm::core::ITimerScheduler& timers_;
-    swarm::core::IEnergy& energy_;
+    const swarm::core::IEnergyProvider& energy_;
     Sink sink_;
     RouteReady routeReady_;
     SwarmSink swarmSink_;

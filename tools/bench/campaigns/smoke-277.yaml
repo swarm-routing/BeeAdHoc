@@ -1,0 +1,29 @@
+# The change-test smoke for #277 (the battery read through swarm-core's
+# IEnergyProvider): a copy of smoke.yaml (see it for the procedure and the
+# cells), with its own generation and the PR's pins. Base: main at 467a4d0
+# (#279, the ns-3 build on swarm-adapter-ns3 v2.2.0); head: 03a3e57, the port
+# change (core/beeadhoc-router.*, the adapter's EnergyPort). Expected: no
+# difference (the battery level is the same on every input).
+generation: smoke-277-03a3e57
+ref: main
+repo: swarm-routing/BeeAdHoc
+workflow: benchmark-cell.yml
+program: routing-compare
+cap: 4
+control: base
+rolling_image: true
+image: ghcr.io/swarm-routing/ns3-dev:latest-optimized
+pins:
+  base: {source_sha: 467a4d0be8a7b88bcffa7b323cd13dbf073a49f9}
+  head: {source_sha: 03a3e5741d9681e045f0aad9c71ab5c414fcfc8b}
+
+arms:
+  base: ""
+  head: ""
+
+cells:
+  grid-rwp: {workflow: benchmark-cell.yml, inputs: {harness: routing-compare, args: "--scenario=paper --nNodes=50 --time=300 --areaX=1500 --areaY=300 --speed=20 --pause=30 --range=300 --propagation=range --mobility=rwp --transport=udp --diag --firstRun=1 --runs=20 --protocols=beeadhoc"}}
+  static-mesh: {workflow: benchmark-cell.yml, inputs: {harness: routing-compare, args: "--scenario=paper --nNodes=50 --time=300 --areaX=1500 --areaY=300 --speed=20 --pause=300 --range=300 --propagation=range --mobility=rwp --transport=udp --diag --firstRun=1 --runs=20 --protocols=beeadhoc"}}
+
+jobs:
+  - {arms: [base, head], cells: "*"}
