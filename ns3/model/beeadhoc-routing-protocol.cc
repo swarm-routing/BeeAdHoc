@@ -73,8 +73,8 @@ RoutingProtocol::RoutingProtocol() = default;
 
 RoutingProtocol::~RoutingProtocol() = default;
 
-double RoutingProtocol::EnergyPort::residualEnergyFraction() const {
-    return m_owner.Energy().residualEnergyFraction();
+swarm::core::EnergySnapshot RoutingProtocol::EnergyPort::snapshot() const {
+    return m_owner.EnergyProvider().snapshot();
 }
 
 void RoutingProtocol::DoInitialize() {

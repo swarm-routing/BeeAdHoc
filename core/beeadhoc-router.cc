@@ -12,7 +12,7 @@ using swarm::core::RouteAction;
 
 Router::Router(NodeAddress self, const Config& config, swarm::core::IClock& clock,
                swarm::core::IRng& rng, swarm::core::ITimerScheduler& timers,
-               swarm::core::IEnergy& energy, Sink sink, RouteReady routeReady,
+               const swarm::core::IEnergyProvider& energy, Sink sink, RouteReady routeReady,
                swarm::core::IRouterObserver* observer)
     : self_(self), config_(config), clock_(clock), rng_(rng), timers_(timers), energy_(energy),
       sink_(std::move(sink)), routeReady_(std::move(routeReady)), observer_(observer),
@@ -23,7 +23,7 @@ Router::Router(NodeAddress self, const Config& config, swarm::core::IClock& cloc
 }
 
 std::uint8_t Router::ownLevel() const {
-    return batteryLevel(energy_.residualEnergyFraction());
+    return batteryLevel(energy_.snapshot().residualFraction());
 }
 
 DataDecision Router::decide(NodeAddress dest, DataDecision d) {
