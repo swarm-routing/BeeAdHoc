@@ -36,9 +36,10 @@ test: core-test swarm-adapter ## the fast tests CI runs on every PR
 	$(NS3_RUN) --test swarm-core=/src/swarm-adapter-ns3 beeadhoc=/src/beeadhoc/ns3
 
 swarm-adapter:  # swarm-adapter-ns3 at SWARM_ADAPTER_REF in SWARM_ADAPTER_NS3, for the ns-3 build
-	@[ -n "$(SWARM_ADAPTER_REF)" ] || { echo "make: no swarm-adapter-ns3 tag in .github/workflows/ns3.yml dependencies:" >&2; exit 2; }
-	@[ -e "$(SWARM_ADAPTER_NS3)" ] || git -c advice.detachedHead=false clone -q --depth 1 --branch "$(SWARM_ADAPTER_REF)" https://github.com/swarm-routing/swarm-adapter-ns3 "$(SWARM_ADAPTER_NS3)"
-	@tag=$$(git -C "$(SWARM_ADAPTER_NS3)" rev-parse -q --verify "refs/tags/$(SWARM_ADAPTER_REF)^{commit}" 2>/dev/null); \
+	@[ -e "$(SWARM_ADAPTER_NS3)" ] || { [ -n "$(SWARM_ADAPTER_REF)" ] || { echo "make: no swarm-adapter-ns3 tag in .github/workflows/ns3.yml dependencies: (pass SWARM_ADAPTER_REF=<tag> or SWARM_ADAPTER_NS3=<checkout>)" >&2; exit 2; }; \
+	  git -c advice.detachedHead=false clone -q --depth 1 --branch "$(SWARM_ADAPTER_REF)" https://github.com/swarm-routing/swarm-adapter-ns3 "$(SWARM_ADAPTER_NS3)"; }
+	@[ -n "$(SWARM_ADAPTER_REF)" ] || { echo "make: no swarm-adapter-ns3 tag known (no .github/workflows/ns3.yml): building on $(SWARM_ADAPTER_NS3) as it is" >&2; exit 0; }; \
+	  tag=$$(git -C "$(SWARM_ADAPTER_NS3)" rev-parse -q --verify "refs/tags/$(SWARM_ADAPTER_REF)^{commit}" 2>/dev/null); \
 	  [ -n "$$tag" ] && [ "$$tag" = "$$(git -C "$(SWARM_ADAPTER_NS3)" rev-parse HEAD 2>/dev/null)" ] || \
 	  echo "make: $(SWARM_ADAPTER_NS3) is not at swarm-adapter-ns3 $(SWARM_ADAPTER_REF), the tag CI builds on" >&2
 
