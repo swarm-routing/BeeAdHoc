@@ -147,8 +147,15 @@ if(BEEADHOC_CORE_TESTS)
   target_link_libraries(beeadhoc_core_tests PRIVATE beeadhoc_core)
   target_compile_options(beeadhoc_core_tests PRIVATE ${BEEADHOC_WARNINGS})
 
+  # swarm-core's protocol contract suite (testbench/swarm-contract-tests.h,
+  # header-only on swarm::core; #198): its own executable, as its README asks.
+  add_executable(beeadhoc_contract_tests test/test-contract.cc)
+  target_link_libraries(beeadhoc_contract_tests PRIVATE beeadhoc_core)
+  target_compile_options(beeadhoc_contract_tests PRIVATE ${BEEADHOC_WARNINGS})
+
   enable_testing()
   add_test(NAME beeadhoc-core COMMAND beeadhoc_core_tests)
+  add_test(NAME beeadhoc-contract COMMAND beeadhoc_contract_tests)
 endif()
 
 if(BEEADHOC_CORE_INSTALL)
