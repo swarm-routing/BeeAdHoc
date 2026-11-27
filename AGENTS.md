@@ -28,7 +28,7 @@ core/       simulator-agnostic agents, forager arrays, metrics + unit tests (MIT
   beeadhoc-swarm.*     the swarm (Listing 13.30, §13.7.3): SWARMSIZE foreign foragers sent home, its versioned wire format
   beeadhoc-trailer.*   the data packet's source-route trailer (route, info, one piggybacked forager) and its versioned wire format
   beeadhoc-router.*    per-node state and decisions (ports in, RouteDecisions out)
-  test/                the core tests (plain CMake + ctest; the ns-3 suite runs the same list); test/consumer-package/: a find_package(beeadhoc-core) consumer
+  test/                the core tests (plain CMake + ctest; the ns-3 suite runs the same list); test/test-contract.cc: swarm-core's protocol contract suite (ctest `beeadhoc-contract`, #198); test/consumer-package/: a find_package(beeadhoc-core) consumer
   beeadhoc-coreConfig.cmake.in   the CMake package beeadhoc-core (BEEADHOC_CORE_INSTALL, on swarm-core's package; #142)
 ns3/        contrib module `beeadhoc` (GPL-2.0-only), compiling core/ on swarm-core
   model/beeadhoc-header.*            ScoutHeader, the swarm payload, and the RouteTrailer right after each data packet's UDP header (core/'s codecs)
