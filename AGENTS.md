@@ -67,8 +67,10 @@ cache stays off for the protocol cores, swarm-routing/.github#489).
 unreleased swarm-core). `swarm-core.lock` stays the record of the release the
 ns-3 build uses (tag, commit, version, and the SHA256 of
 `swarm-core-<ver>.tar.gz` from the release's `SHA256SUMS`;
-swarm-routing/ns3-swarm-core#134). The `Makefile`'s `SWARM_CORE_REF` and the ns-3
-build's `swarm-core=` dependency name the lock's tag; `core-deps` in
+swarm-routing/ns3-swarm-core#134). The `Makefile`'s `SWARM_CORE_REF` names the lock's
+tag; the ns-3 build's `swarm-core=` module is swarm-routing/swarm-adapter-ns3
+at the tag `ns3.yml`'s `dependencies:` pins, which the `Makefile`'s
+`SWARM_ADAPTER_REF` reads from that file; `core-deps` in
 `.github/workflows/licence.yml` and `.github/workflows/ns3.yml` (the licence
 boundary is pinned by commit, golden rule 2) and the `swarm-core=` line of
 `.github/workflows/benchmark-cell.yml` (a cell's build mode takes a commit)
@@ -94,20 +96,20 @@ CONTRIBUTING invariant 7). The
 same locally:
 
 ```bash
-docker run --rm -v "$PWD:/src/beeadhoc:ro" -v "$PWD/../ns3-swarm-core:/src/ns3-swarm-core:ro" \
+docker run --rm -v "$PWD:/src/beeadhoc:ro" -v "$PWD/../swarm-adapter-ns3:/src/swarm-adapter-ns3:ro" \
     ghcr.io/swarm-routing/ns3-dev:latest-debug \
     ns3-build-contrib --strict-warnings --quality-modules beeadhoc --test \
-    swarm-core=/src/ns3-swarm-core beeadhoc=/src/beeadhoc/ns3
+    swarm-core=/src/swarm-adapter-ns3 beeadhoc=/src/beeadhoc/ns3
 ```
 
-(`make test` does the same with `SWARM_CORE_NS3=<checkout>`, default
-`../ns3-swarm-core`). To build the harness arm and run it in the same
+(`make test` does the same with `SWARM_ADAPTER_NS3=<checkout>`, default
+`../swarm-adapter-ns3`, cloned at `SWARM_ADAPTER_REF` when missing). To build the harness arm and run it in the same
 container, also mount `swarm-routing/ns3-tools` at `/src/ns3-tools`, add
 `routing-bench=/src/ns3-tools/ns3/routing-bench` before `beeadhoc=`, and pass
 `--run "routing-compare --scenario=paper --nNodes=20 --time=30 --runs=1
 --protocols=beeadhoc"` to `ns3-build-contrib`. CI
 (`.github/workflows/ns3.yml`) passes `dependencies:
-swarm-core=swarm-routing/ns3-swarm-core@<swarm-core.lock's tag>` and
+swarm-core=swarm-routing/swarm-adapter-ns3@<a swarm-adapter-ns3 release>` and
 `routing-bench=swarm-routing/ns3-tools@<an ns3-tools release>:ns3/routing-bench` (releases; the same at `@main` in `canary-dependencies`, a non-blocking leg outside PRs), runs
 `routing-compare --scenario=paper --nNodes=20 --time=30 --runs=1
 --protocols=beeadhoc` as the smoke and `beeadhoc-example --seed={seed}` as the

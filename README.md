@@ -43,23 +43,25 @@ make core-test VCPKG_ROOT=/path/to/vcpkg   # cmake -S core -B build/core -DCMAKE
 ```
 
 The ns-3 module, in the org's `ns3-dev` image (docker), with
-[`swarm-routing/ns3-swarm-core`](https://github.com/swarm-routing/ns3-swarm-core)
-checked out beside this repository. The test suite (`test.py -s beeadhoc`):
+[`swarm-routing/swarm-adapter-ns3`](https://github.com/swarm-routing/swarm-adapter-ns3)
+(the ns-3 module `swarm-core`) checked out beside this repository at the tag
+`.github/workflows/ns3.yml` pins (`make build`/`make test` clone it there when
+it is missing; `SWARM_ADAPTER_NS3=<checkout>` picks another). The test suite (`test.py -s beeadhoc`):
 
 ```bash
-docker run --rm -v "$PWD:/src/beeadhoc:ro" -v "$PWD/../ns3-swarm-core:/src/ns3-swarm-core:ro" \
+docker run --rm -v "$PWD:/src/beeadhoc:ro" -v "$PWD/../swarm-adapter-ns3:/src/swarm-adapter-ns3:ro" \
     ghcr.io/swarm-routing/ns3-dev:latest-debug \
     ns3-build-contrib --strict-warnings --quality-modules beeadhoc --test \
-    swarm-core=/src/ns3-swarm-core beeadhoc=/src/beeadhoc/ns3
+    swarm-core=/src/swarm-adapter-ns3 beeadhoc=/src/beeadhoc/ns3
 ```
 
 The example, a small random-waypoint MANET (replace `--test` with `--run`):
 
 ```bash
-docker run --rm -v "$PWD:/src/beeadhoc:ro" -v "$PWD/../ns3-swarm-core:/src/ns3-swarm-core:ro" \
+docker run --rm -v "$PWD:/src/beeadhoc:ro" -v "$PWD/../swarm-adapter-ns3:/src/swarm-adapter-ns3:ro" \
     ghcr.io/swarm-routing/ns3-dev:latest-debug \
     ns3-build-contrib --run "beeadhoc-example --seed=1" \
-    swarm-core=/src/ns3-swarm-core beeadhoc=/src/beeadhoc/ns3
+    swarm-core=/src/swarm-adapter-ns3 beeadhoc=/src/beeadhoc/ns3
 ```
 
 The `beeadhoc` arm of the comparison harness, with
@@ -67,11 +69,11 @@ The `beeadhoc` arm of the comparison harness, with
 checked out beside this repository:
 
 ```bash
-docker run --rm -v "$PWD:/src/beeadhoc:ro" -v "$PWD/../ns3-swarm-core:/src/ns3-swarm-core:ro" \
+docker run --rm -v "$PWD:/src/beeadhoc:ro" -v "$PWD/../swarm-adapter-ns3:/src/swarm-adapter-ns3:ro" \
     -v "$PWD/../ns3-tools:/src/ns3-tools:ro" ghcr.io/swarm-routing/ns3-dev:latest-debug \
     ns3-build-contrib \
     --run "routing-compare --scenario=paper --nNodes=20 --time=30 --runs=1 --protocols=beeadhoc" \
-    swarm-core=/src/ns3-swarm-core routing-bench=/src/ns3-tools/ns3/routing-bench beeadhoc=/src/beeadhoc/ns3
+    swarm-core=/src/swarm-adapter-ns3 routing-bench=/src/ns3-tools/ns3/routing-bench beeadhoc=/src/beeadhoc/ns3
 ```
 
 More (sanitizers, the pin, benchmark campaigns): [AGENTS.md](AGENTS.md) "Build & verify".
